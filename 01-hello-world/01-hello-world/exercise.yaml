@@ -1,0 +1,14 @@
+name: hello-world
+input:
+- language: English
+  text: "Hello world!"
+- language: Hungarian
+  text: "Helló Világ!"
+- language: Croatian
+  text: "Pozdrav svijete!"
+- language: Finnish
+  text: "Hei maailma!"
+- language: German
+  text: "Hallo Welt!"
+- language: Zulu
+  text: "Sawubona Mhlaba!"

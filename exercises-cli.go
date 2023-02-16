@@ -22,7 +22,8 @@ var (
 )
 
 func main() {
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	// log.SetFlags(log.LstdFlags | log.Lshortfile)
+	log.SetFlags(0)
 	log.SetPrefix("exercises-cli: ")
 	flag.Usage = Usage
 	flag.Parse()

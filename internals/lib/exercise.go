@@ -1,11 +1,14 @@
 package lib
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
 	yaml "gopkg.in/yaml.v3"
 )
+
+var _ = fmt.Sprintf("%d", 1)
 
 const (
 	ExerciseFileName = "exercise.yaml"
@@ -33,5 +36,6 @@ func NewExercise(dir string) (*Exercise, error) {
 
 // GetInput chooses an input from the given exercise using the student id
 func (ex *Exercise) GetInput(id string) Input {
-	return ex.Input[GetStudentHash(id)%len(ex.Input)]
+	index := GetStudentHash(id) % len(ex.Input)
+	return ex.Input[index]
 }

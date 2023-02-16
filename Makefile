@@ -1,6 +1,7 @@
 # exercise subdirs
 EXERCISE_DIRS=\
-	01-hello-world
+	01-hello-world \
+	19-structs
 
 STUDENT_ID_FILE=STUDENT_ID
 
@@ -9,16 +10,19 @@ STUDENT_ID_FILE=STUDENT_ID
 
 # check if STUDENT_ID is set
 check:
+	export STUDENT_ID=$(STUDENT_ID)
 	@if [ ! -s "$(STUDENT_ID_FILE)" -o ! -r "$(STUDENT_ID_FILE)" ]; then \
 		echo "ERROR: '$(STUDENT_ID_FILE)' is not readable or has zero content"; exit 1; \
 	fi
 
 # run go generate
 generate:
+	export STUDENT_ID=$(STUDENT_ID)
 	go generate ./...
 
 # run the tests
 test:
+	export STUDENT_ID=$(STUDENT_ID)
 	go test ./... -v
 
 # clean up generated files

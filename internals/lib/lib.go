@@ -3,6 +3,7 @@ package lib
 import (
 	"fmt"
 	"hash/fnv"
+	"log"
 	"os"
 	"path/filepath"
 	"text/template"
@@ -62,6 +63,8 @@ func Generate(id string) error {
 	if err != nil {
 		return err
 	}
+
+	log.Printf("Generating exercise %q in dir %q\n", ex.Name, cwd)
 
 	input := ex.GetInput(id)
 

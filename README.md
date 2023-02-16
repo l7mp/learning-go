@@ -37,14 +37,15 @@ make test
 Add a new subdirectory and add the following files:
 - `exercise.yaml`: An exercise definition with a set of inputs, from which `make generate` will
   choose one by hashing on the student id to generate the exercise.
+- `exercise.go`: Placeholder for the solution.
 - `.README.md`: a README template with instructions.
 - `.exercise_test.go`: the test file to check your solutions.
 
 If you add a new top-level directory, don't forget to include it in the `EXERCISE_DIRS` in the
 Makefile.
 
-Then run `make realclean`, this will add the placeholders for the exercise (these will be
-overwritten by `make generate`), add all files in the exercise dir to the git repo, and git-push.
+Then run `make clean`, this will add the placeholders for the exercise (these will be overwritten
+by `make generate`), add all files in the exercise dir to the git repo, and git-push.
 
 ## Clean up
 

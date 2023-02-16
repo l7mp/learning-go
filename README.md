@@ -6,7 +6,15 @@ but it is enough to get the basics and start to learn the advanced stuff on your
 
 ## Getting started
 
-Change to the root of the git repo and 
+Change to the root of the git repo and generate the exercises:
+
+``` console
+echo <MY-STUDENT-ID> > STUDENT_ID
+make generate
+```
+
+Your student id should always be available in the file named `STUDENT_ID` in the main
+directory. You can override this by setting the id in the `STUDENT_ID` environment variable.
 
 ## Write code
 
@@ -23,6 +31,20 @@ At any point in time you can test your solutions as follows.
 make generate
 make test
 ```
+
+## Add a new exercise
+
+Add a new subdirectory and add the following files:
+- `exercise.yaml`: An exercise definition with a set of inputs, from which `make generate` will
+  choose one by hashing on the student id to generate the exercise.
+- `.README.md`: a README template with instructions.
+- `.exercise_test.go`: the test file to check your solutions.
+
+If you add a new top-level directory, don't forget to include it in the `EXERCISE_DIRS` in the
+Makefile.
+
+Then run `make realclean`, this will add the placeholders for the exercise (these will be
+overwritten by `make generate`), add all files in the exercise dir to the git repo, and git-push.
 
 ## Clean up
 

@@ -25,27 +25,22 @@ func TestString(t *testing.T) {
 func TestList(t *testing.T) {
 	games := newGameList()
 
-	assert.Len(t, games, 4, "gamelist len")
+	assert.Len(t, games, 3, "gamelist len")
 
- 	assert.Equal(t, g[0].id, {{index . "list" 0 "id"}}, "game 0 id")
-	assert.Equal(t, g[0].name, "{{index . "list" 0 "name"}}", "game 0 name")
-	assert.Equal(t, g[0].price, {{index . "list" 0 "price"}}, "game 0 price")
-	assert.Equal(t, g[0].genre, "{{index . "list" 0 "genre"}}", "game 0 genre")
+ 	assert.Equal(t, games[0].id, {{index . "list" 0 "id"}}, "game 0 id")
+	assert.Equal(t, games[0].name, "{{index . "list" 0 "name"}}", "game 0 name")
+	assert.Equal(t, games[0].price, {{index . "list" 0 "price"}}, "game 0 price")
+	assert.Equal(t, games[0].genre, "{{index . "list" 0 "genre"}}", "game 0 genre")
 
- 	assert.Equal(t, g[1].id, {{index . "list" 1 "id"}}, "game 1 id")
-	assert.Equal(t, g[1].name, "{{index . "list" 1 "name"}}", "game 1 name")
-	assert.Equal(t, g[1].price, {{index . "list" 1 "price"}}, "game 1 price")
-	assert.Equal(t, g[1].genre, "{{index . "list" 1 "genre"}}", "game 1 genre")
+ 	assert.Equal(t, games[1].id, {{index . "list" 1 "id"}}, "game 1 id")
+	assert.Equal(t, games[1].name, "{{index . "list" 1 "name"}}", "game 1 name")
+	assert.Equal(t, games[1].price, {{index . "list" 1 "price"}}, "game 1 price")
+	assert.Equal(t, games[1].genre, "{{index . "list" 1 "genre"}}", "game 1 genre")
 
- 	assert.Equal(t, g[2].id, {{index . "list" 2 "id"}}, "game 2 id")
-	assert.Equal(t, g[2].name, "{{index . "list" 2 "name"}}", "game 2 name")
-	assert.Equal(t, g[2].price, {{index . "list" 2 "price"}}, "game 2 price")
-	assert.Equal(t, g[2].genre, "{{index . "list" 2 "genre"}}", "game 2 genre")
-
- 	assert.Equal(t, g[3].id, {{index . "list" 3 "id"}}, "game 3 id")
-	assert.Equal(t, g[3].name, "{{index . "list" 3 "name"}}", "game 3 name")
-	assert.Equal(t, g[3].price, {{index . "list" 3 "price"}}, "game 3 price")
-	assert.Equal(t, g[3].genre, "{{index . "list" 3 "genre"}}", "game 3 genre")
+ 	assert.Equal(t, games[2].id, {{index . "list" 2 "id"}}, "game 2 id")
+	assert.Equal(t, games[2].name, "{{index . "list" 2 "name"}}", "game 2 name")
+	assert.Equal(t, games[2].price, {{index . "list" 2 "price"}}, "game 2 price")
+	assert.Equal(t, games[2].genre, "{{index . "list" 2 "genre"}}", "game 2 genre")
 }
 
 func TestById(t *testing.T) {
@@ -56,7 +51,7 @@ func TestById(t *testing.T) {
 	assert.Equal(t, g.price, {{index . "by_id" "result" "price"}}, "game price")
 	assert.Equal(t, g.genre, "{{index . "by_id" "result" "genre"}}", "game genre")
 
-	g, err := queryById(newGameList(), 11)
+	g, err = queryById(newGameList(), 11)
 	assert.EqualError(t, err, "No such game", "error")
 }
 

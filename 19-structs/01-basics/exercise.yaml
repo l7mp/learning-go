@@ -11,7 +11,6 @@ input:
       game_result: "Game 2: x-com 2 costs 30 of genre strategy"
     list:
       - {id: 1, name: "god of war", price: 50, genre: "action adventure"}
-      - {id: 2, name: "x-com 2", price: 30, genre: "strategy"}
       - {id: 3, name: "minecraft", price: 20, genre: "sandbox"}
       - {id: 4, name: "warcraft", price: 40, genre: "strategy"}
     by_id:
@@ -30,7 +29,6 @@ input:
       item_result: "3: minecraft costs 20"
       game_result: "Game 3: minecraft costs 20 of genre sandbox"
     list:
-      - {id: 1, name: "god of war", price: 50, genre: "action adventure"}
       - {id: 2, name: "x-com 2", price: 30, genre: "strategy"}
       - {id: 3, name: "minecraft", price: 20, genre: "sandbox"}
       - {id: 4, name: "warcraft", price: 40, genre: "strategy"}
@@ -39,7 +37,7 @@ input:
       result: {id: 4, name: "warcraft", price: 40, genre: "strategy"}
     name_by_price:
       price: 51
-      result: ["god of war", "x-com 2", "minecraft", "warcraft"]
+      result: ["x-com 2", "minecraft", "warcraft"]
   # case 3
   - new: {id: 3, name: "minecraft", price: 20, genre: "sandbox"}
     string:
@@ -51,7 +49,6 @@ input:
       game_result: "Game 4: warcraft costs 40 of genre strategy"
     list:
       - {id: 1, name: "god of war", price: 50, genre: "action adventure"}
-      - {id: 2, name: "x-com 2", price: 30, genre: "strategy"}
       - {id: 3, name: "minecraft", price: 20, genre: "sandbox"}
       - {id: 4, name: "warcraft", price: 40, genre: "strategy"}
     by_id:
@@ -59,7 +56,7 @@ input:
       result: {id: 1, name: "god of war", price: 50, genre: "action adventure"}
     name_by_price:
       price: 40
-      result: ["x-com 2", "minecraft", "warcraft"]
+      result: ["minecraft", "warcraft"]
   # case 4
   - new: {id: 4, name: "warcraft", price: 40, genre: "strategy"}
     string:
@@ -72,11 +69,10 @@ input:
     list:
       - {id: 1, name: "god of war", price: 50, genre: "action adventure"}
       - {id: 2, name: "x-com 2", price: 30, genre: "strategy"}
-      - {id: 3, name: "minecraft", price: 20, genre: "sandbox"}
       - {id: 4, name: "warcraft", price: 40, genre: "strategy"}
     by_id:
       id: 2
       result: {id: 2, name: "x-com 2", price: 30, genre: "strategy"}
     name_by_price:
       price: 35
-      result: ["x-com 2", "minecraft"]
+      result: ["x-com 2"]

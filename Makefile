@@ -1,6 +1,6 @@
 # exercise subdirs
 EXERCISE_DIRS=\
-	01-hello-world \
+	01-getting-started \
 	19-structs
 
 STUDENT_ID_FILE=STUDENT_ID

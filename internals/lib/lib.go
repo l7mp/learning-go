@@ -24,6 +24,10 @@ const (
 	TestTemplateFile = ".exercise_test.go"
 	// TestFile is the name of the generated test
 	TestFile = "exercise_test.go"
+	// SolutionTemplateFile  is the name of the template file we use to generate the solutions
+	SolutionTemplateFile = ".exercise.go"
+	// SolutionFile is the name of the generated solution
+	SolutionFile = "exercise.go"
 )
 
 // Input is a type alias to the input field of an exercise.
@@ -76,6 +80,10 @@ func Generate(id string) error {
 		return err
 	}
 
+	if err := GenerateSolution(cwd, input); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -108,6 +116,34 @@ func GenerateTest(dir string, input Input) error {
 	}
 
 	r, err := os.Create(filepath.Join(dir, TestFile))
+	if err != nil {
+		return err
+	}
+	defer r.Close()
+
+	err = t.Execute(r, input)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// GenerateSolution generates the solution file.
+func GenerateSolution(dir string, input Input) error {
+	// the solution template exists only in the solution repo, so of this is missing it is not
+	// critical
+	path := filepath.Join(dir, SolutionTemplateFile)
+	if _, err := os.Stat(path); err != nil {
+		return nil
+	}
+
+	t, err := template.ParseFiles(path)
+	if err != nil {
+		return err
+	}
+
+	r, err := os.Create(filepath.Join(dir, SolutionFile))
 	if err != nil {
 		return err
 	}

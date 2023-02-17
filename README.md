@@ -16,6 +16,10 @@ make generate
 Your student id should always be available in the file named `STUDENT_ID` in the main
 directory. You can override this by setting the id in the `STUDENT_ID` environment variable.
 
+``` console
+STUDENT_ID=MY-STUDENT-ID> make generate
+```
+
 ## Write code
 
 Go through the subdirectories, preferably in the same order as the file names, understand the
@@ -28,7 +32,6 @@ file to your git repo.
 At any point in time you can test your solutions as follows.
 
 ``` console
-make generate
 make test
 ```
 

@@ -1,4 +1,4 @@
-package warmup
+package basics
 
 //go:generate go run ../../exercises-cli.go -student-id=$STUDENT_ID generate
 

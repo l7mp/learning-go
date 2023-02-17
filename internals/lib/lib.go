@@ -57,7 +57,7 @@ func GetStudentHash(id string) int {
 }
 
 // Generate generates the README and the test file in the given dir.
-func Generate(id string) error {
+func Generate(id string, verbose bool) error {
 	cwd, err := os.Getwd()
 	if err != nil {
 		return err
@@ -71,16 +71,19 @@ func Generate(id string) error {
 	log.Printf("Generating exercise %q in dir %q\n", ex.Name, cwd)
 
 	input := ex.GetInput(id)
+	if verbose {
+		log.Printf("Using input %#v\n", input)
+	}
 
-	if err := GenerateReadme(cwd, input); err != nil {
+	if err := GenerateReadme(cwd, input, verbose); err != nil {
 		return err
 	}
 
-	if err := GenerateTest(cwd, input); err != nil {
+	if err := GenerateTest(cwd, input, verbose); err != nil {
 		return err
 	}
 
-	if err := GenerateSolution(cwd, input); err != nil {
+	if err := GenerateSolution(cwd, input, verbose); err != nil {
 		return err
 	}
 
@@ -88,7 +91,11 @@ func Generate(id string) error {
 }
 
 // GenerateReadme generates the README.
-func GenerateReadme(dir string, input Input) error {
+func GenerateReadme(dir string, input Input, verbose bool) error {
+	if verbose {
+		log.Printf("Generating README in dir %q\n", dir)
+	}
+
 	t, err := template.ParseFiles(filepath.Join(dir, ReadmeTemplateFile))
 	if err != nil {
 		return err
@@ -109,7 +116,11 @@ func GenerateReadme(dir string, input Input) error {
 }
 
 // GenerateTest generates the test file.
-func GenerateTest(dir string, input Input) error {
+func GenerateTest(dir string, input Input, verbose bool) error {
+	if verbose {
+		log.Printf("Generating tests in dir %q\n", dir)
+	}
+
 	t, err := template.ParseFiles(filepath.Join(dir, TestTemplateFile))
 	if err != nil {
 		return err
@@ -130,12 +141,16 @@ func GenerateTest(dir string, input Input) error {
 }
 
 // GenerateSolution generates the solution file.
-func GenerateSolution(dir string, input Input) error {
+func GenerateSolution(dir string, input Input, verbose bool) error {
 	// the solution template exists only in the solution repo, so of this is missing it is not
 	// critical
 	path := filepath.Join(dir, SolutionTemplateFile)
 	if _, err := os.Stat(path); err != nil {
 		return nil
+	}
+
+	if verbose {
+		log.Printf("Generating solution in dir %q\n", dir)
 	}
 
 	t, err := template.ParseFiles(path)

@@ -1,4 +1,4 @@
-package warmup
+package basics
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 )
 
 func TestNewGame(t *testing.T) {
-	g := newGame({{index . "new" "id"}}, "{{index . "new" "name"}}", {{index . "new" "price"}}, "{{index . "new" "genre"}}")
+	g := newGame({{index .new "id"}}, "{{index .new "name"}}", {{index .new "price"}}, "{{index .new "genre"}}")
 
 	assert.Equal(t, g.id, {{index . "new" "id"}}, "id")
 	assert.Equal(t, g.name, "{{index . "new" "name"}}", "name")
@@ -18,8 +18,8 @@ func TestNewGame(t *testing.T) {
 func TestString(t *testing.T) {
 	g := newGame({{index . "string" "id"}}, "{{index . "string" "name"}}", {{index . "string" "price"}}, "{{index . "string" "genre"}}")
 
-	assert.Equal(t, g.item.String(), {{index . "string" "item_result"}}, "item string")
-	assert.Equal(t, g.String(), {{index . "string" "game_result"}}, "game string")
+	assert.Equal(t, g.item.String(), "{{index . "string" "item_result"}}", "item string")
+	assert.Equal(t, g.String(), "{{index . "string" "game_result"}}", "game string")
 }
 
 func TestList(t *testing.T) {
@@ -35,7 +35,7 @@ func TestList(t *testing.T) {
  	assert.Equal(t, g[1].id, {{index . "list" 1 "id"}}, "game 1 id")
 	assert.Equal(t, g[1].name, "{{index . "list" 1 "name"}}", "game 1 name")
 	assert.Equal(t, g[1].price, {{index . "list" 1 "price"}}, "game 1 price")
-	assert.Equal(t, g[1].genre, "{{index . "list" 1 "genre"}}", "game 1 genre")}
+	assert.Equal(t, g[1].genre, "{{index . "list" 1 "genre"}}", "game 1 genre")
 
  	assert.Equal(t, g[2].id, {{index . "list" 2 "id"}}, "game 2 id")
 	assert.Equal(t, g[2].name, "{{index . "list" 2 "name"}}", "game 2 name")
@@ -63,6 +63,6 @@ func TestById(t *testing.T) {
 func TestNameByPrice(t *testing.T) {
 	games := listNameByPrice(newGameList(), {{index . "name_by_price" "price"}})
 
- 	assert.Equal(t, games, {{index . "name_by_price" "result"}}, "names by prices")
+ 	assert.Equal(t, games, "{{index . "name_by_price" "result"}}", "names by prices")
 }
 

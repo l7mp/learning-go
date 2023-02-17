@@ -18,7 +18,9 @@ input:
       result: {id: 3, name: "minecraft", price: 20, genre: "sandbox"}
     name_by_price:
       price: 21
-      result: ["minecraft"]
+      result:
+        size: 1
+        list: ["minecraft", "N/A", "N/A", "N/A"]
   # case 2
   - new: {id: 2, name: "x-com 2", price: 30, genre: "strategy"}
     string:
@@ -37,7 +39,9 @@ input:
       result: {id: 4, name: "warcraft", price: 40, genre: "strategy"}
     name_by_price:
       price: 51
-      result: ["x-com 2", "minecraft", "warcraft"]
+      result:
+        size: 3
+        list: ["x-com 2", "minecraft", "warcraft", "N/A"]
   # case 3
   - new: {id: 3, name: "minecraft", price: 20, genre: "sandbox"}
     string:
@@ -56,7 +60,9 @@ input:
       result: {id: 1, name: "god of war", price: 50, genre: "action adventure"}
     name_by_price:
       price: 40
-      result: ["minecraft", "warcraft"]
+      result:
+        size: 2
+        list: ["minecraft", "warcraft", "N/A", "N/A"]
   # case 4
   - new: {id: 4, name: "warcraft", price: 40, genre: "strategy"}
     string:
@@ -75,4 +81,6 @@ input:
       result: {id: 2, name: "x-com 2", price: 30, genre: "strategy"}
     name_by_price:
       price: 35
-      result: ["x-com 2"]
+      result:
+        size: 1
+        list: ["x-com 2", "N/A", "N/A", "N/A"]

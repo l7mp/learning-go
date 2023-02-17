@@ -56,8 +56,20 @@ func TestById(t *testing.T) {
 }
 
 func TestNameByPrice(t *testing.T) {
-	games := listNameByPrice(newGameList(), {{index . "name_by_price" "price"}})
+	names := listNameByPrice(newGameList(), {{index . "name_by_price" "price"}})
 
- 	assert.Equal(t, games, "{{index . "name_by_price" "result"}}", "names by prices")
+	assert.Len(t, names, {{index .name_by_price "result" "size"}}, "namelist len")
+	if {{index .name_by_price "result" "size"}} > 0 {
+	 	assert.Equal(t, names[0], "{{index .name_by_price "result" "list" 0}}", "names 1")
+	}
+	if {{index .name_by_price "result" "size"}} > 1 {
+	 	assert.Equal(t, names[1], "{{index .name_by_price "result" "list" 1}}", "names 2")
+	}
+	if {{index .name_by_price "result" "size"}} > 2 {
+	 	assert.Equal(t, names[2], "{{index .name_by_price "result" "list" 2}}", "names 3")
+	}
+	if {{index .name_by_price "result" "size"}} > 3 {
+	 	assert.Equal(t, names[3], "{{index .name_by_price "result" "list" 3}}", "names 4")
+	}
 }
 

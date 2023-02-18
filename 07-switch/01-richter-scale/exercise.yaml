@@ -1,0 +1,20 @@
+name: richter-scale
+input:
+- magnitude: 0.5
+  description: "micro"
+- magnitude: 2.5
+  description: "very minor"
+- magnitude: 3
+  description: "minor"
+- magnitude: 4.5
+  description: "light"
+- magnitude: 5
+  description: "moderate"
+- magnitude: 6
+  description: "strong"
+- magnitude: 7
+  description: "major"
+- magnitude: 8
+  description: "great"
+- magnitude: 11
+  description: "massive"

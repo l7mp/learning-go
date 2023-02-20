@@ -1,6 +1,7 @@
 # exercise subdirs
 EXERCISE_DIRS=\
 	01-getting-started \
+	06-variables \
 	07-switch \
 	19-structs
 

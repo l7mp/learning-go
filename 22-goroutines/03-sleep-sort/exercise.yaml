@@ -1,0 +1,10 @@
+name: sleep-sort
+input:
+- funcName: sleepSort
+  dir: forward
+  input:  "{47, 1, 10, 23, 42, 7}"
+  result: "{1, 7, 10, 23, 42, 47}"
+- funcName: reverseSleepSort
+  dir: reverse
+  input:  "{47, 1, 10, 23, 42, 7}"
+  result: "{47, 42, 23, 10, 7, 1}"

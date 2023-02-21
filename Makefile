@@ -2,7 +2,8 @@
 EXERCISE_DIRS=\
 	01-getting-started \
 	07-switch \
-	19-structs
+	19-structs \
+	22-goroutines
 
 STUDENT_ID_FILE=STUDENT_ID
 

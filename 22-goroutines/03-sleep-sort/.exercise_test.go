@@ -7,7 +7,7 @@ import (
 )
 
 func TestSleepSort(t *testing.T) {
-	input := []int{{index . "input"}}
-	result := []int{{index . "result"}}
-	assert.DeepEqual(t, {{index . "funcName"}}(input), result, "{{index . "dir"}} sleep-sort")
+	input := []uint{{index . "input"}}
+	result := []uint{{index . "result"}}
+	assert.Equal(t, {{index . "funcName"}}(input), result, "{{index . "dir"}} sleep-sort")
 }

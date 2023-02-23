@@ -11,7 +11,8 @@ on:
     tags-ignore:
       - '*'
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
+  workflow_dispatch
 
 jobs:
   lint:

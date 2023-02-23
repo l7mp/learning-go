@@ -18,8 +18,8 @@ func Usage() {
 }
 
 var (
-	flagId  = flag.String("student-id", "", "student id; optional, default is to read from file STUDENT_ID")
-	verbose = flag.Bool("verbose", false, "verbose mode; default is off")
+	studentId = flag.String("student-id", "", "student id; optional, default is to read from file STUDENT_ID")
+	verbose   = flag.Bool("verbose", false, "verbose mode; default is off")
 )
 
 func main() {
@@ -34,7 +34,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	id, err := lib.GetStudentId(flagId)
+	id, err := lib.GetStudentId(studentId)
 	if err != nil {
 		log.Fatalf("Cannot find student id: %s", err)
 	}

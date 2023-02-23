@@ -7,5 +7,5 @@ import (
 )
 
 func TestRepaintColor(t *testing.T) {
-	assert.Equal(t, repaintColor({{index . "primary"}}), "{{index . "complementary"}}")
+	assert.Equal(t, repaintColor("{{index . "primary"}}"), "{{index . "complementary"}}")
 }

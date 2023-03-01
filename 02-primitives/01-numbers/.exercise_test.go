@@ -13,18 +13,18 @@ const h float64 = 6.9
 
 
 func TestArea(t *testing.T) {
-	switch {{index . "shape"}} {
+	switch "{{index . "shape"}}"{
 	case "Circle":
-		assert.Equal(t, shape(r), 36.32)
+		assert.Equal(t, area(r, a, b, h), 36.32)
 	case "Ellipse":
-		assert.Equal(t, shape(a, b), 47.5)
+		assert.Equal(t, area(r, a, b, h), 47.5)
 	case "Trapezoid":
-		assert.Equal(t, shape(a, b, h), 26.91)
+		assert.Equal(t, area(r, a, b, h), 26.91)
 	case "Pentagon":
-		assert.Equal(t, shape(a), 22.297)
+		assert.Equal(t, area(r, a, b, h), 22.297)
 	case "Hexagon":
-		assert.Equal(t, shape(a), 33.67)
+		assert.Equal(t, area(r, a, b, h), 33.67)
 	case "Octagon":
-		assert.Equal(t, shape(a), 62.58)
+		assert.Equal(t, area(r, a, b, h), 62.58)
 	}
 }

@@ -6,6 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestReplaceSubnet(t *testing.T) {
-	assert.Equal(t, replaceSubnet("{{index . "cidr"}}", "{{index . "subnet"}}"), "{{index . "address"}}/{{index . "subnet"}}")
+func TestReplaceNetMask(t *testing.T) {
+	assert.Equal(t, replaceNetMask("{{index . "cidr"}}", "{{index . "subnet"}}"), "{{index . "address"}}/{{index . "subnet"}}")
 }

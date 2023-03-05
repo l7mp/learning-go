@@ -1,6 +1,8 @@
 # exercise subdirs
 EXERCISE_DIRS=\
 	01-getting-started \
+	02-primitives \
+	03-variables \
 	07-switch \
 	19-structs \
 	22-goroutines

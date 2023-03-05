@@ -1,0 +1,14 @@
+name: numbers
+input:
+- shape: "Circle"
+  formula: "A = pi * r^2"
+- shape: "Ellipse"
+  formula: "A = a * b * pi"
+- shape: "Trapezoid"
+  formula: "A = (a + b) * h / 2"
+- shape: "Pentagon"
+  formula: "A = a^2 * sqrt{25 + 10sqrt{5}} / 4"
+- shape: "Hexagon"
+  formula: "A = 3/2 * sqrt{3} * a^2"
+- shape: "Octagon"
+  formula: "A = 2 * (1 + sqrt{2}) * a^2"

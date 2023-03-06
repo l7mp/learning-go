@@ -1,0 +1,14 @@
+name: concat
+input:
+- var1: "a"
+  var2: "b"
+- var1: "c"
+  var2: "d"
+- var1: "e"
+  var2: "f"
+- var1: "g"
+  var2: "h"
+- var1: "i"
+  var2: "j"
+- var1: "k"
+  var2: "l"

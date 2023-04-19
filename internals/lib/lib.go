@@ -83,10 +83,6 @@ func Generate(id string, verbose bool) error {
 		return fmt.Errorf("error generating tests in dir %q: %s", cwd, err)
 	}
 
-	// if err := GenerateExercise(cwd, input, verbose); err != nil {
-	// 	return fmt.Errorf("error generating exercise in dir %q: %s", cwd, err)
-	// }
-
 	if err := GenerateSolution(cwd, input, verbose); err != nil {
 		return fmt.Errorf("error generating solution in dir %q: %s", cwd, err)
 	}
@@ -141,48 +137,6 @@ func GenerateTest(dir string, input Input, verbose bool) error {
 	err = t.Execute(r, input)
 	if err != nil {
 		return fmt.Errorf("template %q: %w", templateFile, err)
-	}
-
-	return nil
-}
-
-// GenerateExercise re-generates the exercise file. The semantics is the following:
-//   - if there is a .exercise.go file in the current dir then we are in the "solutions" repo: do not do
-//     anything, since GenerateSolution will generate the output anyway
-//   - if there is no .exercise.go in the dir but there is an exercise.go then do substitute template
-//     substitution in the exercise.go file
-func GenerateExercise(dir string, input Input, verbose bool) error {
-	// the solution template exists only in the solution repo, so if it exists we do not do
-	// anything
-	path := filepath.Join(dir, SolutionTemplateFile)
-	if _, err := os.Stat(path); err == nil {
-		return nil
-	}
-
-	// if there is an exercise.go then re-generate it
-	path = filepath.Join(dir, SolutionFile)
-	if _, err := os.Stat(path); err != nil {
-		return nil
-	}
-
-	if verbose {
-		log.Printf("Generating exercise for path %q\n", path)
-	}
-
-	t, err := template.ParseFiles(path)
-	if err != nil {
-		return fmt.Errorf("template %q: %w", path, err)
-	}
-
-	r, err := os.Create(filepath.Join(dir, SolutionFile))
-	if err != nil {
-		return err
-	}
-	defer r.Close()
-
-	err = t.Execute(r, input)
-	if err != nil {
-		return err
 	}
 
 	return nil

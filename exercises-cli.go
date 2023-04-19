@@ -23,8 +23,8 @@ var (
 )
 
 func main() {
-	// log.SetFlags(log.LstdFlags | log.Lshortfile)
-	log.SetFlags(0)
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	// log.SetFlags(0)
 	log.SetPrefix("exercises-cli: ")
 	flag.Usage = Usage
 	flag.Parse()
@@ -46,7 +46,7 @@ func main() {
 	switch flag.Arg(0) {
 	case "generate":
 		if err := lib.Generate(id, *verbose); err != nil {
-			log.Fatalf("Cannot generate exercise for student id %s: %s", id, err)
+			log.Fatalf("Cannot generate exercise for student id %q: %s", id, err)
 		}
 	case "check":
 		fmt.Println("Would check stuff")

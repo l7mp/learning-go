@@ -31,8 +31,8 @@ test:
 # clean up generated files
 clean:
 	for dir in $(EXERCISE_DIRS); do \
-		find $$dir -name "README.md" -type f -print0 | xargs -0 -I {} sh -c "echo '# PLEASE RUN make generate' > {}";  \
-		find $$dir -name "exercise_test.go" -type f -print0 | xargs -0 -I {} sh -c "echo '// PLEASE RUN make generate' > {}";  \
+		find $$dir -name "README.md" -type f -print | xargs rm -f;  \
+		find $$dir -name "exercise_test.go" -type f -print | xargs rm -f;  \
 	done
 
 # also wipe student id

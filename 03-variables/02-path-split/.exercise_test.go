@@ -7,5 +7,9 @@ import (
 )
 
 func TestSplitPath(t *testing.T) {
-	assert.Equal(t, splitPath("{{index . "fullpath"}}", "{{index . "component"}}"), "{{index . "output"}}")
+	assert.Equal(t, splitPath("{{index . "tests" 0 "fullpath"}}"), "{{index . "tests" 0 "output"}}")
+	assert.Equal(t, splitPath("{{index . "tests" 1 "fullpath"}}"), "{{index . "tests" 1 "output"}}")
+	assert.Equal(t, splitPath("{{index . "tests" 2 "fullpath"}}"), "{{index . "tests" 2 "output"}}")
+	assert.Equal(t, splitPath("{{index . "tests" 3 "fullpath"}}"), "{{index . "tests" 3 "output"}}")
+	assert.Equal(t, splitPath("{{index . "tests" 4 "fullpath"}}"), "{{index . "tests" 4 "output"}}")
 }

@@ -1,0 +1,8 @@
+name: printer
+input:
+- op1: "received variable of type"
+  op2: "with value"
+- op1: "variable of type"
+  op2: "and value"
+- op1: "type:"
+  op2: "value:"

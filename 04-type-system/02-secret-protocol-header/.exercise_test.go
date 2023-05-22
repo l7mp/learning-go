@@ -13,8 +13,8 @@ const QOS_LSB = 3
 const BROADCST_LSB = 1
 const SECURE_LSB = 0
 
-func mySolution(isFirstAttempt uint8, isBroadcasted uint8, isSecure uint8, qos uint8) uint8 {
-	return uint8(0x02 << PACKET_TYPE_LSB | isFirstAttempt << FIRST_ATTEMPT_LSB | qos << QOS_LSB | isBroadcasted << BROADCST_LSB | isSecure << SECURE_LSB) 
+func mySolution(isFirstAttempt byte, isBroadcasted byte, isSecure byte, qos byte) byte {
+	return byte(0x02 << PACKET_TYPE_LSB | isFirstAttempt << FIRST_ATTEMPT_LSB | qos << QOS_LSB | isBroadcasted << BROADCST_LSB | isSecure << SECURE_LSB) 
 	
 }
 

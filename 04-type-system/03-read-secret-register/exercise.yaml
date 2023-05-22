@@ -1,0 +1,65 @@
+name: read-secret-register
+input:
+  - CHAN_CTRL: 0x53F61A14
+    pos:
+    - TX_CHAN
+    - RX_CHAN
+    - RX_PCODE
+    - TX_PCODE
+########################################
+  - CHAN_CTRL: 0x55F41A14
+    pos:
+    - RX_PCODE
+    - RX_CHAN
+    - TX_CHAN
+    - TX_PCODE
+########################################
+  - CHAN_CTRL: 0xAAF41A24
+    pos:
+    - RX_PCODE
+    - TX_PCODE
+    - RX_CHAN
+    - TX_CHAN
+########################################
+  - CHAN_CTRL: 0xAAF41A24
+    pos:
+    - RX_CHAN
+    - RX_PCODE
+    - TX_PCODE
+    - TX_CHAN
+########################################
+  - CHAN_CTRL: 0xCAF41324
+    pos:
+    - TX_PCODE
+    - RX_CHAN
+    - RX_PCODE
+    - TX_CHAN
+########################################
+  - CHAN_CTRL: 0xCAF4EF73
+    pos:
+    - TX_PCODE
+    - RX_PCODE
+    - RX_CHAN
+    - TX_CHAN
+########################################
+  - CHAN_CTRL: 0xCAFEB00B
+    pos:
+    - RX_PCODE
+    - TX_CHAN
+    - TX_PCODE
+    - RX_CHAN
+########################################
+  - CHAN_CTRL: 0xDEADBEEF
+    pos:
+    - TX_CHAN
+    - RX_PCODE
+    - TX_PCODE
+    - RX_CHAN
+########################################
+  - CHAN_CTRL: 0x1928FEFE
+    pos:
+    - TX_CHAN
+    - TX_PCODE
+    - RX_CHAN
+    - RX_PCODE
+########################################

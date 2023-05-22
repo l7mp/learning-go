@@ -1,0 +1,145 @@
+name: secret-protocol-header
+input:
+  - fa:
+      text: ""
+      val:  1
+    qos:
+      text: "At most once delivery"
+      val: 0
+    bc:
+      text: "not"
+      val: 0
+    sc:
+      text: ""
+      val: 1
+########################################
+  - fa:
+      text: "not"
+      val:  0
+    qos:
+      text: "At most once delivery"
+      val: 0
+    bc:
+      text: ""
+      val: 1
+    sc:
+      text: ""
+      val: 1
+########################################
+  - fa:
+        text: "not"
+        val:  0
+    qos:
+        text: "At most once delivery"
+        val: 0
+    bc:
+        text: "not"
+        val: 0
+    sc:
+        text: "not"
+        val: 0
+########################################
+  - fa:
+        text: ""
+        val:  1
+    qos:
+        text: "At least once delivery"
+        val: 1
+    bc:
+        text: "not"
+        val: 0
+    sc:
+        text: "not"
+        val: 0
+########################################
+  - fa:
+        text: ""
+        val:  1
+    qos:
+        text: "At least once delivery"
+        val: 1
+    bc:
+        text: "not"
+        val: 0
+    sc:
+        text: ""
+        val: 1
+########################################
+  - fa:
+        text: ""
+        val:  1
+    qos:
+        text: "At least once delivery"
+        val: 1
+    bc:
+        text: ""
+        val: 1
+    sc:
+        text: "not"
+        val: 0
+########################################
+  - fa:
+        text: "not"
+        val:  0
+    qos:
+        text: "Exactly once delivery"
+        val: 2
+    bc:
+        text: "not"
+        val: 0
+    sc:
+        text: "not"
+        val: 0
+########################################
+  - fa:
+        text: "not"
+        val:  0
+    qos:
+        text: "Exactly once delivery"
+        val: 2
+    bc:
+        text: ""
+        val: 1
+    sc:
+        text: "not"
+        val: 0
+########################################
+  - fa:
+        text: ""
+        val:  1
+    qos:
+        text: "Exactly once delivery"
+        val: 2
+    bc:
+        text: "not"
+        val: 0
+    sc:
+        text: ""
+        val: 1
+########################################
+  - fa:
+        text: "not"
+        val:  0
+    qos:
+        text: "Exactly once delivery"
+        val: 2
+    bc:
+        text: ""
+        val: 1
+    sc:
+        text: "not"
+        val: 0
+########################################
+  - fa:
+        text: ""
+        val:  1
+    qos:
+        text: "Exactly once delivery"
+        val: 2
+    bc:
+        text: ""
+        val: 1
+    sc:
+        text: ""
+        val: 1
+########################################

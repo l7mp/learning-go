@@ -25,7 +25,7 @@ input:
   arg1: 4
   arg2: 13
 - type1: seconds
-- type2: minutes
+  type2: minutes
   arg1: 9
   arg2: 57
 - type1: seconds

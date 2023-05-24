@@ -5,6 +5,7 @@ EXERCISE_DIRS=\
 	03-variables \
 	04-type-system \
 	07-switch \
+	08-arrays \
 	19-structs \
 	22-goroutines
 

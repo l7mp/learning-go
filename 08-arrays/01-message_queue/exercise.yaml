@@ -1,0 +1,56 @@
+name: message-queue
+input:
+  - chan: 
+    - A
+    - B
+    - C
+    text:
+    - Hello
+    - World
+    - Again
+########################################
+  - chan: 
+    - A
+    - C
+    - B
+    text:
+    - World
+    - Hello
+    - Again
+########################################
+  - chan: 
+    - C
+    - A
+    - B
+    text:
+    - Hello
+    - World
+    - Again
+########################################
+  - chan: 
+    - C
+    - B
+    - A
+    text:
+    - World
+    - Again
+    - Hello
+########################################
+  - chan: 
+    - B
+    - A
+    - C
+    text:
+    - Again
+    - Hello
+    - World
+########################################
+  - chan: 
+    - B
+    - C
+    - A
+    text:
+    - Hello
+    - Again
+    - World
+########################################

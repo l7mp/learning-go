@@ -1,0 +1,20 @@
+name: factorial-or-sum
+input:
+- func: factorial
+  input: 15
+  output: 1307674368000
+- func: factorial
+  input: 10
+  output: 3628800
+- func: factorial
+  input: 19
+  output: 121645100408832000
+- func: sum
+  input: 15
+  output: 120
+- func: sum
+  input: 10
+  output: 55
+- func: sum
+  input: 19
+  output: 190

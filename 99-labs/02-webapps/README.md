@@ -10,11 +10,11 @@ In this lab we build a simple web app in Go and learn how to deploy it into Kube
 
 ## A basic web service in Go
 
-One of the greatest strengths of Go lies in the its suitability for developing web applications. It has a HTTP server as part of the standard library, offers great performance, and it is easy to deploy as a container into Kubernetes. This exercise will walk you through building a basic "hello-world" web application with Go, which we will deploying into Kubernetes later. 
+One of the greatest strengths of Go lies in the its suitability for developing web applications. It has a HTTP server as part of the standard library, offers great performance, and it is easy to deploy as a container into Kubernetes. This exercise will walk you through building a basic "hello-world" web application with Go.
 
 ### A Go web server
 
-The below simple Go program will open a HTTP port at 8080, listen to HTTP queries on the path `/` and respond with the standard greeting `Hello, world!`. 
+The below simple Go program will open an HTTP server at port 8080, listen to HTTP queries on the path `/`, and respond with the usual greeting `Hello, world!`. 
 
 ``` go
 package main
@@ -34,7 +34,7 @@ func main() {
 }
 ```
 
-The first line, `package main` declares that the code in the `main.go` file belongs to the `main` package. In the next few lines, the `net/http` and the `fmt` packages are imported into the file. The former provides the HTTP server implementation we use in our app, while the latter helps access operating system functionality. The `HelloHandler` function is a standard HTTP request handler with the signature `func(w http.ResponseWriter, r *http.Request)`, where `r` can be used to access the details of the HTTP request and `w` can be used to write the response. We are now using `fmt.Printf` to write the string `Hello, world!` to the HTTP response. When not specifying otherwise, Go will automatically set the HTTP status 200 (`OK`) in the response. 
+The first line, `package main` declares that the code in the `main.go` file belongs to the `main` package. In the next few lines, the `net/http` and the `fmt` packages are imported: the former provides the HTTP server implementation and the latter helps handle formatted strings. The `HelloHandler` function is a standard HTTP request handler with the signature `func(w http.ResponseWriter, r *http.Request)`, where `r` can be used to access the details of the HTTP request being served and `w` is used to write the response. Below we use `fmt.Printf` to write the string `Hello, world!` into the HTTP response. When not specifying otherwise, Go will automatically set the HTTP status 200 OK in the response.
 
 The `main` function first assigns the `HelloHandler` request handler to the HTTP path `/`, meaning that whenever the server is called with an empty path (say, using the URL `http://example.com/`) it will automatically call our handler that will respond with the `Hello, world!` greeting. Finally, `http.ListenAndServe` spawns the HTTP server on port 8080. This function is blocking, so the program won't exit unless it encounters en error (or it is explicitly killed)
 
@@ -49,25 +49,25 @@ Hello, world!
 
 > **Note**: The address `localhost` is the short name for the loopback interface address, which defaults to `127.0.0.1`. Also note that the trailing slash is optional, so the following request would be equivalent: `curl http://127.0.0.1:8080`
 
-Congratulations, you have build and run your first Go web app! Now fire up your favorite browser and direct it to the URL `localhost:8080` and see your first webpage rendered in full glory.
+Congratulations, you have built and run your first Go web app! Now fire up your favorite browser and direct it to the URL `localhost:8080` and see your first webpage rendered in full glory.
 
 ### Exercise
 
-Modify the program to return the hostname of the server it is running at:
+Modify the program to return the hostname of the server it is running at. This requires the following changes to `main.go`:
 - first, import the `os` package from the Go standard lib: add `"os"` to the `import` list in parentheses;
 - declare a global variable called `hostname` of type string that we will use to store the hostname: `var hostname string`;
 - before starting the web server in the `main` function, store the hostname in the global variable;
-- first query the hostname: `h, err := os.Hostname()`, where `h` is a temporary variable for the return value and `err` will contain the error if something go wrong;
+- first query the hostname: `h, err := os.Hostname()`, where `h` is a temporary variable for the return value and `err` will contain the error if something goes wrong;
 - make sure to check the error before proceeding: 
   ```go
-  	if err != nil {
-		panic(err)
-	}
+  if err != nil {
+      panic(err)
+  }
   ```
-- store the returned hostname in the global variable so that the HTTP handler, which runs in a separate function and so cannot reach `h`, will access it: `hostname = h`
+- store the returned hostname in the global variable `hostname` so that the HTTP handler, which runs in a separate function and so cannot reach `h`, will access it: `hostname = h`
 - finally, modify the HTTP handler `HelloHandler` to add value of the global `hostname` variable to the response: `fmt.Fprintf(w, "Hello world from %s!", hostname)`
 
-> ✅ Check
+> ✅ <span style="color:red;">Check</span>
 >
 > Run the below first test to make sure that you have successfully completed the first exercise
 > ``` sh

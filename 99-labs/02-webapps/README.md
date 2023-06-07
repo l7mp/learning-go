@@ -67,7 +67,7 @@ Modify the program to return the hostname of the server it is running at. This r
 - store the returned hostname in the global variable `hostname` so that the HTTP handler, which runs in a separate function and so cannot reach `h`, will access it: `hostname = h`
 - finally, modify the HTTP handler `HelloHandler` to add value of the global `hostname` variable to the response: `fmt.Fprintf(w, "Hello world from %s!", hostname)`
 
-> ✅ <span style="color:red;">Check</span>
+> ✅ **Check**
 >
 > Run the below first test to make sure that you have successfully completed the first exercise
 > ``` sh

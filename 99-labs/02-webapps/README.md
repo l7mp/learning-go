@@ -90,11 +90,11 @@ Kubernetes is undoubtedly the present and the future of managing containerized m
 
 A Kubernetes *cluster* consists of a set of worker machines (*nodes*) that run containerized applications, plus a *control plane* that manages the worker nodes and the containers, or the containers co-packaged into a Kubernetes *pod*, running on them. The control plane components make global decisions about the cluster and maintain cluster state. In production settings some nodes are dedicated to run the control plane separately from the worker nodes that execute the *workload* (the pods), but control plane components can be run on any node and can share the same node as the workers. This allows to run Kubernetes on a single node (e.g., Minikube).
 
-![Kubernetes architecture, https://sysdig.com/blog/monitor-kubernetes-api-server.]("fig/kubernetes_arch.png")
+![Kubernetes architecture, https://sysdig.com/blog/monitor-kubernetes-api-server.](fig/kubernetes_arch.png)
 
 The most important component of the control plane is the `kube-apiserver` that exposes the Kubernetes API acting as a frontend for the Kubernetes control plane. The cluster state is maintained in `etcd`, a consistent and highly-available key value store. The `kube-scheduler` watches for newly created pods with no assigned node and selects a node for them to run on, the *kube-controller-manager* implements the common Kubernetes control loops, and `kube-dns` implements a cluster-wide DNS service which allows access to ephemeral pod and service IP addresses using short DNS domain names (see later).
 
-Each node runs a `kubelet` daemon, which manages the containers/pods running on the node, `kube-proxy`, an implementation of the Kubernetes Service concept (see later), and a *container runtime* that is the software that is responsible for running the containers themselves.
+Each node runs a `kubelet` daemon, which manages the containers/pods running on the node, `kube-proxy`, which an implementation of the Kubernetes Service concept (see later), and a *container runtime* that is the software that is responsible for running the containers themselves.
 
 ### Using Minikube
 

@@ -10,6 +10,10 @@ EXERCISE_DIRS=\
 	19-structs \
 	22-goroutines
 
+# LAB subdirs
+LAB_DIRS=\
+	99-labs
+
 STUDENT_ID_FILE=STUDENT_ID
 
 # files to be generated

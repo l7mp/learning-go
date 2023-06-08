@@ -127,6 +127,7 @@ We will often use additional functionality from the [Istio service mesh](https:/
 ``` sh
 curl -L https://istio.io/downloadIstio | sh -
 cd istio*
+kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.6.2" | kubectl apply -f -
 bin/istioctl install --set profile=minimal -y
 kubectl label namespace default istio-injection=enabled --overwrite
 ```

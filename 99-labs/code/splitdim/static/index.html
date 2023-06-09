@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SplitDim Banking App</title>
+</head>
+<body>
+    <h1>SplitDim Banking App</h1>
+
+    <h2>Transfer Money</h2>
+    <form id="transferForm">
+        <label for="sender">Sender:</label>
+        <input type="text" id="sender" name="sender" required><br>
+
+        <label for="receiver">Receiver:</label>
+        <input type="text" id="receiver" name="receiver" required><br>
+
+        <label for="amount">Amount:</label>
+        <input type="number" id="amount" name="amount" pattern="[0-9]" min="0" step="1" required><br>
+
+        <button type="submit">Transfer</button>
+    </form>
+
+    <h2>Clear Account Balances</h2>
+    <div id="transfer-list"></div>
+
+
+    <h2>Account List</h2>
+    <table id="accountList">
+        <tr>
+            <th>Holder</th>
+            <th>Balance</th>
+        </tr>
+    </table>
+
+    <script>
+        function clearAccounts() {
+            fetch('/api/clear')
+                .then(response => response.json())
+                .then(data => {
+                    const transferList = document.getElementById('transfer-list');
+                    transferList.innerHTML = '';
+
+                    if (data.length === 0) {
+                        transferList.innerHTML = 'No transfers required to clear balances.';
+                    } else {
+                        data.forEach(transfer => {
+                            const transferText = `${transfer.amount} units from ${transfer.sender} to ${transfer.receiver}<br>`;
+                            transferList.innerHTML += transferText;
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.log('Error:', error);
+                });
+        }
+
+        // Function to fetch and display the account list
+        function fetchAccountList() {
+            fetch("/api/accounts")
+                .then(response => response.json())
+                .then(data => {
+                    const accountListTable = document.getElementById("accountList");
+                    
+                    // Clear the existing account list
+                    while (accountListTable.rows.length > 1) {
+                        accountListTable.deleteRow(1);
+                    }
+                    
+                    // Populate the account list table
+                    data.forEach(account => {
+                        const row = accountListTable.insertRow();
+                        row.insertCell().textContent = account.holder;
+                        row.insertCell().textContent = account.balance;
+                    });
+                })
+                .catch(error => {
+                    console.log("Failed to fetch account list.", error);
+                });
+        }
+
+        // Function to handle the form submission for money transfer
+        document.getElementById("transferForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            // Get the form values
+            var sender = document.getElementById("sender").value;
+            var receiver = document.getElementById("receiver").value;
+            var amount = parseFloat(document.getElementById("amount").value);
+
+            // Make the transfer API call
+            fetch("/api/transfer", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ sender: sender, receiver: receiver, amount: amount })
+            })
+            .then(() => {
+                // Clear the form inputs
+                document.getElementById("sender").value = "";
+                document.getElementById("receiver").value = "";
+                document.getElementById("amount").value = "";
+
+                // Fetch and display the updated clear and account list
+                clearAccounts()
+                fetchAccountList();
+            })
+            .catch(error => {
+                console.log("Failed to make the money transfer.", error);
+            });
+        });
+
+        // Initial fetch of the account list on page load
+      clearAccounts()
+      fetchAccountList();
+    </script>
+</body>
+</html>

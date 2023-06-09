@@ -3,10 +3,11 @@
 In this lab we build a simple web app in Go and learn how to deploy it into Kubernetes. Each section is closed with an exercise and a test that you can run to check whether you successfully completed the exercise.
 
 ## Table of Contents
-1. [A basic web service in Go](#a-basic-web-service-in-go)
+
+1. [A basic web service](#a-basic-web-service)
 1. [Deploy into Kubernetes](#deploy-into-kubernetes)
 
-## A basic web service in Go
+## A basic web service
 
 One of the greatest strengths of Go lies in the its suitability for developing web applications. It offers a HTTP server as part of the standard library, guarantees great performance, and it is easy to deploy as a container into Kubernetes. This exercise will walk you through building a basic "hello-world" web application with Go.
 
@@ -14,12 +15,17 @@ One of the greatest strengths of Go lies in the its suitability for developing w
 
 First we create a new Go module. This is not strictly necessary for building and running Go programs locally, but unavoidable if we want to later package them up into a container. 
 
+First, go to the root of this repo and initialize a new Go project under `99-labs/code/helloworld`. We will work in this directory throughout this lab.
+
 ``` sh
+cd 99-labs/code/helloworld
 go mod init github.com/<my-user>/helloworld
 go mod tidy
 ```
 
-> **Note**: The above assumes that you will host your project at `GitHub.com` with the username `<my-user>`. We will spare this step below so in fact the package name can be anything. We recommend you set up your own user at GitHub and use that as the package name, but please do not publish your solutions because you spoil the fun for everyone else (plus, we regularly change the exercises so your published code would not work for other people anyway). Sometimes we will use the real GitHub user called `github.com/l7mp`; it is not worth trying to find the code under this user's [repositories](https://github.com/orgs/l7mp/repositories), we do not publish our solutions.
+> **Note**: The above assumes that you will host your project at `GitHub.com` with the username `<my-user>`. We will not upload the code to GitHub (in fact, we *ask you* not to upload it) so in fact the package name can be anything. We recommend you set up your own user at GitHub and use that as the package name. Throughout this course we often use the real GitHub user `l7mp`; we assume you automatically replace this user name with your own when not requested otherwise.
+
+> **Warning**: Please do not publish your solutions because you spoil the fun for everyone else (plus, we regularly change the exercises so your published code would not work for other people anyway). 
 
 ### A Go web server
 
@@ -43,7 +49,7 @@ func main() {
 }
 ```
 
-The first line, `package main` declares that the code belongs to the `main` package. In the next few lines, the `net/http` and the `fmt` packages are imported: the former provides the HTTP server implementation and the latter helps in formatting strings. The `HelloHandler` function is a standard HTTP request handler with the signature `func(w http.ResponseWriter, r *http.Request)`, where `r` can be used to access the details of the HTTP request being served and `w` is used to write the response. Below we use `fmt.Printf` to write the string `Hello, world!` into the HTTP response. When not specifying otherwise, Go will automatically set the HTTP status 200 OK in the response.
+The first line, `package main` declares that the code belongs to the `main` package. In the next few lines, the `net/http` and `fmt` packages are imported: the former provides the HTTP server implementation and the latter helps in formatting strings. The `HelloHandler` function is a standard HTTP request handler with the signature `func(w http.ResponseWriter, r *http.Request)`, where `r` can be used to access the details of the HTTP request being served and `w` is used to write the response. Below we use `fmt.Printf` to write the string `Hello, world!` into the HTTP response. When not specifying otherwise, Go will automatically set the HTTP status 200 OK in the response.
 
 The `main` function first assigns the `HelloHandler` request handler to the HTTP path `/`, meaning that whenever the server is called with an empty path (say, using the URL `http://example.com/`) it will call our handler that will respond with the `Hello, world!` greeting. Finally, `http.ListenAndServe` spawns the HTTP server on port 8080. This function is blocking, so the program won't exit unless it encounters en error (or it is explicitly killed)
 
@@ -63,7 +69,7 @@ Congratulations, you have built and run your first Go web app! Now fire up your 
 ### Exercise
 
 Modify the program to return the hostname of the server it is running at. This requires the following changes to `main.go`:
-- first, import the `os` package from the Go standard lib: add `"os"` to the `import` list in parentheses;
+- first, import the `os` package from the Go standard lib: add `os` to the `import` list in parentheses;
 - declare a global variable called `hostname` of type string that we will use to store the hostname: `var hostname string`;
 - before starting the web server in the `main` function, store the hostname in the global variable;
 - first query the hostname: `h, err := os.Hostname()`, where `h` is a temporary variable for the return value and `err` will contain the error if something goes wrong;
@@ -215,10 +221,11 @@ The standard way to build container images is via the following steps (do not is
 
 > **Note**: Just swap `podman` with `docker` if you are using Docker, the two should be equivalent. In addition, Linux will require you to run `podman` with superuser rights, so prefix all `podman` commands with `sudo`.
 
-Once pushed, the image should be available to Kubernetes for creating new pods. However, this roundtrip from a local build via a central container image repository and then back again to a local Kubernetes cluster can become tedious if we modify/update an image at fast pace. Minikube simplifies building and deploying new images for us: you can build an image inside the Minikube cluster and use the local image right away without having to go through a container registry. 
+Once pushed, the image would be available for Kubernetes to create new pods. However, this roundtrip from a local build via a central container image repository and then back again to a local Kubernetes cluster can become tedious if we modify/update an image at fast pace. Minikube simplifies building and deploying new images for us: you can build an image *inside* the Minikube cluster and use the local image right away without having to go through a container registry. 
 
 The following rules apply:
-- use the `minikube image` command instead of `podman` to manage container images: Minikube implements lots of [useful `podman` commands](https://minikube.sigs.k8s.io/docs/commands/image) via the `minikube` CLI tool;
+- Minikube implements lots of [useful `podman` commands](https://minikube.sigs.k8s.io/docs/commands/image) via the `minikube` CLI tool;
+- use the `minikube image` command instead of `podman` to manage container images inside the Minikube cluster;
 - prefix all container images with `localhost/` in all Kubernetes manifests to refer the `kubelet` to the local container image.
 
 Issue the below to build the container image of the hello-world web app locally inside the Minikube cluster:
@@ -236,7 +243,7 @@ localhost/<my-user>/helloworld:latest
 ...
 ```
 
-> **Warning**: Make sure you understand and practice the above, throughout the rest of this lab and the subsequent ones we will just publish the `podman` workflow and silently assume you're substituting `podman` with `minikube image` and use the local image names (i.e., those with the prefix `localhost/`).
+> **Warning**: Make sure you understand and practice the above, throughout the rest of this lab and the subsequent ones we silently assume you're using `minikube image` to build images and use the local image names (i.e., those with the prefix `localhost/`) for Kubernetes.
 
 ### Pods
 
@@ -409,9 +416,9 @@ NAME         TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE     SELECTO
 helloworld   ClusterIP   10.98.135.40   <none>        8080/TCP   4m27s   app=helloworld
 ```
 
-The default Service type is `ClusterIP`, which assigns an IP address (`10.98.135.40` above) from a pool of IP addresses that your cluster has reserved for that purpose to the pods. From this point, you can use this single IP address to reach the pods of the Service. Note that Services of type `ClusterIP` are reachable only *from inside the cluster*: external clients will not be able to reach them.
+The default Service type is `ClusterIP`, which assigns an IP address (`10.98.135.40` above) from a pool of IP addresses that your cluster has reserved for that purpose. From this point, you can use this single IP address to reach the pods of the Service. Note that Services of type `ClusterIP` are reachable only *from inside the cluster*: external clients will not be able to reach them.
 
-> **Note**: Curiously, Minikube allows local access to `ClusterIP` services, but this is only a Minikube simplification and in general this will not work.
+> **Note**: Curiously, Minikube allows local access to `ClusterIP` services, but this is only a Minikube subtlety and in general this will not work.
 
 To check Service access from the cluster, we deploy a separate pod called `net-debug` that we use to send queries to our web server pods. Attach to the console of the pod and execute a curl request to the cluster IP `10.98.135.40` and port 8080 from inside that pod:
 
@@ -439,7 +446,7 @@ Observe that the resolved address is exactly the `ClusterIP`.
 
 > **Note**: The fully qualified domain name (FQDN) of our Service is `helloworld.default.svc.cluster.local`, but any subdomain of that will correctly resolve the cluster IP as long as the subdomain unambiguously identifies a Service. 
 
-> **Note**: The `default` in the above FQDN refers to the Kubernetes namespace called `default`. Namespaces are an extremely useful Kubernetes concept to isolate workloads running in the same cluster but we won't have time to go into the detauls.
+> **Note**: The `default` in the above FQDN refers to the Kubernetes namespace called `default`. Namespaces are an extremely useful Kubernetes concept to isolate workloads running in the same cluster but we won't have time to go into the details.
 
 But perhaps even more importantly, the two HTTP queries to the Service were responded by different pods (first by `helloworld-67f7d78ccd-2fklj` and then by `helloworld-67f7d78ccd-qn6wk`). This highlights one of the most important properties of Kubernetes Services: they spread requests randomly across the pods of the Service, which makes sure the load is evenly distributed between the replicas.
 
@@ -471,9 +478,7 @@ The `port` is now set to 80, which will be used by Kubernetes as the public port
 
 > **Note:*: The cluster IP is the same as the external IP in the above case, but this is just a Minikube subtlety. Usually the cluster IP will be chosen as an unroutable private IP and only the external IP will be global.
 
-> **Warning**: External access via `LoadBalancer` services requires additional support from the cloud provider. The provider will have to lease a public IP from its address pool and make the Service available externally via that public IP. For local Kubernetes clusters this may not work without manually installing an additional tool like MetalLB. 
-
-Minikube contains built-in support for LoadBalancers but this requires the extra command `minikube tunnel` to run in the background. It is best to start `minikube tunnel` in a new console right after `minikube start`. 
+External access via `LoadBalancer` services requires additional support from the cloud provider. The provider will have to lease a public IP from its address pool and make the Service available externally via that public IP. For local Kubernetes clusters this may not work without manually installing an additional tool like MetalLB. Minikube contains built-in support for LoadBalancers but this requires the extra command `minikube tunnel` to run in the background. It is best to start `minikube tunnel` in a new console right after `minikube start`. 
 
 Query the Service again to learn the external IP:
 
@@ -483,7 +488,7 @@ NAME         TYPE           CLUSTER-IP     EXTERNAL-IP    PORT(S)        AGE
 helloworld   LoadBalancer   10.98.135.40   10.98.135.40   80:31275/TCP   105s
 ```
 
-> **Warning**: If the external IP in the output of `kubectl get` shows a status `<pending>` then `minikube tunnel` is not running. Just start it and everything should work fine. At least on Minikube. Otherwise, contact your Kubernetes provider.
+> **Warning**: If the external IP in the output of `kubectl get` shows the status `<pending>` for more than a minute then `minikube tunnel` is not running. Just start it and everything should work fine. At least on Minikube. Otherwise, contact your Kubernetes provider.
 
 Now we can issue a HTTP query to the Service from the host:
 
@@ -529,3 +534,11 @@ Extend the web app to also return the version of Go used to compile the web serv
 > go test --tags=kubernetes -run TestHelloWorldKubernetes
 > PASS
 > ```
+
+<!--
+Local Variables:
+eval: (auto-fill-mode -1)
+eval: (visual-line-mode t)
+markdown-enable-math: t
+End:
+-->

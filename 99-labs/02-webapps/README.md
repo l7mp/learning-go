@@ -19,8 +19,9 @@ First, go to the root of this repo and initialize a new Go project under `99-lab
 
 ``` sh
 cd 99-labs/code/helloworld
-go mod init github.com/<my-user>/helloworld
-go mod tidy
+go mod init github.com/<my-user>/helloworld       # init Go module; use your own user id
+go get github.com/stretchr/testify/assert         # add depencency
+go mod tidy                                       # update module version
 ```
 
 > **Note**: The above assumes that you will host your project at `GitHub.com` with the username `<my-user>`. We will not upload the code to GitHub (in fact, we *ask you* not to upload it) so in fact the package name can be anything. We recommend you set up your own user at GitHub and use that as the package name. Throughout this course we often use the real GitHub user `l7mp`; we assume you automatically replace this user name with your own when not requested otherwise.

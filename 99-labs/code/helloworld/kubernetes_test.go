@@ -20,31 +20,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func execCmd(t *testing.T, cmd string, args ...string) (string, string) {
-	return execCmdContext(context.Background(), t, cmd, args...)
-}
-
-func execCmdContext(ctx context.Context, t *testing.T, cmd string, args ...string) (string, string) {
-	p, err := exec.LookPath(cmd)
-	if errors.Is(err, exec.ErrDot) {
-		err = nil
-	}
-	assert.NoError(t, err, fmt.Sprintf("find command %q in PATH", cmd))
-
-	log.Print("Executing:\t", cmd, " ", strings.Join(args, " "))
-
-	e := exec.CommandContext(ctx, p, args...)
-	var outb, errb bytes.Buffer
-	e.Stdout = &outb
-	e.Stderr = &errb
-	assert.NoError(t, e.Run(), fmt.Sprintf("run command %q", cmd))
-
-	log.Print("StdOut:\t", outb.String())
-	log.Print("StdErr:\t ", errb.String())
-
-	return outb.String(), errb.String()
-}
-
 func TestHelloWorldKubernetes(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

@@ -1,6 +1,8 @@
 # A silly web app: SplitDim
 
-In this lab we build a Go web app that allows groups of people to keep track of money transfers between themselves and helps clear debs and credits with minimal money transfer. The app is by and large modeled after the excellent [SplitWise)[https://www.splitwise.com] app but it is much dumber so we will call it SplitDim. The below tasks walk you through writing a simple web app with the basic local database and deploying it into Kubernetes; we will gradually extend the app during the next labs to implement the 5 cloud native pillars (recall: scalability, loose coupling, resilience, manageabilty, and observability). Each section is closed with a test that you can run to check whether you successfully completed all tasks in the section.
+In the course of this lab we are going to build a Go web app that allows groups of people to keep track of money transfers between themselves and helps clear debs and credits with minimal money transfer. The app is by and large modeled after the excellent [SplitWise](https://www.splitwise.com) app, but it is much dumber so we will call it SplitDim. 
+
+The below tasks walk you through writing a simple web app that implements the barebones SplitDim functionality with a basic local database. Later we will gradually extend the app to implement the 5 cloud native pillars. Each section contains tests that you can run to check whether you successfully completed all tasks in the section.
 
 ## Table of Contents
 
@@ -13,17 +15,19 @@ In this lab we build a Go web app that allows groups of people to keep track of 
 
 ## A skeleton
 
-SplitDim helps housemates, trips, friends, and family to maintain their money transfers and keep track who owns who. Imagine you are at a trip with your friends, you invite one of your friends for a coffee, they pay the taxi fee for the entire group, and then someone else from the group pays your train ticket. After a while, this because impossible to keep track of. Enter SplitDim, a simple webapp that allows friends to register their transfers (e.g., "Joe paid Alice's coffee for 5 USD", and then "Alice paid Joe's train ticket for 3 USD") and see (1) the current balance of each registered user (how much debt or credit they have) and (2) the minimal list of mutual money transfers that would allow them the clear the debts ("Alice would need to pay Joe 2 USD to clear the debt").
+SplitDim helps housemates, trips, friends, and family members maintain their internal money transfers and keep track who owns who. Imagine you are at a trip with your friends, you invite one of your friends for a coffee, they pay the taxi fee for the entire group, and then someone else from the group pays your train ticket. After a while, it because practically impossible to keep track of. 
 
-We are going to build SplitDim as a Go web app. During this lab we will write only the barebones web service that keeps the balances in memory, later we will extend it into a proper cloud-native app. The web service implements 4 APIs:
-- `POST: /api/transfer`: register a transfer between two users of a given amount (this API uses a POST method to let users post the transfer's details in JSON file),
-- `GET: /api/accounts`: return the list containing the current balance of each registered user,
-- `GET: /api/clear`: return the list transfers that would allow each user to clear their balance,
-- `GET: /api/reset`: set all balances to zero.
+Enter SplitDim, a simple web app that allows friends to register their transfers (e.g., "Joe paid Alice's coffee for 5 USD", and then "Alice paid Joe's train ticket for 3 USD") and see (1) the current balance of each registered user (how much debt or credit they have) and (2) the minimal list of mutual money transfers that would allow them the clear all debts ("Alice would need to pay Joe 2 USD to clear the debt").
+
+We are going to build SplitDim as a Go web app. During this lab we will write only the barebones web service that keeps the balances in memory; later we will extend it into a proper cloud-native app. The web service will implement 4 APIs:
+- `POST: /api/transfer`: register a transfer between two users of a given amount (this API uses the POST HTTP method to let users post the transfer's details in JSON format),
+- `GET: /api/accounts`: return the list of current balances for each registered user,
+- `GET: /api/clear`: return the list of transfers that would allow users to clear their debts between themselves, and
+- `GET: /api/reset`: reset all balances to zero.
 
 So let's start, shall we?
 
-1. Initialize a new Go project under `99-labs/code/splitdim`.
+1. Initialize a new Go project under `99-labs/code/splitdim`. Make sure you actually use this directory: there are some files placed there for you to help your work. 
 
    ``` sh
    cd 99-labs/code/splitdim
@@ -32,13 +36,13 @@ So let's start, shall we?
    go mod tidy
    ```
 
-1. Declare that we are going to build an executable.
+1. Open a new file called `main.go` and declare that you are going to build an executable.
 
    ``` go
    package main
    ```
 
-1. Import the packages we will be using.
+1. Import the packages to be used.
 
    ``` go
    import (
@@ -49,16 +53,16 @@ So let's start, shall we?
 1. Implement 4 empty HTTP handlers: these will be the placeholders for the SplitDim API.
 
    ``` go
-   // TransferHandler is HTTP handler that implements the money transfer API.
+   // TransferHandler is a HTTP handler that implements the money transfer API.
    func TransferHandler(w http.ResponseWriter, r *http.Request) {}
    
-   // AccountListHandler is HTTP handler that returns the current balance of each registered user.
+   // AccountListHandler is a HTTP handler that returns the current balance of each registered user.
    func AccountListHandler(w http.ResponseWriter, r *http.Request) {}
    
-   // ClearHandler is HTTP handler that returns a list of transfers to clear the balance of each user.
+   // ClearHandler is a HTTP handler that returns a list of transfers to clear the balance of each user.
    func ClearHandler(w http.ResponseWriter, r *http.Request) {}
    
-   // ResetHandler is HTTP handler that allows to zero out all balances.
+   // ResetHandler is a HTTP handler that allows to zero out all balances.
    func ResetHandler(w http.ResponseWriter, r *http.Request) {}
    ```
 
@@ -73,9 +77,9 @@ So let's start, shall we?
    }
    ```
 
-1. Install a HTTP handler for to serve a static HTML file with inline JavaScript to interact with the SplitDim API. This page implements the client GUI of our service so that you can connect from a browser, send transfers and see the current balances (of course, real man use `curl` but anyway). The HTML file is provided as part of this lab in order to allow you to concentrate on the server side, but feel free to modify it according to your liking.
+1. Install a HTTP handler to serve a static HTML file with inline JavaScript to interact with the SplitDim API. This page implements the client GUI of our service so that you can connect from a browser, send transfers and see the current balances (of course real men use `curl`, but anyway). The HTML file is provided as part of this lab in order to allow you to concentrate on the server side, but feel free to modify it according to your liking.
 
-   The below will register a static HTTP handler that will serve the pre-packaged HTML file when someone requests the default path (`/`).
+   The next will register a static HTTP handler that will serve the prepackaged HTML file for the default path (`/`).
 
    ``` go
    http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -83,7 +87,7 @@ So let's start, shall we?
    })
    ```
 
-1. Register the 4 empty HTTP handlers for the API endpoints we wish to serve.
+1. Register the 4 empty HTTP handlers for the 4 API endpoints.
 
    ``` go
    http.HandleFunc("/api/transfer", TransferHandler)
@@ -128,8 +132,17 @@ func SomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 ```
-
 Substitute `http.MethodPost` with `http.MethodGet` for handlers that accept only GET requests.
+
+Another subtlety worth noting that `http.HandleFunc("/api/transfer", TransferHandler)` will route *all* HTTP requests whose path starts `/api/transfer` to the `TransferHandler`, e.g., `/api/transfer/random/api` and `/api/transfer/some/malicious/attack`. To make sure *only* the required API is served, add the below to the handler:
+
+``` go
+func handler(w http.ResponseWriter, r *http.Request) {
+    if req.URL.Path != "/api/transfer" {
+        http.NotFound(w, req)
+        return
+}
+```
 
 > ✅ **Check**: 
 >

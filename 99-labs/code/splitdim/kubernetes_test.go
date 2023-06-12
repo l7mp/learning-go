@@ -1,88 +1,93 @@
-//go:build kubernetes
+// go:build kubernetes
 
 package main
 
-// import (
-// 	"bytes"
-// 	"context"
-// 	"errors"
-// 	"fmt"
-// 	"io"
-// 	"log"
-// 	"net"
-// 	"net/http"
-// 	"os/exec"
-// 	"regexp"
-// 	"strings"
-// 	"testing"
-// 	"time"
+import (
+	"bytes"
+	"context"
+	"fmt"
+	"io"
+	"net"
+	"net/http"
+	"strings"
+	"testing"
+	"time"
 
-// 	"github.com/stretchr/testify/assert"
-// )
+	"github.com/stretchr/testify/assert"
+)
 
-// func execCmd(t *testing.T, cmd string, args ...string) (string, string) {
-// 	return execCmdContext(context.Background(), t, cmd, args...)
-// }
+func TestSplitDimKubernetes(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
-// func execCmdContext(ctx context.Context, t *testing.T, cmd string, args ...string) (string, string) {
-// 	p, err := exec.LookPath(cmd)
-// 	if errors.Is(err, exec.ErrDot) {
-// 		err = nil
-// 	}
-// 	assert.NoError(t, err, fmt.Sprintf("find command %q in PATH", cmd))
+	// clean up cluster
+	execCmd(t, "kubectl", "delete", "-f", "deploy/kubernetes-local-db.yaml")
 
-// 	log.Print("Executing:\t", cmd, " ", strings.Join(args, " "))
+	// build the container image
+	_, _, err := execCmd(t, "minikube", "image", "build", "-t", "l7mp/splitdim", "-f", "deploy/Dockerfile", ".")
+	assert.NoError(t, err, "kubectl delete")
 
-// 	e := exec.CommandContext(ctx, p, args...)
-// 	var outb, errb bytes.Buffer
-// 	e.Stdout = &outb
-// 	e.Stderr = &errb
-// 	assert.NoError(t, e.Run(), fmt.Sprintf("run command %q", cmd))
+	// redeploy
+	_, _, err = execCmd(t, "kubectl", "apply", "-f", "deploy/kubernetes-local-db.yaml")
+	assert.NoError(t, err, "kubectl apply")
 
-// 	log.Print("StdOut:\t", outb.String())
-// 	log.Print("StdErr:\t ", errb.String())
+	// may take a while
+	time.Sleep(20 * time.Second)
 
-// 	return outb.String(), errb.String()
-// }
+	// redeploy
+	_, _, err = execCmd(t, "kubectl", "get", "service", "splitdim")
+	assert.NoError(t, err, "kubectl get")
 
-// func TestHelloWorldKubernetes(t *testing.T) {
-// 	// ctx, cancel := context.WithCancel(context.Background())
-// 	// defer cancel()
+	ip, _, err := execCmd(t, "kubectl", "get", "service", "splitdim", "-o", `jsonpath="{.status.loadBalancer.ingress[0].ip}"`)
+	if ip == "" {
+		// make sure minikube tunnel is running if no public IP exists
+		execCmdContext(ctx, t, "minikube", "tunnel")
+		// may take a while
+		time.Sleep(10 * time.Second)
+		ip, _, err = execCmd(t, "kubectl", "get", "service", "splitdim", "-o", `jsonpath="{.status.loadBalancer.ingress[0].ip}"`)
+	}
 
-// 	// // clean up cluster
-// 	// execCmd(t, "kubectl", "delete", "-f", "deploy/kubernetes-deployment.yaml")
-// 	// execCmd(t, "kubectl", "delete", "-f", "deploy/kubernetes-service.yaml")
+	ip = strings.Trim(ip, `"`)
+	assert.NotNil(t, net.ParseIP(ip), "public IP")
 
-// 	// // build the container image
-// 	// execCmd(t, "minikube", "image", "build", "-t", "l7mp/helloworld", "-f", "deploy/Dockerfile", ".")
+	// reset
+	url := fmt.Sprintf("http://%s:80/api/reset", ip)
+	res, err := http.Get(url)
+	assert.NoError(t, err, "GET")
+	assert.Equal(t, http.StatusOK, res.StatusCode, "status code")
 
-// 	// // redeploy
-// 	// execCmd(t, "kubectl", "apply", "-f", "deploy/kubernetes-deployment.yaml")
-// 	// execCmd(t, "kubectl", "apply", "-f", "deploy/kubernetes-service.yaml")
+	body, err := io.ReadAll(res.Body)
+	assert.NoError(t, err, "read response body")
+	assert.Equal(t, "", string(body), "response")
 
-// 	// // may take a while
-// 	// time.Sleep(10 * time.Second)
+	// transfer
+	url = fmt.Sprintf("http://%s:80/api/transfer", ip)
+	b := bytes.NewBuffer([]byte(`{"sender":"a","receiver":"b","amount":1}`))
+	res, err = http.Post(url, "application/json", b)
+	assert.NoError(t, err, "POST")
+	assert.Equal(t, http.StatusOK, res.StatusCode, "status code")
 
-// 	// ip, _ := execCmd(t, "kubectl", "get", "service", "helloworld", "-o", `jsonpath="{.status.loadBalancer.ingress[0].ip}"`)
-// 	// if ip == "" {
-// 	// 	// make sure minikube tunnel is running if no public IP exists
-// 	// 	execCmdContext(ctx, t, "minikube", "tunnel")
-// 	// 	// may take a while
-// 	// 	time.Sleep(10 * time.Second)
-// 	// 	ip, _ = execCmd(t, "kubectl", "get", "service", "helloworld", "-o", `jsonpath="{.status.loadBalancer.ingress[0].ip}"`)
-// 	// }
+	// accounts
+	url = fmt.Sprintf("http://%s:80/api/accounts", ip)
+	res, err = http.Get(url)
+	assert.NoError(t, err, "GET")
+	assert.Equal(t, http.StatusOK, res.StatusCode, "status code")
 
-// 	// ip = strings.Trim(ip, `"`)
-// 	// assert.NotNil(t, net.ParseIP(ip), "public IP")
+	body, err = io.ReadAll(res.Body)
+	assert.NoError(t, err, "read response body")
+	assert.Equal(t, `[{"holder":"a","balance":1},{"holder":"b","balance":-1}]`, string(body), "response")
 
-// 	// // and Get
-// 	// url := fmt.Sprintf("http://%s//:8080", ip)
-// 	// res, err := http.Get(url)
-// 	// assert.NoError(t, err, "GET")
-// 	// assert.Equal(t, http.StatusOK, res.StatusCode, "status code")
+	// clear
+	url = fmt.Sprintf("http://%s:80/api/clear", ip)
+	res, err = http.Get(url)
+	assert.NoError(t, err, "GET")
+	assert.Equal(t, http.StatusOK, res.StatusCode, "status code")
 
-// 	// body, err := io.ReadAll(res.Body)
-// 	// assert.NoError(t, err, "read response body")
+	body, err = io.ReadAll(res.Body)
+	assert.NoError(t, err, "read response body")
+	assert.Equal(t, `[{"sender":"b","receiver":"a","amount":1}]`, string(body), "response")
 
-// 	// assert.Regexp(t, regexp.MustCompile("^Hello world from .* running Go version"), string(body), "response")
-// }
+	// clean up cluster
+	execCmd(t, "kubectl", "delete", "-f", "deploy/kubernetes-local-db.yaml")
+
+}

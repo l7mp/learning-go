@@ -19,12 +19,12 @@ First, go to the root of this repo and initialize a new Go project under `99-lab
 
 ``` sh
 cd 99-labs/code/helloworld
-go mod init github.com/<my-user>/helloworld       # init Go module; use your own user id
+go mod init helloworld                            # init Go module
 go get github.com/stretchr/testify/assert         # add depencency
 go mod tidy                                       # update module version
 ```
 
-> **Note**: The above assumes that you will host your project at `GitHub.com` with the username `<my-user>`. We will not upload the code to GitHub (in fact, we *ask you* not to upload it) so in fact the package name can be anything. We recommend you set up your own user at GitHub and use that as the package name. Throughout this course we often use the real GitHub user `l7mp`; we assume you automatically replace this user name with your own when not requested otherwise.
+> **Note**: The above assumes that you will never publish your code and make it available through `pkg.go.dev` for others to `go get` it.  If you ever want to publish code, make sure to choose a globally unique package name. The best option is to init a new project at GitHub.com, say, under `github.com/<my-user>/<my-package>`, where `<my-user>` is your GitHub id and `<my-package>` is the package name, init the go module with this full name, and publish from GitHub. Since we will not upload the code to GitHub (in fact, we *ask you* not to upload it), the package name can be anything. 
 
 > **Warning**: Please do not publish your solutions because you spoil the fun for everyone else (plus, we regularly change the exercises so your published code would not work for other people anyway). 
 
@@ -59,7 +59,7 @@ The `main` function first assigns the `HelloHandler` request handler to the HTTP
 Copy the code into a new file named `main.go` and execute it with `go run main.go` (you can also use `go build` that will build the `main` package into an executable). If all goes well, the prompt should disappear: the HTTP server silently starts and awaits requests. Send one using the omnipotent `curl` tool:
 
 ``` sh
-curl http://localhost:8080/
+curl http://localhost:8080
 Hello, world!
 ```
 
@@ -215,7 +215,7 @@ CMD ["/helloworld"]
 > **Warning**: Make sure you understand what is going on here: later you will be requested to write your own Dockerfiles (see [here](https://docs.docker.com/engine/reference/builder) for more details).
 
 The standard way to build container images is via the following steps (do not issue these command just yet, most probably they won't work anyway):
-- build the image: `podman image build -t <my-user>/helloworld -f deploy/Dockerfile .`;
+- build the image: `podman image build -t helloworld -f deploy/Dockerfile .`;
 - list local container images: `podman image ls`;
 - login to the default container image repository: `podman login`;
 - upload the `<image>` at `<version>` to the default container repository: `podman push <image>:<version>`.
@@ -232,15 +232,15 @@ The following rules apply:
 Issue the below to build the container image of the hello-world web app locally inside the Minikube cluster:
 
 ``` sh
-minikube image build -t <my-user>/helloworld -f deploy/Dockerfile .
+minikube image build -t helloworld -f deploy/Dockerfile .
 ```
 
-Make sure to substitute `<my-user>` with your own username. If all goes well, listing the container images available in Minikube should show a long list of images containing our new image with the `latest` tag automatically appended:
+If all goes well, listing the container images available in Minikube should show a long list of images containing our new image with the `latest` tag automatically appended:
 
 ``` sh
 minikube image ls
 ...
-localhost/<my-user>/helloworld:latest
+localhost/helloworld:latest
 ...
 ```
 
@@ -253,7 +253,7 @@ Next, we deploy the image into a Kubernetes *pod*. A pod is a set of one or more
 Use the below command to deploy the helloworld web app to Kubernetes:
 
 ``` sh
-kubectl run helloworld --image=localhost/<my-user>/helloworld
+kubectl run helloworld --image=localhost/helloworld
 ```
 
 This will create a new pod with the Go web app we have just built and run it in a Kubernetes pod named `helloworld`. Note how we added `localhost/` to the image name: this indicates to Minikube to skip downloading the image from the default container registry (usually Docker Hub).
@@ -276,7 +276,7 @@ metadata:
 spec:
   containers:
   - name: helloworld
-    image: localhost/l7mp/helloworld
+    image: localhost/helloworld
 EOF
 ```
 
@@ -293,7 +293,7 @@ kubectl delete pod helloworld
 Instead, we usually create a higher level object called a *Deployment* (or StatefulSet) that makes sure that a predefined number of pods running the same image will always be available whatever happens (for the curious: a Deployment is essentially a pod template plus a ReplicaSet):
 
 ``` sh
-kubectl create deployment helloworld --image=localhost/<my-user>/helloworld --replicas=2
+kubectl create deployment helloworld --image=localhost/helloworld --replicas=2
 ```
 
 This will create two pods that both run the `helloworld` image and make sure to restart failed pods on error.
@@ -319,7 +319,7 @@ spec:
     spec:
       containers:
       - name: helloworld
-        image: localhost/l7mp/helloworld
+        image: localhost/helloworld
 EOF
 ```
 
@@ -363,9 +363,7 @@ helloworld-67f7d78ccd-lvbl6   1/1     Running   0          12m     10.244.0.61  
 helloworld-67f7d78ccd-ph5jf   1/1     Running   0          3s      10.244.0.64   minikube
 ```
 
-### Services
-
-When pods are ephemeral, it becomes fairly difficult to refer to any of them. Observe in the above that the pods of the Deployment run on seemingly random private IPs assigned automatically by Kubernetes to the pods from the CIDR range `10.244.0.0/24`. If we delete a pod, it will restart with a different IP:
+Since pods are now created ephemeral, it becomes fairly difficult to refer to any of them. Observe in the above that the pods of the Deployment run on seemingly random private IPs assigned automatically by Kubernetes to the pods from the CIDR range `10.244.0.0/24`. If we delete a pod, it will restart with a different IP:
 
 ``` sh
 kubectl delete pod helloworld-67f7d78ccd-ph5jf
@@ -378,6 +376,8 @@ helloworld-67f7d78ccd-qn6wk   1/1     Running   0          4s      10.244.0.65  
 ```
 
 The last pod now runs on the `10.244.0.65` IP.
+
+### Services
 
 In Kubernetes, a *Service* is a method for exposing an app that is running as one or more pods in your cluster using a common and easy-to-remember IP address and name. Services are the main tool for service discovery in Kubernetes: create a set of pods (e.g., using a Deployment) and use a Service to make sure that the pods are available on the network so that clients can interact with them, say, using a single IP address or a DNS domain name (this creates a *loose coupling* between clients and servers, see later).
 

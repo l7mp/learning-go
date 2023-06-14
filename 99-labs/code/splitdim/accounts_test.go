@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/l7mp/splitdim/pkg/api"
-
 	"github.com/stretchr/testify/assert"
+
+	"splitdim/pkg/api"
 )
 
 var _ = fmt.Sprintf("dummy")

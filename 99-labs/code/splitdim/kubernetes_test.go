@@ -24,7 +24,7 @@ func TestSplitDimKubernetes(t *testing.T) {
 	execCmd(t, "kubectl", "delete", "-f", "deploy/kubernetes-local-db.yaml")
 
 	// build the container image
-	_, _, err := execCmd(t, "minikube", "image", "build", "-t", "l7mp/splitdim", "-f", "deploy/Dockerfile", ".")
+	_, _, err := execCmd(t, "minikube", "image", "build", "-t", "splitdim", "-f", "deploy/Dockerfile", ".")
 	assert.NoError(t, err, "kubectl delete")
 
 	// redeploy

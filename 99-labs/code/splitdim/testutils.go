@@ -14,19 +14,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// func testServerAvailable(t *testing.T, ctx context.Context, port int) {
-// 	if _, err := http.Get(fmt.Sprintf("http://:%d", port)); err != nil {
-// 		// Server is not running
-
-// 		cmd := exec.CommandContext(ctx, "go", "run", "main.go")
-// 		cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-// 		go cmd.Run()
-
-// 		// Wait for the server to start
-// 		time.Sleep(500 * time.Millisecond)
-// 	}
-// }
-
 func testHTTP(t *testing.T, api, method, body string) (*http.Response, error) {
 	uri := fmt.Sprintf("http://:8080/%s", api)
 

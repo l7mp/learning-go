@@ -32,12 +32,10 @@ So let's start, shall we?
 
    ``` sh
    cd 99-labs/code/splitdim
-   go mod init github.com/l7mp/splitdim
+   go mod init splitdim
    go get github.com/stretchr/testify/assert
    go mod tidy
       ```
-
-   > **Note**: The package is created under the `github.com/l7mp` account. Feel free to use your own user id but then make sure to update the import paths in the prepackaged tests because we assume you use this user id. 
 
 1. Open a new file called `main.go` and declare that you are going to build an executable.
 
@@ -229,11 +227,11 @@ The next step is to define our internal `DataLayer`: the internal representation
        "sort"
        "sync"
    
-       "github.com/l7mp/splitdim/pkg/api"
+       "splitdim/pkg/api"
    )
    ```
 
-   > **Note **: We want to use our own API, hence the (sub)package import `github.com/l7mp/splitdim/pkg/api`.
+   > **Note **: We want to use our own API, hence the (sub)package import `github.com/<my-user>/splitdim/pkg/api`.
 
    > **Note **: From now on we will not explicitly write import lists: remember, just add imports when Go complains during compilation.
 
@@ -285,12 +283,13 @@ The next step is to define our internal `DataLayer`: the internal representation
    }
    ```
 
-> ✅ **Check**: 
+> ✅ **Check**:
 >
 > Run the below test to check whether you have successfully completed the exercise. If all goes well, you should see the output `PASS`.
 > ``` sh
-> go test ./... --tags=localconstructor -v
-> PASS
+<!-- > go test ./... --tags=localconstructor -v -->
+<!-- > PASS -->
+<!-- > 
 > ```
 
 ## Reset

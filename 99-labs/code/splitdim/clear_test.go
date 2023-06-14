@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/l7mp/splitdim/pkg/api"
+	"splitdim/pkg/api"
 
 	"github.com/stretchr/testify/assert"
 )

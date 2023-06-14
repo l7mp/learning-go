@@ -1,4 +1,4 @@
-// go:build kubernetes
+//go:build kubernetes
 
 package main
 

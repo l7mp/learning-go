@@ -8,7 +8,8 @@ EXERCISE_DIRS=\
 	07-loops \
 	08-arrays \
 	19-structs \
-	22-goroutines
+	22-goroutines \
+	23-input-scanning
 
 # LAB subdirs
 LAB_DIRS=\

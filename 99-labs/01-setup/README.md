@@ -19,12 +19,12 @@ We provide instructions for setting up a native workspace on GNU/Linux. Windows 
 **CPU:** 2-core x86_64 CPU should be sufficient for native installation, at least 4 cores are required for the VM.
 **Memory:** 4GB for native install, 8GB is recommended for the VM.
 
-> Warning
+> **Warning**  
 > Make sure your Internet connection is working, we will download software packages.
 
 ## Installation
 
-The course requires the following software to be installed:
+The course requires these software:
 - [Go programming language](https://go.dev/)
 - [Visual Studio Code](https://code.visualstudio.com/) or any editor
 - [podman](https://podman.io/) or [docker](https://www.docker.com/)
@@ -35,7 +35,7 @@ The course requires the following software to be installed:
 - [Istio and istioctl](https://istio.io/)
 
 
-> Note
+> **Note**
 > If you use the VM, jump to [Insall Istio](#install-istio)
 
 ### Install Go

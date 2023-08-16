@@ -78,4 +78,4 @@ Copyright 2021-2023 by its authors. Some rights reserved. See [AUTHORS](AUTHORS)
 
 ## Acknowledgments
 
-Examples adopted from the [[Go: Bootcamp Course](https://github.com/inancgumus/learngo).
+Examples adopted from the [Go: Bootcamp Course](https://github.com/inancgumus/learngo).

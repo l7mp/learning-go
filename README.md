@@ -22,14 +22,16 @@ directory. You can override this by setting the id in the `STUDENT_ID` environme
 STUDENT_ID=MY-STUDENT-ID> make generate
 ```
 
-## Write code
+## Solve Exercises
+
+### Write code
 
 Go through the subdirectories, preferably in the same order as the file names, understand the
 exercise specified in the README, and insert your solution into `exercise.go` near the
 pleaceholder. You can divide your code to as many files as you want but don't forget to add each
 file to your git repo.
 
-## Test
+### Test
 
 At any point in time you can test your solutions as follows.
 
@@ -37,7 +39,7 @@ At any point in time you can test your solutions as follows.
 make test
 ```
 
-## Add a new exercise
+### Add a new exercise
 
 Add a new subdirectory and add the following files:
 - `exercise.yaml`: An exercise definition with a set of inputs, from which `make generate` will
@@ -51,6 +53,15 @@ Makefile.
 
 Then run `make clean`, this will add the placeholders for the exercise (these will be overwritten
 by `make generate`), add all files in the exercise dir to the git repo, and git-push.
+
+## Do the labs
+
+Lab tasks are located in the [99-labs](99-labs/) folder. The labs give
+you hands-on development and deployment experience. You will learn how
+to build and containerize Go programs as well as how to run them in
+Kubernetes. Each lab contains a README that gives you context and
+specifies the lab exercise. Labs depend on each other. For that, it is
+recommended to do labs one after the other.
 
 ## Clean up
 

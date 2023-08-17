@@ -22,7 +22,7 @@ directory. You can override this by setting the id in the `STUDENT_ID` environme
 STUDENT_ID=MY-STUDENT-ID> make generate
 ```
 
-## Solve Exercises
+## Solve exercises
 
 ### Write code
 
@@ -38,6 +38,26 @@ At any point in time you can test your solutions as follows.
 ``` console
 make test
 ```
+
+### Keep track of repo updates
+
+
+1. Store your changes
+``` console
+git stash
+```
+
+2. Pull updates
+``` console
+git pull
+```
+
+3. Restore your changes
+``` console
+git stash
+```
+
+4. Optional: fix conflicts and re-run tests
 
 ### Add a new exercise
 
@@ -56,12 +76,10 @@ by `make generate`), add all files in the exercise dir to the git repo, and git-
 
 ## Do the labs
 
-Lab tasks are located in the [99-labs](99-labs/) folder. The labs give
-you hands-on development and deployment experience. You will learn how
-to build and containerize Go programs as well as how to run them in
-Kubernetes. Each lab contains a README that gives you context and
-specifies the lab exercise. Labs depend on each other. For that, it is
-recommended to do labs one after the other.
+Labs tasks are located in the [99-labs](99-labs/) folder. The labs give you hands-on development and
+deployment experience. You will learn how to build and containerize Go programs as well as how to
+run them in Kubernetes. Each lab contains a README that gives you context and specifies the lab
+exercise. Labs depend on each other. For that, it is recommended to do labs one after the other.
 
 ## Clean up
 

@@ -1,35 +1,32 @@
 name: secret-protocol-header
 input:
-  - qos:
-      text: "At most once delivery"
-      val: 0
-      sol0: 64
-      sol1: 65
-      sol2: 66
-      sol3: 67
-      sol4: 80
-      sol5: 81
-      sol6: 82
-      sol7: 83
-  - qos:
-      text: "At least once delivery"
-      val: 1
-      sol0: 68
-      sol1: 69
-      sol2: 70
-      sol3: 71
-      sol4: 84
-      sol5: 85
-      sol6: 86
-      sol7: 87
-  - qos:
-      text: "Exactly once delivery"
-      val: 2
-      sol0: 72
-      sol1: 73
-      sol2: 74
-      sol3: 75
-      sol4: 88
-      sol5: 89
-      sol6: 90
-      sol7: 91
+  - qos: "At most once delivery"
+    val: 0
+    sol0: 64
+    sol1: 65
+    sol2: 66
+    sol3: 67
+    sol4: 80
+    sol5: 81
+    sol6: 82
+    sol7: 83
+  - qos: "At least once delivery"
+    val: 1
+    sol0: 68
+    sol1: 69
+    sol2: 70
+    sol3: 71
+    sol4: 84
+    sol5: 85
+    sol6: 86
+    sol7: 87
+  - qos: "Exactly once delivery"
+    val: 2
+    sol0: 72
+    sol1: 73
+    sol2: 74
+    sol3: 75
+    sol4: 88
+    sol5: 89
+    sol6: 90
+    sol7: 91

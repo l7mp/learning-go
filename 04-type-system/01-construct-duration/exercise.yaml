@@ -1,42 +1,54 @@
 name: construct-duration
 input:
-- type1: hours
-  type2: minutes
-  arg1: 7
-  arg2: 46
+# - type1: hours
+#   type2: minutes
+#   arg1: 7
+#   arg2: 46
 - type1: hours
   type2: seconds
   arg1: 9
   arg2: 11
-- type1: minutes
-  type2: hours
+  sol1: "1h0m2s"
+  sol2: "4h0m7s"
+  sol3: "12h0m23s"
+- type1: hours
+  type2: minutes
   arg1: 2
   arg2: 16
-- type1: minutes
-  type2: seconds
-  arg1: 8
-  arg2: 18
+  sol1: "1h2m0s"
+  sol2: "4h7m0s"
+  sol3: "12h23m0s"
+# - type1: minutes
+#   type2: seconds
+#   arg1: 8
+#   arg2: 18
 - type1: seconds
   type2: milliseconds
   arg1: 14
   arg2: 15
-- type1: seconds
-  type2: hours
-  arg1: 4
-  arg2: 13
-- type1: seconds
-  type2: minutes
-  arg1: 9
-  arg2: 57
-- type1: seconds
-  type2: milliseconds
-  arg1: 5
-  arg2: 42
-- type1: seconds
-  type2: microseconds
-  arg1: 6
-  arg2: 503
-- type1: milliseconds
-  type2: microseconds
-  arg1: 30
-  arg2: 180
+  sol1: "1.002s"
+  sol2: "4.007s"
+  sol3: "12.023s"
+# - type1: seconds
+#   type2: hours
+#   arg1: 4
+#   arg2: 13
+# - type1: seconds
+#   type2: minutes
+#   arg1: 9
+#   arg2: 57
+# - type1: seconds
+#   type2: milliseconds
+#   arg1: 5
+#   arg2: 42
+# - type1: seconds
+#   type2: microseconds
+#   arg1: 6
+#   arg2: 503
+# - type1: milliseconds
+#   type2: microseconds
+#   arg1: 30
+#   arg2: 180
+#   sol1: "1h0m2s"
+#   sol2: "1h0m2s"
+#   sol3: "1h0m2s"

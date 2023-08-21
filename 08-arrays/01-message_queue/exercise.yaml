@@ -8,49 +8,24 @@ input:
     - Hello
     - World
     - Again
+    id: 1
 ########################################
   - chan: 
     - A
     - C
     - B
     text:
-    - World
     - Hello
     - Again
+    - World
+    id: 2
 ########################################
   - chan: 
     - C
     - A
     - B
     text:
-    - Hello
-    - World
-    - Again
-########################################
-  - chan: 
-    - C
-    - B
-    - A
-    text:
-    - World
-    - Again
-    - Hello
-########################################
-  - chan: 
-    - B
-    - A
-    - C
-    text:
     - Again
     - Hello
     - World
-########################################
-  - chan: 
-    - B
-    - C
-    - A
-    text:
-    - Hello
-    - Again
-    - World
-########################################
+    id: 3

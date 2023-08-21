@@ -15,8 +15,8 @@ const (
 )
 
 type Exercise struct {
-	Name  string    `yaml:"name"`
-	Input [](Input) `yaml:"input"`
+	Name  string  `yaml:"name"`
+	Input []Input `yaml:"input"`
 }
 
 // NewExercise reads the exercise definition in the given directory

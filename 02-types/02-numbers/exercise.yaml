@@ -3,7 +3,7 @@ input:
 - descr: "`x` over `y` as an percentage rounded to the nearest integer (so the result for `x=1.2` and `y=2.4` would be 50)"
   funcName: "percentage"
   func: "func percentage(x,y float64) int"
-  sol0: 2
+  sol0: 50
   sol1: 4
   sol2: 24
   funcstring: "func percentageString(x,y string) (int, error)"

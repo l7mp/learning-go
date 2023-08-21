@@ -8,8 +8,6 @@ import (
 
 func TestCalculator(t *testing.T) {
 	assert.Equal(t, {{index . "sol0"}}, {{index . "funcName"}}(1.2, 2.4), "basic test 0")
-	assert.Equal(t, {{index . "sol0"}}, {{index . "funcName"}}(1.2, 2.4), "basic test 0")
-
 	assert.Equal(t, {{index . "sol1"}}, {{index . "funcName"}}(3.67, 100.0), "basic test 1")
 	assert.Equal(t, {{index . "sol2"}}, {{index . "funcName"}}(34.91, 144.02), "basic test 2")
 

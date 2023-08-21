@@ -2,11 +2,11 @@
 
 In the course of this lab we are going to build a Go web app that allows groups of people to keep track of money transfers between themselves and helps clear debs and credits with minimal money transfer. The app is by and large modeled after the excellent [SplitWise](https://www.splitwise.com) app, but it is much dumber so we will call it SplitDim. 
 
-The below tasks walk you through writing a simple web app that implements the barebones SplitDim functionality with a basic local database. Later we will gradually extend the app to implement the 5 cloud native pillars. Each section contains tests that you can run to check whether you successfully completed all tasks in the section.
+The below tasks guide you in writing a simple web app that implements the barebones SplitDim functionality with a basic local database. Later we will gradually extend the app to implement the 5 cloud native pillars. The tasks are followed by tests; absolve each to check whether you successfully completed the lab.
 
 ## Table of Contents
 
-1. [A webapp skeleton]([#a-skeleton])
+1. [Basics]([#basics])
 1. [API](#database-api)
 1. [Local data layer](#local-data-layer)
 1. [Reset](#reset)
@@ -14,7 +14,7 @@ The below tasks walk you through writing a simple web app that implements the ba
 1. [Accounts](#accounts)
 1. [Clear](#clear)
 
-## A skeleton
+## Basics
 
 SplitDim helps housemates, trips, friends, and family members maintain their internal money transfers and keep track of who owns who. Imagine you are at a trip with your friends, you invite one of your friends for a coffee, they pay the taxi fee for the entire group, and then someone else from the group pays your train ticket. After a while, it becomes practically impossible to remember all mutual payments and clear the debts. 
 

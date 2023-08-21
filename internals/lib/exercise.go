@@ -37,6 +37,10 @@ func NewExercise(dir string) (*Exercise, error) {
 
 // GetInput chooses an input from the given exercise using the student id
 func (ex *Exercise) GetInput(id string) Input {
+	if len(ex.Input) == 0 {
+		// dummy
+		return Input{}
+	}
 	index := GetStudentHash(id) % len(ex.Input)
 	return ex.Input[index]
 }

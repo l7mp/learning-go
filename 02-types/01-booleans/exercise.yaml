@@ -3,16 +3,12 @@ input:
 - op: AND
   name: and
   impl: "&&"
-  demorgan1: |
-    \overline{A+B}
-  demorgan2: |
-    \overline{A OR B} = \overline{A} AND \overline{B}
+  demorgan1: "\\overline{A+B}"
+  demorgan2: "\\overline{A OR B} = \\overline{A} AND \\overline{B}"
   demorganimpl: "func dm(x, y bool) bool { return !(x || y) }"
 - op: OR
   name: "or"
   impl: "||"
-  demorgan1: |
-    \overline{A AND B}
-  demorgan2: |
-    \overline{A AND B} = \overline{A} OR \overline{B}
+  demorgan1: "\\overline{A AND B}"
+  demorgan2: "\\overline{A AND B} = \\overline{A} OR \\overline{B}"
   demorganimpl: "func dm(x, y bool) bool { return !(x && y) }"

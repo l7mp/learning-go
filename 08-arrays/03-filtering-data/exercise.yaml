@@ -1,38 +1,10 @@
 name: filtering-data
 input:
-  - keys: [Christian Huang,Emily Taylor,Wendy Rogers,Paul Wilkinson,Amanda Rivers,Antonio Marshall,Amy Solomon,Martha Mendoza DVM,Gary Cannon,Steven Randall,Kenneth Avila,Daniel Rodriguez,Nicole Robinson,Jeffrey Richardson,Denise Flores,Erin Martinez,John Murphy,Patricia Davis,Brian Lucas,Elijah Blackwell,Frank Mitchell,Jessica Brandt,Jonathan Hunter,Mrs. Diane Palmer,Christine Roth,Sarah Hansen,Susan Gonzalez MD,Donald Lambert,Cole Castillo,Lindsey Thompson]
-    values: 316, 4883, 6369, 6498, 11374, 13602, 17000, 22419, 24382, 24404, 26971, 26979, 27514, 31045, 31260, 36641, 39861, 42432, 50449, 52303, 54183, 54533, 55115, 65682, 82084, 82559, 84646, 87039, 89272, 98883
+  - name: odd
     filter: odd
-########################################
-  - keys: [Christian Huang,Emily Taylor,Wendy Rogers,Paul Wilkinson,Amanda Rivers,Antonio Marshall,Amy Solomon,Martha Mendoza DVM,Gary Cannon,Steven Randall,Kenneth Avila,Daniel Rodriguez,Nicole Robinson,Jeffrey Richardson,Denise Flores,Erin Martinez,John Murphy,Patricia Davis,Brian Lucas,Elijah Blackwell,Frank Mitchell,Jessica Brandt,Jonathan Hunter,Mrs. Diane Palmer,Christine Roth,Sarah Hansen,Susan Gonzalez MD,Donald Lambert,Cole Castillo,Lindsey Thompson]
-    values: 182, 1139, 4373, 4678, 7991, 8890, 13710, 18971, 20022, 20305, 20583, 21399, 25083, 39027, 43282, 53194, 56085, 57157, 59103, 59704, 61920, 72092, 72166, 72881, 75965, 83556, 87063, 89317, 98540, 99563
-    filter: odd
-########################################
-  - keys: [Christian Huang,Emily Taylor,Wendy Rogers,Paul Wilkinson,Amanda Rivers,Antonio Marshall,Amy Solomon,Martha Mendoza DVM,Gary Cannon,Steven Randall,Kenneth Avila,Daniel Rodriguez,Nicole Robinson,Jeffrey Richardson,Denise Flores,Erin Martinez,John Murphy,Patricia Davis,Brian Lucas,Elijah Blackwell,Frank Mitchell,Jessica Brandt,Jonathan Hunter,Mrs. Diane Palmer,Christine Roth,Sarah Hansen,Susan Gonzalez MD,Donald Lambert,Cole Castillo,Lindsey Thompson]
-    values: 2454, 12420, 14862, 23701, 25532, 27787, 28555, 32438, 39923, 42711, 43821, 43919, 56936, 58542, 65976, 66851, 67759, 71263, 76603, 78400, 81924, 83639, 85281, 88832, 89377, 90407, 92619, 94722, 97981, 99497
-    filter: odd
-########################################
-  - keys: [Lorenzo Costa,Breno da Mota,Rebeca Aragão,Dra. Ana Beatriz Moura,Marcela Rodrigues,Thiago Gomes,Milena Teixeira,João Guilherme Martins,Gabriel Cardoso,Vitória da Luz,Caio Farias,Yuri da Mata,Antônio da Rocha,Lucca Rodrigues,Mariana Oliveira,Paulo Moraes,Cauê Costa,João Peixoto,Luna da Rocha,Sophia Sales,Dr. Nicolas Duarte,Heitor Viana,Sr. João Gabriel Barbosa,Dra. Lara Ramos,Dra. Clarice Nogueira,Sr. Luiz Henrique Nunes,Davi Lucca Jesus,Renan Cunha,Leandro Castro,Bryan Sales]
-    values: 817, 1400, 1843, 2039, 4647, 7205, 15983, 19310, 20320, 20829, 23333, 30299, 31440, 32593, 43490, 51478, 55212, 58652, 59378, 60257, 60678, 65398, 72735, 73630, 74081, 74924, 76418, 83541, 85616, 92548
+  - name: even
     filter: even
-########################################
-  - keys: [Lorenzo Costa,Breno da Mota,Rebeca Aragão,Dra. Ana Beatriz Moura,Marcela Rodrigues,Thiago Gomes,Milena Teixeira,João Guilherme Martins,Gabriel Cardoso,Vitória da Luz,Caio Farias,Yuri da Mata,Antônio da Rocha,Lucca Rodrigues,Mariana Oliveira,Paulo Moraes,Cauê Costa,João Peixoto,Luna da Rocha,Sophia Sales,Dr. Nicolas Duarte,Heitor Viana,Sr. João Gabriel Barbosa,Dra. Lara Ramos,Dra. Clarice Nogueira,Sr. Luiz Henrique Nunes,Davi Lucca Jesus,Renan Cunha,Leandro Castro,Bryan Sales]
-    values: 1959, 5441, 6575, 8960, 12989, 13716, 17208, 19582, 26664, 27458, 29366, 32319, 33051, 35767, 37120, 50078, 50820, 52917, 57936, 60062, 76578, 78930, 86529, 87318, 89538, 90505, 92773, 93712, 97674, 98098
-    filter: even
-########################################
-  - keys: [Lorenzo Costa,Breno da Mota,Rebeca Aragão,Dra. Ana Beatriz Moura,Marcela Rodrigues,Thiago Gomes,Milena Teixeira,João Guilherme Martins,Gabriel Cardoso,Vitória da Luz,Caio Farias,Yuri da Mata,Antônio da Rocha,Lucca Rodrigues,Mariana Oliveira,Paulo Moraes,Cauê Costa,João Peixoto,Luna da Rocha,Sophia Sales,Dr. Nicolas Duarte,Heitor Viana,Sr. João Gabriel Barbosa,Dra. Lara Ramos,Dra. Clarice Nogueira,Sr. Luiz Henrique Nunes,Davi Lucca Jesus,Renan Cunha,Leandro Castro,Bryan Sales]
-    values: 4851, 5079, 8731, 14674, 15180, 20269, 25053, 28639, 34412, 35163, 35367, 36366, 37778, 39545, 40040, 44828, 44997, 48779, 50154, 52267, 57819, 67794, 70808, 72974, 81677, 84318, 93424, 95185, 95465, 96490
-    filter: even
-########################################
-  - keys: [Baytal Duran,Safinaz Sezgin,Kadınana Varlık İnönü Yaman,Dr. Cannur Türcan Aslan Akçay,Dr. Ünsever Şafak,Dr. Birgül Menişan Dumanlı Türk,Gülseren Akçay,Bayan Rabbiye Güçlü Erdoğan,Bay Pehlil Korutürk,Asım Yaman,Gökçe Sezer,Akgöl Çamurcuoğlu,Hükümdar Sancak İnönü,Gülnaziye Hançer,Kayıt Şama,Habibe Tarhan,Günsel Alemdar Akçay,Dr. Güleğen Kısakürek,Kenter Çorlu,Bayan Menfeat Günver Tarhan Alemdar,Şenkal Akdeniz,Bay Ebuakil İlim Durmuş,Tatu Öcalan,Dr. Gökçebalan Nurcan Ergül,Dr. Akif Çetin,Dr. Kelâmi Alpsü Yıldırım,Tarancı Ertuncay Hançer,Taylak Sakarya,Bayan Rojnu Badegül Yılmaz Durmuş,Dr. Süha Manço]
-    values: 4851, 5079, 8731, 14674, 15180, 20269, 25053, 28639, 34412, 35163, 35367, 36366, 37778, 39545, 40040, 44828, 44997, 48779, 50154, 52267, 57819, 67794, 70808, 72974, 81677, 84318, 93424, 95185, 95465, 96490
-    filter: bigger-than-mean
-########################################
-  - keys: [Baytal Duran,Safinaz Sezgin,Kadınana Varlık İnönü Yaman,Dr. Cannur Türcan Aslan Akçay,Dr. Ünsever Şafak,Dr. Birgül Menişan Dumanlı Türk,Gülseren Akçay,Bayan Rabbiye Güçlü Erdoğan,Bay Pehlil Korutürk,Asım Yaman,Gökçe Sezer,Akgöl Çamurcuoğlu,Hükümdar Sancak İnönü,Gülnaziye Hançer,Kayıt Şama,Habibe Tarhan,Günsel Alemdar Akçay,Dr. Güleğen Kısakürek,Kenter Çorlu,Bayan Menfeat Günver Tarhan Alemdar,Şenkal Akdeniz,Bay Ebuakil İlim Durmuş,Tatu Öcalan,Dr. Gökçebalan Nurcan Ergül,Dr. Akif Çetin,Dr. Kelâmi Alpsü Yıldırım,Tarancı Ertuncay Hançer,Taylak Sakarya,Bayan Rojnu Badegül Yılmaz Durmuş,Dr. Süha Manço]
-    values: 4851, 5079, 8731, 14674, 15180, 20269, 25053, 28639, 34412, 35163, 35367, 36366, 37778, 39545, 40040, 44828, 44997, 48779, 50154, 52267, 57819, 67794, 70808, 72974, 81677, 84318, 93424, 95185, 95465, 96490
-    filter: bigger-than-mean
-########################################
-  - keys: [Baytal Duran,Safinaz Sezgin,Kadınana Varlık İnönü Yaman,Dr. Cannur Türcan Aslan Akçay,Dr. Ünsever Şafak,Dr. Birgül Menişan Dumanlı Türk,Gülseren Akçay,Bayan Rabbiye Güçlü Erdoğan,Bay Pehlil Korutürk,Asım Yaman,Gökçe Sezer,Akgöl Çamurcuoğlu,Hükümdar Sancak İnönü,Gülnaziye Hançer,Kayıt Şama,Habibe Tarhan,Günsel Alemdar Akçay,Dr. Güleğen Kısakürek,Kenter Çorlu,Bayan Menfeat Günver Tarhan Alemdar,Şenkal Akdeniz,Bay Ebuakil İlim Durmuş,Tatu Öcalan,Dr. Gökçebalan Nurcan Ergül,Dr. Akif Çetin,Dr. Kelâmi Alpsü Yıldırım,Tarancı Ertuncay Hançer,Taylak Sakarya,Bayan Rojnu Badegül Yılmaz Durmuş,Dr. Süha Manço]
-    values: 4851, 5079, 8731, 14674, 15180, 20269, 25053, 28639, 34412, 35163, 35367, 36366, 37778, 39545, 40040, 44828, 44997, 48779, 50154, 52267, 57819, 67794, 70808, 72974, 81677, 84318, 93424, 95185, 95465, 96490
-    filter: bigger-than-mean
-########################################
+  - name: greater
+    filter: "strictly greater than 5"
+  - name: smaller
+    filter: "smaller than, or equal to 4"

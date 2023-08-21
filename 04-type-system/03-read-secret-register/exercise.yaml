@@ -1,65 +1,34 @@
 name: read-secret-register
 input:
   - CHAN_CTRL: 0x53F61A14
+    id: 1
     pos:
-    - TX_CHAN
-    - RX_CHAN
-    - RX_PCODE
-    - TX_PCODE
+      - TX_CHAN
+      - RX_CHAN
+      - RX_PCODE
+      - TX_PCODE
+    test0: "[]byte{0xba, 0xab, 0x82, 0x19}"
+    test1: "[]byte{0xbe, 0xad, 0xde, 0xef}"
+    test2: "[]byte{0x45, 0x23, 0x01, 0x67}"
 ########################################
   - CHAN_CTRL: 0x55F41A14
+    id: 2
     pos:
-    - RX_PCODE
-    - RX_CHAN
-    - TX_CHAN
-    - TX_PCODE
+      - RX_PCODE
+      - RX_CHAN
+      - TX_CHAN
+      - TX_PCODE
+    test0: "[]byte{0x82, 0xab, 0xba, 0x19}"
+    test1: "[]byte{0xde, 0xad, 0xbe, 0xef}"
+    test2: "[]byte{0x01, 0x23, 0x45, 0x67}"
 ########################################
   - CHAN_CTRL: 0xAAF41A24
+    id: 3
     pos:
     - RX_PCODE
     - TX_PCODE
     - RX_CHAN
     - TX_CHAN
-########################################
-  - CHAN_CTRL: 0xAAF41A24
-    pos:
-    - RX_CHAN
-    - RX_PCODE
-    - TX_PCODE
-    - TX_CHAN
-########################################
-  - CHAN_CTRL: 0xCAF41324
-    pos:
-    - TX_PCODE
-    - RX_CHAN
-    - RX_PCODE
-    - TX_CHAN
-########################################
-  - CHAN_CTRL: 0xCAF4EF73
-    pos:
-    - TX_PCODE
-    - RX_PCODE
-    - RX_CHAN
-    - TX_CHAN
-########################################
-  - CHAN_CTRL: 0xCAFEB00B
-    pos:
-    - RX_PCODE
-    - TX_CHAN
-    - TX_PCODE
-    - RX_CHAN
-########################################
-  - CHAN_CTRL: 0xDEADBEEF
-    pos:
-    - TX_CHAN
-    - RX_PCODE
-    - TX_PCODE
-    - RX_CHAN
-########################################
-  - CHAN_CTRL: 0x1928FEFE
-    pos:
-    - TX_CHAN
-    - TX_PCODE
-    - RX_CHAN
-    - RX_PCODE
-########################################
+    test0: "[]byte{0x82, 0x19, 0xab, 0xba}"
+    test1: "[]byte{0xde, 0xef, 0xad, 0xbe}"
+    test2: "[]byte{0x01, 0x67, 0x23, 0x45}"

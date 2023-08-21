@@ -7,10 +7,12 @@ import (
 )
 
 func TestParseChannelControlRegister(t *testing.T) {
-	TX_CHAN, RX_CHAN, RX_PCODE, TX_PCODE := parseChannelControlRegister({{index . "CHAN_CTRL"}})
-	TX_CHAN_REFERNCE, RX_CHAN_REFERNCE, RX_PCODE_REFERNCE, TX_PCODE_REFERNCE := mySolution({{index . "CHAN_CTRL"}})
-	assert.Equal(t, TX_CHAN, TX_CHAN_REFERNCE)
-	assert.Equal(t, RX_CHAN, RX_CHAN_REFERNCE)
-	assert.Equal(t, RX_PCODE, RX_PCODE_REFERNCE)
-	assert.Equal(t, TX_PCODE, TX_PCODE_REFERNCE)
+	a,b,c,d := parseChannelControlRegister(0x82abba19)
+	assert.Equal(t, {{index . "test0"}}, []byte{a,b,c,d})
+
+	a,b,c,d = parseChannelControlRegister(0xdeadbeef)
+	assert.Equal(t, {{index . "test1"}}, []byte{a,b,c,d})
+
+	a,b,c,d = parseChannelControlRegister(0x01234567)
+	assert.Equal(t, {{index . "test2"}}, []byte{a,b,c,d})
 }

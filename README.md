@@ -2,9 +2,7 @@
 
 *Work-in-progress*
 
-A series of basic Go exercises inspired from the [Go: Bootcamp
-Course](https://github.com/inancgumus/learngo). Solving all exercises will not make you a Go ninja
-but it is enough to get the basics and start to learn the advanced stuff on your own.
+A series of basic Go exercises inspired from the [Go: Bootcamp Course](https://github.com/inancgumus/learngo). Solving all exercises will not make you a Go ninja but it is enough to get the basics and start to learn the advanced stuff on your own.
 
 ## Getting started
 
@@ -15,8 +13,7 @@ echo <MY-STUDENT-ID> > STUDENT_ID
 make generate
 ```
 
-Your student id should always be available in the file named `STUDENT_ID` in the main
-directory. You can override this by setting the id in the `STUDENT_ID` environment variable.
+Your student id should always be available in the file named `STUDENT_ID` in the main directory. You can override this by setting the id in the `STUDENT_ID` environment variable.
 
 ``` console
 STUDENT_ID=MY-STUDENT-ID> make generate
@@ -26,10 +23,16 @@ STUDENT_ID=MY-STUDENT-ID> make generate
 
 ### Write code
 
-Go through the subdirectories, preferably in the same order as the file names, understand the
-exercise specified in the README, and insert your solution into `exercise.go` near the
-pleaceholder. You can divide your code to as many files as you want but don't forget to add each
-file to your git repo.
+Go through the subdirectories, preferably in the same order as the file names, understand the exercise specified in the README, and insert your solution into `exercise.go` near the pleaceholder.
+
+Once done with the exercise in the directory `<exercise-directory>`, make sure to git-add and git-commit your solution.
+
+``` console
+git add <exercise-directory>/exercise.go
+git commit -m 'solved <exercise-directory>'
+```
+
+You can divide your code to as many files as you want but don't forget to add each file to your git repo.
 
 ### Test
 
@@ -41,18 +44,28 @@ make test
 
 ### Keep track of repo updates
 
+#### With all local changes committed to git
+
+``` console
+git pull --rebase
+```
+
+#### With local changes in the working directory
 
 1. Store your changes
+
 ``` console
 git stash
 ```
 
 2. Pull updates
+
 ``` console
 git pull
 ```
 
 3. Restore your changes
+
 ``` console
 git stash
 ```
@@ -62,34 +75,29 @@ git stash
 ### Add a new exercise
 
 Add a new subdirectory and add the following files:
-- `exercise.yaml`: An exercise definition with a set of inputs, from which `make generate` will
-  choose one by hashing on the student id to generate the exercise.
+- `exercise.yaml`: An exercise definition with a set of inputs, from which `make generate` will choose one by hashing on the student id to generate the exercise.
 - `exercise.go`: Placeholder for the solution.
 - `.README.md`: a README template with instructions.
 - `.exercise_test.go`: the test file to check your solutions.
 
-If you add a new top-level directory, don't forget to include it in the `EXERCISE_DIRS` in the
-Makefile.
+If you add a new top-level directory, don't forget to include it in the `EXERCISE_DIRS` in the Makefile.
 
-Then run `make clean`, this will add the placeholders for the exercise (these will be overwritten
-by `make generate`), add all files in the exercise dir to the git repo, and git-push.
+Then run `make clean`, this will add the placeholders for the exercise (these will be overwritten by `make generate`), add all files in the exercise dir to the git repo, and git-push.
 
 ## Do the labs
 
-Labs tasks are located in the [99-labs](99-labs/) folder. The labs give you hands-on development and
-deployment experience. You will learn how to build and containerize Go programs as well as how to
-run them in Kubernetes. Each lab contains a README that gives you context and specifies the lab
-exercise. Labs depend on each other. For that, it is recommended to do labs one after the other.
+Labs tasks are located in the [99-labs](99-labs/) folder. The labs give you hands-on development and deployment experience. You will learn how to build and containerize Go programs as well as how to run them in Kubernetes. Each lab contains a README that gives you context and specifies the lab exercise. Labs depend on each other. For that, it is recommended to do labs one after the other.
 
 ## Clean up
 
-Reset all generated files to the default placeholder.
+Reset all generated files to the default placeholder. Warning: this will drop all your uncommitted
+local changes, use it at your own risk.
 
 ``` console
 make clean
 ```
 
-Also reset the student id: this is required before pushing any modification to the exercises.
+Also reset the student id: this is required before pushing any modification to any of the exercises.
 
 ``` console
 make realclean

@@ -9,7 +9,7 @@ on service meshes.
 ## Available labs
 
 1. [Setting up the work environment](01-setup/)
-1. [Deploying a web app into Kubernetes](02-webapps/)
+1. [Deploying web applications into Kubernetes](02-webapps/)
 1. [A silly web app: SplitDim](02-splitdim/)
 
 <!-- Local Variables: -->

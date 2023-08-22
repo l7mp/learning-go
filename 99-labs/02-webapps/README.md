@@ -1,6 +1,6 @@
-# Deploying a web app into Kubernetes
+# Deploying web applications into Kubernetes
 
-In this lab we build a simple web app in Go and learn how to deploy it into Kubernetes. Each section is closed with an exercise and a test that you can run to check whether you successfully completed the exercise.
+During this lab, we will build a simple web app in Go and learn how to deploy it into Kubernetes. Each section is closed with an exercise and a test that you can run to check whether you successfully completed the exercise.
 
 ## Table of Contents
 
@@ -24,7 +24,8 @@ go get github.com/stretchr/testify/assert         # add depencency
 go mod tidy                                       # update module version
 ```
 
-> **Note**: The above assumes that you will never publish your code and make it available through `pkg.go.dev` for others to `go get` it.  If you ever want to publish code, make sure to choose a globally unique package name. The best option is to init a new project at GitHub.com, say, under `github.com/<my-user>/<my-package>`, where `<my-user>` is your GitHub id and `<my-package>` is the package name, init the go module with this full name, and publish from GitHub. Since we will not upload the code to GitHub (in fact, we *ask you* not to upload it), the package name can be anything. 
+> **Note**   
+> The above assumes that you will never publish your code and make it available through `pkg.go.dev` for others to `go get` it.  If you ever want to publish code, make sure to choose a globally unique package name. The best option is to init a new project at GitHub.com, say, under `github.com/<my-user>/<my-package>`, where `<my-user>` is your GitHub id and `<my-package>` is the package name, init the go module with this full name, and publish from GitHub. Since we will not upload the code to GitHub (in fact, we *ask you* not to upload it), the package name can be anything. 
 
 > **Warning**: Please do not publish your solutions because you spoil the fun for everyone else (plus, we regularly change the exercises so your published code would not work for other people anyway). 
 
@@ -63,7 +64,8 @@ curl http://localhost:8080
 Hello, world!
 ```
 
-> **Note**: The address `localhost` is the short name for the loopback interface address, which defaults to `127.0.0.1`. Also note that the trailing slash is optional, so the following request would be equivalent: `curl http://127.0.0.1:8080`
+> **Note**   
+> The address `localhost` is the short name for the loopback interface address, which defaults to `127.0.0.1`. Also note that the trailing slash is optional, so the following request would be equivalent: `curl http://127.0.0.1:8080`
 
 Congratulations, you have built and run your first Go web app! Now fire up your favorite browser and direct it to the URL `localhost:8080` and see your first webpage rendered in full glory.
 
@@ -127,7 +129,8 @@ minikube start --memory=4096 --cpus=2 --driver=podman --container-runtime=cri-o
 
 This will download all required artifacts and create a new Minikube cluster using 4GB memory and max 2 CPU cores locally. The cluster will use the `podman` driver and the `cri-o` container runtime. 
 
-> **Warning**: Feel free to increase CPU/memory limits above to get a more responsive Kubernetes but refrain from decreasing them significantly, Kubernetes can be resource hungry.
+> **Warning**  
+> Feel free to increase CPU/memory limits above to get a more responsive Kubernetes but refrain from decreasing them significantly, Kubernetes can be resource hungry.
 
 We will often use additional functionality from the [Istio service mesh](https://istio.io). Use the below to download and enable Istio:
 
@@ -154,7 +157,8 @@ Make sure that `kubectl` is installed locally and carry out some useful customiz
   ```
 - type `kubectl clu<TAB>` to check if autocompletion works: the shell should automatically complete your command to `kubectl cluster-info`.
 
-> **Note**: Never use CLIs without autocompletion and always reach out for `<TAB>` while typing. CLI tools [written in Go](https://pkg.go.dev/github.com/spf13/cobra) typically provide autocompletion out of the box. If a shell does not provide autocompletion, don't use it.
+> **Note**   
+> Never use CLIs without autocompletion and always reach out for `<TAB>` while typing. CLI tools [written in Go](https://pkg.go.dev/github.com/spf13/cobra) typically provide autocompletion out of the box. If a shell does not provide autocompletion, don't use it.
 
 Some useful `kubectl` commands:
 - `kubectl config view`: view current client config, including the API server URL, access tokens, etc.;
@@ -212,7 +216,8 @@ COPY --from=build /helloworld .
 CMD ["/helloworld"]
 ```
 
-> **Warning**: Make sure you understand what is going on here: later you will be requested to write your own Dockerfiles (see [here](https://docs.docker.com/engine/reference/builder) for more details).
+> **Warning**   
+> Make sure you understand what is going on here: later you will be requested to write your own Dockerfiles (see [here](https://docs.docker.com/engine/reference/builder) for more details).
 
 The standard way to build container images is via the following steps (do not issue these command just yet, most probably they won't work anyway):
 - build the image: `podman image build -t helloworld -f deploy/Dockerfile .`;
@@ -220,7 +225,8 @@ The standard way to build container images is via the following steps (do not is
 - login to the default container image repository: `podman login`;
 - upload the `<image>` at `<version>` to the default container repository: `podman push <image>:<version>`.
 
-> **Note**: Just swap `podman` with `docker` if you are using Docker, the two should be equivalent. In addition, Linux will require you to run `podman` with superuser rights, so prefix all `podman` commands with `sudo`.
+> **Note**   
+> Just swap `podman` with `docker` if you are using Docker, the two should be equivalent. In addition, Linux will require you to run `podman` with superuser rights, so prefix all `podman` commands with `sudo`.
 
 Once pushed, the image would be available for Kubernetes to create new pods. However, this roundtrip from a local build via a central container image repository and then back again to a local Kubernetes cluster can become tedious if we modify/update an image at fast pace. Minikube simplifies building and deploying new images for us: you can build an image *inside* the Minikube cluster and use the local image right away without having to go through a container registry. 
 
@@ -244,7 +250,8 @@ localhost/helloworld:latest
 ...
 ```
 
-> **Warning**: Make sure you understand and practice the above, throughout the rest of this lab and the subsequent ones we silently assume you're using `minikube image` to build images and use the local image names (i.e., those with the prefix `localhost/`) for Kubernetes.
+> **Warning**   
+> Make sure you understand and practice the above, throughout the rest of this lab and the subsequent ones we silently assume you're using `minikube image` to build images and use the local image names (i.e., those with the prefix `localhost/`) for Kubernetes.
 
 ### Pods
 
@@ -332,7 +339,8 @@ helloworld-67f7d78ccd-9tjw6   1/1     Running   0          2m51s
 helloworld-67f7d78ccd-lvbl6   1/1     Running   0          2m51s
 ```
 
-> **Note**: The `kubectl get deployment helloworld` would return the status of the Deployment, not the pods that belong to it. In order to query the pods, we have to use `kubectl get pods` and identify the pods we are interested in by filtering on the label `app:helloworld` automatically applied by `kubectl create deployment` to all the pods running in the Deployment.
+> **Note**   
+> The `kubectl get deployment helloworld` would return the status of the Deployment, not the pods that belong to it. In order to query the pods, we have to use `kubectl get pods` and identify the pods we are interested in by filtering on the label `app:helloworld` automatically applied by `kubectl create deployment` to all the pods running in the Deployment.
 
 Observe how the name of the pods is now a semi-random hash appended to `helloworld`; this reinforces that pods in a Deployment are ephemeral and disposable. To demonstrate this, kill one of the pods and then `kubectl get` the pod list again:
 
@@ -419,7 +427,8 @@ helloworld   ClusterIP   10.98.135.40   <none>        8080/TCP   4m27s   app=hel
 
 The default Service type is `ClusterIP`, which assigns an IP address (`10.98.135.40` above) from a pool of IP addresses that your cluster has reserved for that purpose. From this point, you can use this single IP address to reach the pods of the Service. Note that Services of type `ClusterIP` are reachable only *from inside the cluster*: external clients will not be able to reach them.
 
-> **Note**: Curiously, Minikube allows local access to `ClusterIP` services, but this is only a Minikube subtlety and in general this will not work.
+> **Note**   
+> Curiously, Minikube allows local access to `ClusterIP` services, but this is only a Minikube subtlety and in general this will not work.
 
 To check Service access from the cluster, we deploy a separate pod called `net-debug` that we use to send queries to our web server pods. Attach to the console of the pod and execute a curl request to the cluster IP `10.98.135.40` and port 8080 from inside that pod:
 
@@ -445,9 +454,11 @@ helloworld.default.svc.cluster.local has address 10.98.135.40
 
 Observe that the resolved address is exactly the `ClusterIP`.
 
-> **Note**: The fully qualified domain name (FQDN) of our Service is `helloworld.default.svc.cluster.local`, but any subdomain of that will correctly resolve the cluster IP as long as the subdomain unambiguously identifies a Service. 
+> **Note**    
+> The fully qualified domain name (FQDN) of our Service is `helloworld.default.svc.cluster.local`, but any subdomain of that will correctly resolve the cluster IP as long as the subdomain unambiguously identifies a Service. 
 
-> **Note**: The `default` in the above FQDN refers to the Kubernetes namespace called `default`. Namespaces are an extremely useful Kubernetes concept to isolate workloads running in the same cluster but we won't have time to go into the details.
+> **Note**   
+> The `default` in the above FQDN refers to the Kubernetes namespace called `default`. Namespaces are an extremely useful Kubernetes concept to isolate workloads running in the same cluster but we won't have time to go into the details.
 
 But perhaps even more importantly, the two HTTP queries to the Service were responded by different pods (first by `helloworld-67f7d78ccd-2fklj` and then by `helloworld-67f7d78ccd-qn6wk`). This highlights one of the most important properties of Kubernetes Services: they spread requests randomly across the pods of the Service, which makes sure the load is evenly distributed between the replicas.
 
@@ -477,7 +488,8 @@ EOF
 
 The `port` is now set to 80, which will be used by Kubernetes as the public port on the load balancer address, and `targetPort` is set to 8080, which is the port the pods actually listen on. Kubernetes load balancers will silently do the port mapping from port 80 and route external requests to the pods at 8080.
 
-> **Note:*: The cluster IP is the same as the external IP in the above case, but this is just a Minikube subtlety. Usually the cluster IP will be chosen as an unroutable private IP and only the external IP will be global.
+> **Note**   
+> The cluster IP is the same as the external IP in the above case, but this is just a Minikube subtlety. Usually the cluster IP will be chosen as an unroutable private IP and only the external IP will be global.
 
 External access via `LoadBalancer` services requires additional support from the cloud provider. The provider will have to lease a public IP from its address pool and make the Service available externally via that public IP. For local Kubernetes clusters this may not work without manually installing an additional tool like MetalLB. Minikube contains built-in support for LoadBalancers but this requires the extra command `minikube tunnel` to run in the background. It is best to start `minikube tunnel` in a new console right after `minikube start`. 
 
@@ -489,7 +501,8 @@ NAME         TYPE           CLUSTER-IP     EXTERNAL-IP    PORT(S)        AGE
 helloworld   LoadBalancer   10.98.135.40   10.98.135.40   80:31275/TCP   105s
 ```
 
-> **Warning**: If the external IP in the output of `kubectl get` shows the status `<pending>` for more than a minute then `minikube tunnel` is not running. Just start it and everything should work fine. At least on Minikube. Otherwise, contact your Kubernetes provider.
+> **Warning**   
+> If the external IP in the output of `kubectl get` shows the status `<pending>` for more than a minute then `minikube tunnel` is not running. Just start it and everything should work fine. At least on Minikube. Otherwise, contact your Kubernetes provider.
 
 Now we can issue a HTTP query to the Service from the host:
 
@@ -498,7 +511,8 @@ curl http://10.98.135.40
 Hello world from helloworld-67f7d78ccd-qn6wk!
 ```
 
-> **Note**: This time you don't need to explicitly specify the port in the HTTP URL because port 80 is the default.
+> **Note**   
+> This time you don't need to explicitly specify the port in the HTTP URL because port 80 is the default.
 
 And that is all. We have built and deployed a Go web app into Kubernetes and had a lot of fun along the way. Kubernetes and Go are so cool!
 

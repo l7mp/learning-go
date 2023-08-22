@@ -23,7 +23,7 @@ STUDENT_ID=MY-STUDENT-ID> make generate
 
 ### Write code
 
-Go through the subdirectories, preferably in the same order as the file names, understand the exercise specified in the README, and insert your solution into `exercise.go` near the pleaceholder.
+Go through the subdirectories, preferably in the same order as the file names, understand the exercise specified in the `README.md` file, and insert your solution into `exercise.go` near the pleaceholder.
 
 Once done with the exercise in the directory `<exercise-directory>`, make sure to git-add and git-commit your solution.
 
@@ -32,7 +32,7 @@ git add <exercise-directory>/exercise.go
 git commit -m 'solved <exercise-directory>'
 ```
 
-You can divide your code to as many files as you want but don't forget to add each file to your git repo.
+You can divide your code into as many files as you like but don't forget to add each file to your git repo.
 
 ### Test
 
@@ -44,7 +44,14 @@ make test
 
 ### Keep track of repo updates
 
+Sometimes we update the main git repo to fix bugs or add new exercises. We will try to make sure to keep these annoyances at the minimum. The below workflow shows how to update your local working copy without overwriting your solutions.
+
+> **Warning**:  
+> Make sure to commit all your code into git: this will guarantee that you will never lose your solutions even if some of the below steps go wrong. You can also back up your git repo but please make sure that your solutions are kept private (a private GitHUb repo will do it).
+
 #### With all local changes committed to git
+
+If you have a clear git tree with all your changes committed, the below should update only the files that change in the master.
 
 ``` console
 git pull --rebase
@@ -52,25 +59,27 @@ git pull --rebase
 
 #### With local changes in the working directory
 
-1. Store your changes
+If you have uncommitted changes, follow the below steps.
 
-``` console
-git stash
-```
+1. Store your changes temporarily.
 
-2. Pull updates
+   ``` console
+   git stash
+   ```
 
-``` console
-git pull
-```
+2. Pull updates.
 
-3. Restore your changes
+   ``` console
+   git pull
+   ```
 
-``` console
-git stash
-```
+3. Restore your changes.
 
-4. Optional: fix conflicts and re-run tests
+   ``` console
+   git stash
+   ```
+
+4. Optional: fix conflicts and re-run tests.
 
 ### Add a new exercise
 

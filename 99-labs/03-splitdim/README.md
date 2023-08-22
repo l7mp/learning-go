@@ -310,16 +310,16 @@ The next step is to define our internal `DataLayer`: the internal representation
 
 ## Reset
 
-Next, we set off to write the HTTP handlers and the actual implementations for our API. First we write the `api/reset` HTTP handler and implementation, since (1) this is our simplest API and (2) it helps us initializing the account database in the tests.
+Next, we write the HTTP handlers and the actual implementation for our API. First we implement the HTTP handler for the `api/reset` API endpoint, since (1) this is our simplest API and (2) it helps us (re-)initialize the account database in the tests.
 
-Before we set off, below is a list of useful functions that help dealing with encoding/decoding HTTP requests and responses to/from JSON, plus some additional handy utilities you can use to write HTTP handlers:
-   - `json.NewDecoder(r.Body).Decode(&var)`: decode the body from the `r` of type `http.Request` into the variable `var` of the requested type (make sure to import `encoding/json`),
-   - `json, err := json.Marshal(var)`: marshal the data in `var` into `json` of type `[]byte` or return an error,
-   - `w.Header().Set("Content-Type", "application/json")`: set the HTTP response header `Content-Type` to `application/json`,
-   - `_, err = w.Write(json)`: write the byte slice `json` into the HTTP response body represented by `w`,
-   - `w.WriteHeader(status)`: write the HTTP status `status` (e.g., `http.StatusBadRequest`, `http.StatusNotFound` or `http.StatusOk`) into the HTTP response `w`,
-   - `fmt.Fprintf(w, "API request failed: %s", err)`: write an error message into the HTTP response body,
-   - `log.Printf("format", args...)`: log a request.
+Before we start, below is a list of useful functions that help dealing with encoding/decoding HTTP requests and responses to/from JSON, plus some additional utilities for writing HTTP handlers:
+- `err := json.NewDecoder(r.Body).Decode(&var)`: decode the body from the `r` of type `http.Request` into the variable `var` of the requested type (make sure to import `encoding/json`) or return an error;
+- `json, err := json.Marshal(var)`: marshal the data in `var` into the byte slice (i.e., `[]byte`) `json` in JSON format or return an error;
+- `w.Header().Set("Content-Type", "application/json")`: set the HTTP response header `Content-Type` to `application/json`;
+- `_, err = w.Write(json)`: write the byte slice `json` into the HTTP response body represented by `w`;
+- `w.WriteHeader(status)`: write the HTTP status `status` (e.g., `http.StatusBadRequest`, `http.StatusNotFound` or `http.StatusOk`) into the HTTP response `w`;
+- `fmt.Fprintf(w, "API request failed: %s", err)`: write an error message into the HTTP response body;
+- `log.Printf("format", args...)`: log a request.
 
 > **Note**
 > 
@@ -332,14 +332,14 @@ Before we set off, below is a list of useful functions that help dealing with en
    - return HTTP 500 error status (`http.StatusInternalServerError`) if something went wrong and write the error message into the response body,
    - if all went well, return HTTP 200 (`http.StatusOK`).
    
-1. Actually implement the ``db.Reset()` call from the above. This will require extending the below function in the `pkg/db/local` package:
+1. Implement the `db.Reset()` call from the above. This will require extending the below function in the `pkg/db/local` package:
 
    ``` go
    func (db *localDB) Reset() error { ... }
    ```
 
    The implementation should make the following steps to reset the account database:
-   - lock the database `db` for *writing* (`db.mu.Lock()`),
+   - lock the database `db` for *writing* (use `db.mu.Lock()`),
    - make sure the database will be unlocked at the end of the call (`defer db.mu.Unlock()`), and
    - re-initialize the accounts database: `db.accounts = make(map[string]int)`.
    
@@ -364,7 +364,7 @@ Before we set off, below is a list of useful functions that help dealing with en
    - return HTTP 500 error status (`http.StatusInternalServerError`) if something went wrong and write the error message into the response body,
    - if all went well, return HTTP 200 (`http.StatusOK`).
    
-1. Actually implement the ``db.Transfer(t)` call from the above. This will require extending the below function in the `pkg/db/local` package:
+1. Implement the `db.Transfer(t)` call from the above. This will require extending the below function in the `pkg/db/local` package:
 
    ``` go
    func (db *localDB) Transfer(t api.Transfer) error { ... }
@@ -374,9 +374,9 @@ Before we set off, below is a list of useful functions that help dealing with en
    - check if the sender and the receiver in the transfer are different and return an appropriate error if not,
    - lock the database `db` for *writing* (`db.mu.Lock()`),
    - make sure the database will be unlocked at the end of the call (`defer db.mu.Unlock()`), and
-   - perform the actual transaction: increase the balance of the sender by the amount of the transfer (meaning that the sender is now a *creditor* in the transaction) and decrease the balance of the receiver with the same amount (meaning that the receiver is now in *debt*: the receiver *owns* "amount" of money to the sender).
+   - perform the actual transaction: increase the balance of the sender by the amount of the transfer (meaning that the sender is now a *creditor* in the transaction) and decrease the balance of the receiver with the same amount (meaning that the receiver is now in *debt*: the receiver *owes* "amount" money to the sender).
    
-   If any of the users are not actually registered in the database then the transfer API should silently initialize the balance of these users with zero balance and perform the transaction on after that. This simplifies the API a lot (otherwise we would need an additional `api/register` API as well).
+   If any of the users are not actually registered in the database then the transfer API should silently initialize the balance of the new users to zero and perform the transaction on after that. This simplifies the API a lot (otherwise we would need an additional `api/register` API as well).
 
 > ✅ **Check**
 >
@@ -394,14 +394,14 @@ The `api/accounts` API should return the current balance of each registered user
 1. Implement the HTTP handler for the `/api/accounts` API, i.e., the `AccountListHandler` function in `main.go`. This function should should implement the following steps: 
    - check that the request uses the HTTP GET method (already done),
    - log the request, 
-   - call `accountList, err := db.AccountList()` to obtain the current list of user accounts and balances from the data layer (an `[]api.Accuunt` slice) (this will currently call the placeholder, we will implement this in the next step),
+   - call `accountList, err := db.AccountList()` to obtain the current list of user accounts and balances from the data layer, where the resultant `accountList` is of type `[]api.Account` (this will currently call the placeholder, we will implement this in the next step),
    - return HTTP 500 error status (`http.StatusInternalServerError`) if something went wrong and write the error message into the response body,
    - marshal the returned `accountList` to JSON and return HTTP 500 error status (`http.StatusInternalServerError`) if this fails,
    - set the HTTP response header `Content-Type` to `application/json`,
    - write the JSON data into the HTTP response body,
    - if all went well, return HTTP 200 (`http.StatusOK`).
    
-1. Implement the ``db.AccountList()` call from the above. This will require extending the below function in the `pkg/db/local` package:
+1. Implement the `db.AccountList()` call from the above. This will require extending the below function in the `pkg/db/local` package:
 
    ``` go
    func (db *localDB) AccountList() ([]api.Account, error) { ... }
@@ -411,13 +411,14 @@ The `api/accounts` API should return the current balance of each registered user
    - lock the database `db` for *reading* (`db.mu.RLock()`),
    - make sure the database will be unlocked at the end of the call (`defer db.mu.RUnlock()`), 
    - initialize an empty account list to return later: `ret := []api.Account{}`,
-   - iterate through the local database and copy the use accounts out into `ret` (recall: the database is a map from user names to balances while the returned list is a slice of `struct{Holder string, Balance int}` structs, make sure to do the conversion),
+   - iterate through the local database and copy the use accounts out into `ret` (recall: the database is a map from user names to balances while the returned list is a slice of `Account{Holder string, Balance int}` structs, make sure to do the conversion),
    - to make the returned list more accessible to users, sort it by name (don't forget to import the `sort` package):
-    ``` go
-    sort.Slice(ret, func(i, j int) bool {
-        return ret[i].Holder < ret[j].Holder
-    })
-    ```
+     ``` go
+     sort.Slice(ret, func(i, j int) bool {
+         return ret[i].Holder < ret[j].Holder
+     })
+     ```
+
     - return `ret` and a `nil` error.
 
 > ✅ **Check**
@@ -431,9 +432,9 @@ The `api/accounts` API should return the current balance of each registered user
 
 ## Clear
 
-We left the most difficult API to the end: generating a list of suggested transfers between users how to clear all debts in the database. 
+We left the most difficult API to the end: generating a list of suggested transfers between users for how to clear all debts in the database. 
 
-Although not entirely trivial, this algorithm is not that difficult: just find a user with positive balance (meaning the user is a creditor) and another one with negative balance (meaning the user is a debtor) and create a transaction with the debtor as the sender and the creditor as the receiver with the amount hat is the minimum of the balances of the debtor and the creditor. Observe that in this step we have cleared the balance of at least one user, so we made progress. Do this as long as there is a user with positive balance. This is the algortithm we will use below, but first we have to write the HTTP handler.
+Although not entirely trivial, this algorithm is not that difficult: just find a user with positive balance (meaning the user is a creditor) and another one with negative balance (meaning the user is a debtor) and create a transaction with the debtor as the sender and the creditor as the receiver with the amount that is the minimum of the balances of the debtor and the creditor. Observe that in this step we have cleared the balance of at least one user, so we made progress. Do this as long as there is a user with positive balance. This is the algortithm we will use below, but first we have to write the HTTP handler.
 
 1. Implement the HTTP handler for the `/api/clear` API, i.e., the `ClearHandler` function in `main.go`. This function should should implement the following steps: 
    - check that the request uses the HTTP GET method (already done),
@@ -444,7 +445,7 @@ Although not entirely trivial, this algorithm is not that difficult: just find a
    - write the JSON data into the HTTP response body,
    - if all went well, return HTTP 200 (`http.StatusOK`).
    
-1. Actually implement the ``db.Clear()` call from the above. This will require extending the below function in the `pkg/db/local` package:
+1. Implement the `db.Clear()` call from the above. This will require extending the below function in the `pkg/db/local` package:
 
    ``` go
    func (db *localDB) Clear() ([]api.Transfer, error) { ... }
@@ -452,13 +453,19 @@ Although not entirely trivial, this algorithm is not that difficult: just find a
 
    The implementation should make the following steps to clear the debts:
    - lock the database `db` for *reading* (`db.mu.RLock()`),
-   - make sure the database will be unlocked at the end of the call (`defer db.mu.RUnlock()`), 
    - check the consistency of the database (this will prevent infinite loops later) by summing up user balances and checking whether the total balance is zero (return an error if this fails),
    - copy the account database into a local variable called `tempAcc` that the algorithm will work on (we don't want to actually perform the clearing operation, we just want to suggest a way to do this),
-   - initialize an empty slice of transfers: `transfers := make([]api.Transfer, 0)`,
-   - iterate through all user-balance pairs in the accounts database to find the creditor: `for sender, balance := range tempAcc { ... }`,
+   - unlock the database (`db.mu.RUnlock()`), 
+   - initialize an empty slice of transfers: `transfers := make([]api.Transfer)`,
+   - iterate through all user-balance pairs in the accounts database to find a creditor: 
+     ```go
+     for sender, balance := range tempAcc { ... }
+     ```
    - check if the balance of `sender` is negative, otherwise continue,
-   - iterate through all user-balance pairs again to find a debtor: `for sender, balance := range tempAcc { ... }`,
+   - iterate through all user-balance pairs again to find a debtor: 
+     ```go
+     for receiver, receiverBalance := range tempAcc { ... }
+     ```
    - check if the balance of `receiver` is positive, otherwise continue,
    - compute the minimum of the balances of the `sender` and the `receiver` and store it in `transferAmount`,
    - create an transfer from the `sender` to the `receiver` of size `transferAmount`,

@@ -220,20 +220,19 @@ cd learning-go
 You should always add commit your solutions to this repo (see below) to avoid losing your work. 
 
 > **Note**  
-> We recommend you keep a safe copy of your git tree somewhere safe. The simplest way to create a GitHUb private fork and use that to back up your solutions. We ask you to keep your GitHub repo private to prevent others from copying your work.
+> We recommend you keep a copy of your git tree somewhere safe to back up your solutions. The simplest way is to use a GitHub private fork for this purpose. We ask you to keep your GitHub repo private, in order to prevent others from copying your work.
 
 ### Generate the exercises
 
 Change to the root of the git repo and make sure to read the instructions in the `README.md` file. The below summarizes the main steps.
 
 ``` shell
-cd <learning-go-dir>
 echo <MY-STUDENT-ID> > STUDENT_ID
 make generate
 ```
 
 > **Warning**:  
-> You must use your own student id. We will check this so make sure you do not mistype your id.
+> You must use your own student id. We will check this, so make sure you do not mistype your id.
 
 ### Solve the first homework
 
@@ -254,7 +253,18 @@ FAIL	github.com/l7mp/learning-go/01-getting-started/01-hello-world [build failed
 FAIL
 ```
 
-Consult the `README.md` file for how to solve the exercise and place your solution into the file `exercise.go` at the placeholder. It is usually not worth copying someone else solution: most probably your exercises will be quite different (that is what `make generate` is for).
+Consult the `README.md` file for how to solve the exercise and place your solution into the file `exercise.go` at the placeholder. 
+
+> **Note**  
+> It is usually not worth copying someone else's solution: most probably your exercises will be quite different for theirs (that is what `make generate` is for).
+
+For instance, you may be asked to write a `helloWorld` function in Go that will return the string `Hello world!`. In which case, insert the below code into `exercise.go`:
+
+```go
+func helloWorld() string {
+    return "Hello world!"
+}
+```
 
 > ✅ **Check**: 
 >
@@ -266,7 +276,7 @@ Consult the `README.md` file for how to solve the exercise and place your soluti
 > PASS
 > ```
 
-After all the tests pass, git-commit your solution: this makes sure it remains there even if you re-generate the exercises.
+If all tests pass, then git-commit your solution: this makes sure it remains there even if you re-generate the exercises.
 
 ``` shell
 git add exercise.go

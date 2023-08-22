@@ -141,7 +141,7 @@ minikube start --memory=4096 --cpus=2 --driver=podman --container-runtime=cri-o
 > **Note**  
 > Cluster creation may take some time.
 
-This will create a local Kubernetes cluster with 4 GB memory and 2 CPUs using podman as the container driver, and configures `kubectl` to talk to this cluster. Feel free to customize the parameters; e.g., it is a good idea to increase the amount of CPU and memory available to your cluster if your platform provides enough resource.
+This will create a local Kubernetes cluster with 4 GB memory and 2 vCPUs using podman as the container driver, and configure `kubectl` to talk to this cluster. Feel free to customize the CPU/memory limits in the abobe; e.g., it is a good idea to increase the amount of CPU and memory available to your cluster to obtain a more responsive Kubernetes.
 
 > **Note**  
 > Once done working with Kubernetes make sure to close it with `minikube stop`: Kubernetes may take up considerable resources and this commands frees those resources up. You can always restart your cluster with `minikube start` and continue working from where you left the last time you issued `minikube stop`.

@@ -112,7 +112,7 @@ Once ready, you can run the program with `go run main.go`: if all goes well you 
 
 This means your server is ready to accept HTTP requests.
 
-> ✅ **Check**: 
+> ✅ **Check**
 >
 > Run the below test to check whether you have successfully completed the exercise. If all goes well, you should see the output `PASS`.
 > ``` sh
@@ -135,7 +135,7 @@ func SomeHandler(w http.ResponseWriter, r *http.Request) {
 ```
 Substitute `http.MethodPost` with `http.MethodGet` for handlers that accept only GET requests.
 
-> ✅ **Check**: 
+> ✅ **Check**
 >
 > Run the below test to check whether you have successfully completed the exercise. If all goes well, you should see the output `PASS`.
 > ``` sh
@@ -144,7 +144,9 @@ Substitute `http.MethodPost` with `http.MethodGet` for handlers that accept only
 > ```
 > Make sure the web service is running: the test issues requests to the HTTP server and checks whether the response is as expected.
 
-> **Note**: Currently `http.HandleFunc("/api/transfer", TransferHandler)` will route *all* HTTP requests with a path that starts with `/api/transfer` to the `TransferHandler`, including `/api/transfer/random/api` or `/api/transfer/some/malicious/attack`. To make sure *only* the required API is served, you can check for the HTTP path inside the handler.
+> **Note**
+> 
+> Currently `http.HandleFunc("/api/transfer", TransferHandler)` will route *all* HTTP requests with a path that starts with `/api/transfer` to the `TransferHandler`, including `/api/transfer/random/api` or `/api/transfer/some/malicious/attack`. To make sure *only* the required API is served, you can check for the HTTP path inside the handler.
 
 ## API
 
@@ -171,7 +173,9 @@ The next task is to design the public SplitDim API, that is, the Go structs (and
    }
    ```
 
-   > **Warning**: Documenting your public APIs is mandatory. Using the [Godoc](https://go.dev/blog/godoc) format will simplify generating easy-to-browse documentation from your code. Below we will sometime omit the docs for brevity, but you should never!
+   > **Warning**
+   > 
+   > Documenting your public APIs is mandatory. Using the [Godoc](https://go.dev/blog/godoc) format will simplify generating easy-to-browse documentation from your code. Below we will sometime omit the docs for brevity, but you should never!
 
 1. We also 
 
@@ -185,7 +189,9 @@ The next task is to design the public SplitDim API, that is, the Go structs (and
    }
    ```
 
-   > **Warning**: Always add the JSON tags as above!If you expect your data format to ever be marshaled to JSON.
+   > **Warning**
+   > 
+   > Always add the JSON tags as above!If you expect your data format to ever be marshaled to JSON.
 
 1. Finally, we design the `DataLayer` API: this will be a Go `interface` that simply declares the functions we want to support. Later, we will create multiple implementations.
 
@@ -203,9 +209,11 @@ The next task is to design the public SplitDim API, that is, the Go structs (and
    }
    ```
 
-   > **Note**: This is an internal API: we don't want people to import and use these internal data structures. Technically, therefore, we should place these definitions, and the implementations we will create later, into a new package under `internal/`, which, recall, cannot be imported from outside the main package. We will spare this now for simplicity, but in practice always be aware of what's public and what's private in your code.
+   > **Note**
+   > 
+   > This is an internal API: we don't want people to import and use these internal data structures. Technically, therefore, we should place these definitions, and the implementations we will create later, into a new package under `internal/`, which, recall, cannot be imported from outside the main package. We will spare this now for simplicity, but in practice always be aware of what's public and what's private in your code.
 
-> ✅ **Check**: 
+> ✅ **Check**
 >
 > Run the below test to check whether you have successfully completed the exercise. If all goes well, you should see the output `PASS`.
 > ``` sh
@@ -231,9 +239,13 @@ The next step is to define our internal `DataLayer`: the internal representation
    )
    ```
 
-   > **Note **: We want to use our own API, hence the (sub)package import `github.com/<my-user>/splitdim/pkg/api`.
+   > **Note **
+   > 
+   > We want to use our own API, hence the (sub)package import `github.com/<my-user>/splitdim/pkg/api`.
 
-   > **Note **: From now on we will not explicitly write import lists: remember, just add imports when Go complains during compilation.
+   > **Note **
+   > 
+   > From now on we will not explicitly write import lists: remember, just add imports when Go complains during compilation.
 
 1. Use the below definition for the internal data layer.
 
@@ -256,7 +268,9 @@ The next step is to define our internal `DataLayer`: the internal representation
    }
    ```
 
-   > **Warning**: It is idiomatic Go to make data structure definitions private and let  constructors return an *interface* as a pointer to the struct instead of the actual struct itself (observe that the above returns `api.DataLayer`, not `localDB`). Since `localDB` is private, the caller would not be able to do much with it anyway.
+   > **Warning**
+   > 
+   > It is idiomatic Go to make data structure definitions private and let  constructors return an *interface* as a pointer to the struct instead of the actual struct itself (observe that the above returns `api.DataLayer`, not `localDB`). Since `localDB` is private, the caller would not be able to do much with it anyway.
 
 1. Implement the placeholders for the 4 interface methods.
 
@@ -283,7 +297,7 @@ The next step is to define our internal `DataLayer`: the internal representation
    }
    ```
 
-> ✅ **Check**:
+> ✅ **Check**
 >
 > Run the below test to check whether you have successfully completed the exercise. If all goes well, you should see the output `PASS`.
 > ``` sh
@@ -305,7 +319,9 @@ Before we set off, below is a list of useful functions that help dealing with en
    - `fmt.Fprintf(w, "API request failed: %s", err)`: write an error message into the HTTP response body,
    - `log.Printf("format", args...)`: log a request.
 
-> **Note **: If unsure about the use of any of these functions, remember that all Go libraries come with excellent documentation at [`pkg.go.dev`](https://pkg.go.dev). For instance, the documentation of the `net/http` package is [here](https://pkg.go.dev/net/http),  [here](https://pkg.go.dev/encoding/json) is the docs for the JSON encoding/decoding functions, etc.
+> **Note**
+> 
+> If unsure about the use of any of these functions, remember that all Go libraries come with excellent documentation at [`pkg.go.dev`](https://pkg.go.dev). For instance, the documentation of the `net/http` package is [here](https://pkg.go.dev/net/http), [here](https://pkg.go.dev/encoding/json) is the docs for the JSON encoding/decoding functions, etc.
 
 1. Implement the HTTP handler for the `/api/reset` API, i.e., the `ResetHandler` function in `main.go`. This function should should implement the following steps: 
    - check that the request uses the HTTP GET method (already done),
@@ -325,7 +341,7 @@ Before we set off, below is a list of useful functions that help dealing with en
    - make sure the database will be unlocked at the end of the call (`defer db.mu.Unlock()`), and
    - re-initialize the accounts database: `db.accounts = make(map[string]int)`.
    
-> ✅ **Check**: 
+> ✅ **Check**
 >
 > Run the below test to check whether you have successfully completed the exercise. If all goes well, you should see the output `PASS`.
 > ``` sh
@@ -360,7 +376,7 @@ Before we set off, below is a list of useful functions that help dealing with en
    
    If any of the users are not actually registered in the database then the transfer API should silently initialize the balance of these users with zero balance and perform the transaction on after that. This simplifies the API a lot (otherwise we would need an additional `api/register` API as well).
 
-> ✅ **Check**: 
+> ✅ **Check**
 >
 > Run the below test to check whether you have successfully completed the exercise. If all goes well, you should see the output `PASS`.
 > ``` sh
@@ -402,7 +418,7 @@ The `api/accounts` API should return the current balance of each registered user
     ```
     - return `ret` and a `nil` error.
 
-> ✅ **Check**: 
+> ✅ **Check**
 >
 > Run the below test to check whether you have successfully completed the exercise. If all goes well, you should see the output `PASS`.
 > ``` sh
@@ -448,7 +464,7 @@ Although not entirely trivial, this algorithm is not that difficult: just find a
    - decrease the balance of the `receiver` by `transferAmount` since they are now being payed back their credit,
    - check if the balance of the sender reached zero: if yes, break the loop, this user is now ready.
    
-> ✅ **Check**: 
+> ✅ **Check**
 >
 > Run the below test to check whether you have successfully completed the exercise. If all goes well, you should see the output `PASS`.
 > ``` sh
@@ -457,7 +473,7 @@ Although not entirely trivial, this algorithm is not that difficult: just find a
 > ```
 > Make sure the web service is running: the test issues requests to the HTTP server and checks whether the response is as expected.
 
-> ✅ **Check**: 
+> ✅ **Check**
 >
 > Run the below test to check whether you have successfully completed *all* the exercises above. If all goes well, you should see the output `PASS`.
 > ``` sh
@@ -478,6 +494,7 @@ The last step is to package up everything into a Docker container, deploy into K
 
 
 > ✅ **Check**
+> 
 > Test your Kubernetes deployment. Some useful commands for testing from the shell:
 > - store the external IP assigned by Kubernetes to the `splitdim` service:
 >   ``` sh

@@ -259,4 +259,4 @@ git add exercise.go
 git commit -m 'first exercise solved'
 ```
 
-You can test *all* your solutions from the main directory by issuing `make test`. Currently only the first test will pass: at the end of the course you should have *all tests* to succeed.
+You can test *all* your solutions from the main directory by issuing `make test`. Currently only the first test will succeed: at the end of the course you should have *all the tests* pass.

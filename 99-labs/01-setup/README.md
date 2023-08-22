@@ -34,7 +34,7 @@ The course requires these software:
 - `make`
 - [Istio and istioctl](https://istio.io/)
 
-> **Note**:  
+> **Note**  
 > If you use the VM, jump to [Insall Istio](#install-istio)
 
 ### Install Go
@@ -117,7 +117,7 @@ sudo apt-get install -y kubectl
 echo "source <(kubectl completion bash)" >> ~/.bashrc
 ```
 
-> **Note**:  
+> **Note**  
 > If you use a different shell (e.g., zsh) , check configuration steps with `kubectl completion -h`
 
 ### Install Minikube
@@ -137,12 +137,12 @@ Once installed, we create a local Kubernetes cluster. Copy the below into your t
 minikube start --memory=4096 --cpus=2 --driver=podman --container-runtime=cri-o
 ```
 
-> **Note**:  
+> **Note**  
 > Cluster creation may take some time.
 
 This will create a local Kubernetes cluster with 4 GB memory and 2 CPUs using podman as the container driver, and configures `kubectl` to talk to this cluster. Feel free to customize the parameters; e.g., it is a good idea to increase the amount of CPU and memory available to your cluster if your platform provides enough resource.
 
-> **Note**:  
+> **Note**  
 > Once done working with Kubernetes make sure to close it with `minikube stop`: Kubernetes may take up considerable resources and this commands frees those resources up. You can always restart your cluster with `minikube start` and continue working from where you left the last time you issued `minikube stop`.
 
 ### Install Istio

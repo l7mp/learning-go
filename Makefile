@@ -7,10 +7,10 @@ EXERCISE_DIRS=\
 	06-switch \
 	07-loops \
 	08-arrays \
+	15-pointers \
 	19-structs \
 	22-goroutines \
-	23-misc \
-	26-pointers
+	23-misc
 
 # LAB subdirs
 LAB_DIRS=\

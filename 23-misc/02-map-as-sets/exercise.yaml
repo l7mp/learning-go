@@ -2,14 +2,14 @@ name: search
 # text taken from The Exegesis from Philip K. Dick's VALIS, https://whattoconsume.wordpress.com/2022/09/04/the-exegesis-from-philip-k-dicks-valis
 input:
 - text: "One Mind there is; but under it two principles contend. The Mind lets in the light, then the dark, in interaction; so time is generated. At the end Mind awards victory to the light; time ceases and the Mind is complete. He causes things to look different so it would appear time has passed. Matter is plastic in the face of Mind."
-  word: "PRINCIPLES"
+  word: "mind"
   result: true
 - text: "One by one he draws us out of the world. The Empire never ended. The Head Apollo is about to return. St. Sophia is going to be born again; she was not acceptable before. The Buddha is in the park. Siddhartha sleeps (but is going to awaken). The time you have waited for has come."
-  word: "VAMPIRE"
-  result: false
-- text: "The upper realm has plenary powers. He lived a long time ago, but he is still alive. Apollonius of Tyana, writing as Hermes Trismegistos, said, That which is above is that which is below. By this he meant to tell us that our universe is a hologram, but he lacked the term."
-  word: "hologram"
+  word: "ONE"
   result: true
-- text: "The great secret known to Apollonius of Tyana, Paul of Tarsus, Simon Magus, Asklepios, Paracelsus, Boehme and Bruno is that: we are moving backward in time. The universe in fact is contracting into a unitary entity which is completing itself. Decay and disorder are seen by us in reverse, as increasing. These healers learned to move forward in time, which is retrograde to us."
-  word: "goOD"
+- text: "The upper realm has plenary powers. He lived a long time ago, but he is still alive. Apollonius of Tyana, writing as Hermes Trismegistos, said, That which is above is that which is below. By this he meant to tell us that our universe is a hologram, but he lacked the term."
+  word: "alive"
   result: false
+- text: "The great secret known to Apollonius of Tyana, Paul of Tarsus, Simon Magus, Asklepios, Paracelsus, Boehme and Bruno is that: we are moving backward in time. The universe in fact is contracting into a unitary entity which is completing itself. Decay and disorder are seen by us in reverse, as increasing. These healers learned to move forward in time, which is retrograde to us."
+  word: "TIME"
+  result: true

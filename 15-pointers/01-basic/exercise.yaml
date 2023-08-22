@@ -1,0 +1,5 @@
+name: pointerbasic
+input:
+  - type: int
+  - type: bool
+  - type: string

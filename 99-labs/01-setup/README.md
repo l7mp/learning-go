@@ -246,17 +246,17 @@ Consult the `README.md` file for how to solve the exercise and place your soluti
 > **Note**:  
 > It is usually not worth copying someone else solution: most probably your exercises will be quite different (that is what `make generate` is for).
 
-Once correctly solved, all tests in the exercise should pass:
+> ✅ **Check**: 
+>
+> Once correctly solved, all tests in the exercise should pass:
+> ``` shell
+> go test ./... -v
+> === RUN   TestHelloWorld
+> --- PASS: TestHelloWorld (0.00s)
+> PASS
+> ```
 
-``` shell
-go test ./... -v
-=== RUN   TestHelloWorld
---- PASS: TestHelloWorld (0.00s)
-PASS
-ok
-```
-
-Once done, make sure to git-commit your solution: this makes sure it remains there even if you re-generate the exercises.
+After all the tests pass, git-commit your solution: this makes sure it remains there even if you re-generate the exercises.
 
 ``` shell
 git add exercise.go

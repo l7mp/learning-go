@@ -144,7 +144,7 @@ Substitute `http.MethodPost` with `http.MethodGet` for handlers that accept only
 > ```
 > Make sure the web service is running: the test issues requests to the HTTP server and checks whether the response is as expected.
 
-   > **Note**: Currently `http.HandleFunc("/api/transfer", TransferHandler)` will route *all* HTTP requests with a path that starts with `/api/transfer` to the `TransferHandler`, including `/api/transfer/random/api` or `/api/transfer/some/malicious/attack`. To make sure *only* the required API is served, you can check for the HTTP path inside the handler.
+> **Note**: Currently `http.HandleFunc("/api/transfer", TransferHandler)` will route *all* HTTP requests with a path that starts with `/api/transfer` to the `TransferHandler`, including `/api/transfer/random/api` or `/api/transfer/some/malicious/attack`. To make sure *only* the required API is served, you can check for the HTTP path inside the handler.
 
 ## API
 

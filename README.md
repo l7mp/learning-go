@@ -1,7 +1,5 @@
 # Learning Go: Basic Go exercises
 
-*Work-in-progress*
-
 A series of basic Go exercises inspired from the [Go: Bootcamp Course](https://github.com/inancgumus/learngo). Solving all exercises will not make you a Go ninja but it is enough to get the basics and start to learn the advanced stuff on your own.
 
 ## Getting started

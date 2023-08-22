@@ -18,7 +18,7 @@ The below tasks guide you in writing a simple web app that implements the barebo
 
 ## Basics
 
-SplitDim helps housemates, trips, friends, and family members maintain their internal money transfers and keep track of who owns who. Imagine you are at a trip with your friends, you invite one of your friends for a coffee, they pay the taxi fee for the entire group, and then someone else from the group pays your train ticket. After a while, it becomes practically impossible to remember all mutual payments and clear the debts. 
+SplitDim helps housemates, friends, and family members maintain their internal money transfers and keep track of who owns who. Imagine you are at a trip with your friends, you invite one of your friends for a coffee, they pay the taxi fee for the entire group, and then someone else from the group pays your train ticket. After a while, it becomes practically impossible to remember all mutual payments and clear the debts. 
 
 Enter SplitDim, a simple web app that allows friends to register their transfers (e.g., "Joe paid Alice's coffee for 5 USD", and then "Alice paid Joe's train ticket for 3 USD") and see (1) the current balance of each registered user (how much debt or credit they have) and (2) the minimal list of mutual money transfers that would allow them the clear all debts ("Alice would need to pay Joe 2 USD to clear the debt").
 
@@ -164,22 +164,27 @@ The next task is to design the public SplitDim API, that is, the Go structs (and
 
    ``` go
    package api
+
    // Transfer represents a transaction.
    type Transfer struct {
-       // The debtor.
+       // The debtor name.
        Sender string `json:"sender"`
-       // The creditor.
+       // The creditor name.
        Receiver string `json:"receiver"`
        // The amount transferred in the transaction.
        Amount int `json:"amount"`
    }
    ```
 
+   > **Note**
+   > 
+   > Recall, the JSON tags in the struct fields help marshaling/unmarshaling Go structs to/from JSON. For instance, the struct field `Sender` will receive its way from the JSON key `sender` during unmarshaling, and vice versa.
+
    > **Warning**
    > 
    > Documenting your public APIs is mandatory. Using the [Godoc](https://go.dev/blog/godoc) format will simplify generating easy-to-browse documentation from your code. Below we will sometime omit the docs for brevity, but you should never!
 
-1. We also 
+1. The API endpoint `/api/transfer` will be used to return the current balance of each registered user. The `Account` struct is the basic data model for this API.
 
    ``` go
    // Account represents the balance of a user.
@@ -190,10 +195,6 @@ The next task is to design the public SplitDim API, that is, the Go structs (and
        Balance int `json:"balance"`
    }
    ```
-
-   > **Warning**
-   > 
-   > Always add the JSON tags as above!If you expect your data format to ever be marshaled to JSON.
 
 1. Finally, we design the `DataLayer` API: this will be a Go `interface` that simply declares the functions we want to support. Later, we will create multiple implementations.
 
@@ -241,13 +242,13 @@ The next step is to define our internal `DataLayer`: the internal representation
    )
    ```
 
-   > **Note **
+   > **Note**
    > 
-   > We want to use our own API, hence the (sub)package import `github.com/<my-user>/splitdim/pkg/api`.
+   > We want to use our own API, hence the (sub)package import `splitdim/pkg/api`.
 
-   > **Note **
+   > **Note**
    > 
-   > From now on we will not explicitly write import lists: remember, just add imports when Go complains during compilation.
+   > From now on we will not show import lists explicitly: remember, just add imports when Go complains during compilation.
 
 1. Use the below definition for the internal data layer.
 
@@ -261,7 +262,7 @@ The next step is to define our internal `DataLayer`: the internal representation
    }
    ```
 
-1. Create a constructor. Recall, Go does not have explicit constructors, so conventionally we export a `New*` function from the package that can be called to create a data structure.
+1. Create a constructor. Recall, Go does not have explicit constructors, so conventionally we export a `NewDataLayer` function from the package that can be called to create a data structure.
 
    ``` go
    // NewDataLayer creates a new database of accounts.
@@ -283,13 +284,13 @@ The next step is to define our internal `DataLayer`: the internal representation
    func (db *localDB) Reset() error { nil }
    ```
 
-1. Create an actual in-memory database in `main.go`. Declare the global variable `db` that will hold the database (it is global so that the HTTP handlers can access it):
+1. Initialize the in-memory database in `main.go`. Declare the global variable `db` that will hold the database (it is global so that the HTTP handlers can access it):
 
    ``` go
    var db api.DataLayer
    ```
 
-   Then actually construct the database in the `main` function:
+   Then construct the database in the `main` function:
    
    ```go
    func main() {
@@ -303,9 +304,8 @@ The next step is to define our internal `DataLayer`: the internal representation
 >
 > Run the below test to check whether you have successfully completed the exercise. If all goes well, you should see the output `PASS`.
 > ``` sh
-<!-- > go test ./... --tags=localconstructor -v -->
-<!-- > PASS -->
-<!-- > 
+> go test ./... --tags=localconstructor -v
+> PASS
 > ```
 
 ## Reset

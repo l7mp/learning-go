@@ -7,8 +7,7 @@ import (
 // DO NOT REMOVE THIS COMMENT
 //go:generate go run ../../exercises-cli.go -student-id=$STUDENT_ID generate
 
-// search reads in a text and a word and return true if the word in the text and
-// false if not.
-func contain(stdin io.Reader, word string) bool {
+// search reads a text and a word and returns true if the word appears in the text and false if it does not.
+func contain(reader io.Reader, word string) bool {
 	// INSERT YOUR CODE HERE
 }

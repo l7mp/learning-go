@@ -1,4 +1,4 @@
-name: factorial-or-sum
+name: factorial-sum-abs
 input:
 - func: factorial
   name: factorial
@@ -10,5 +10,5 @@ input:
   output: 120
 - func: abs
   name: "absolute value"
-  input: 15
-  output: 120
+  input: -15
+  output: 15

@@ -231,7 +231,7 @@ echo <MY-STUDENT-ID> > STUDENT_ID
 make generate
 ```
 
-> **Warning**:  
+> **Warning**   
 > You must use your own student id. We will check this, so make sure you do not mistype your id.
 
 ### Solve the first homework
@@ -258,7 +258,7 @@ Consult the `README.md` file for how to solve the exercise and place your soluti
 > **Note**  
 > It is usually not worth copying someone else's solution: most probably your exercises will be quite different for theirs (that is what `make generate` is for).
 
-For instance, you may be asked to write a `helloWorld` function in Go that will return the string `Hello world!`. In which case, insert the below code into `exercise.go`:
+For instance, you may be asked to write a `helloWorld` function in Go that will return the string `Hello world!` (your exercise may differ, so make sure you read the README carefully!). In this case, insert the below code into `exercise.go`:
 
 ```go
 func helloWorld() string {
@@ -266,7 +266,7 @@ func helloWorld() string {
 }
 ```
 
-> ✅ **Check**: 
+> ✅ **Check** 
 >
 > Once correctly solved, all tests in the exercise should pass:
 > ``` shell

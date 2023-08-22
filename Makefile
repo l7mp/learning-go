@@ -19,14 +19,21 @@ LAB_DIRS=\
 STUDENT_ID_FILE=STUDENT_ID
 
 # files to be generated
-.PHONY: check generate test clean realclean
+.PHONY: init check generate test clean realclean
 
 # check if STUDENT_ID is set
 check:
 	export STUDENT_ID=$(STUDENT_ID)
 	@if [ ! -s "$(STUDENT_ID_FILE)" -o ! -r "$(STUDENT_ID_FILE)" ]; then \
-		echo "ERROR: '$(STUDENT_ID_FILE)' is not readable or has zero content"; exit 1; \
+		echo "ERROR: '$(STUDENT_ID_FILE)' is not readable or empty"; exit 1; \
 	fi
+
+# init the placeholder files
+init:
+	@for dir in $(EXERCISE_DIRS); do \
+		find $$dir/* -type d -exec sh -c 'echo \# PLEASE RUN make generate > "$$0/README.md"' {} \; ; \
+		find $$dir/* -type d -exec sh -c 'echo // PLEASE RUN make generate > "$$0/exercise_test.go"' {} \; ; \
+	done
 
 # run go generate
 generate:

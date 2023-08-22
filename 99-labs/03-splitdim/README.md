@@ -496,10 +496,9 @@ The last step is to package up everything into a Docker container, deploy into K
 >   curl http://${EXTERNAL_IP}/api/reset
 >   ```
 
-<!--
-Local Variables:
-eval: (auto-fill-mode -1)
-eval: (visual-line-mode t)
-markdown-enable-math: t
-End:
--->
+<!-- Local Variables: -->
+<!-- mode: markdown; coding: utf-8 -->
+<!-- auto-fill-mode: nil -->
+<!-- visual-line-mode: 1 -->
+<!-- markdown-enable-math: t -->
+<!-- End: -->

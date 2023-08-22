@@ -1,6 +1,6 @@
 # Setting up the work environment
 
-In this lab we set up a workspace for developing and testing our cloud-native applications implemented in this course. The workspace consists of a *Go development environment* (compiler, the `go` utility, standard libraries, etc.) complete with an Go-enabled editor, a local *Kubernetes cluster* that we can use to deploy and test our code, and *Istio, a popular service mesh* distribution that makes it easier to operate the microservice applications we will develop.
+During this lab we will set up a workspace for developing and testing the Go applications we will implement. The workspace consists of a *Go development environment* (compiler, the `go` utility, standard libraries, etc.) complete with an Go-enabled editor, a local *Kubernetes cluster* that can be used to deploy and test Go code, and *Istio, a popular service mesh* distribution that makes it easier to operate our microservice applications.
 
 ## Table of Contents
 
@@ -57,23 +57,23 @@ To install and setup Code, execute the following commands in your terminal:
 
 1. Install Code with the package manager:
 
-```shell
-wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
-sudo install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
-sudo sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
-rm -f packages.microsoft.gpg
-sudo apt-get update
-sudo apt-get install -y code
-```
+   ```shell
+   wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
+   sudo install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
+   sudo sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
+   rm -f packages.microsoft.gpg
+   sudo apt-get update
+   sudo apt-get install -y code
+   ```
 
 1. Install plugins to have improve syntax highlighting, static analyzer, and additional useful features:
 
-```shell
-code --install-extension golang.go redhat.vscode-yaml
-go install github.com/go-delve/delve/cmd/dlv@latest
-go install honnef.co/go/tools/cmd/staticcheck@latest
-go install golang.org/x/tools/gopls@latest
-```
+   ```shell
+   code --install-extension golang.go redhat.vscode-yaml
+   go install github.com/go-delve/delve/cmd/dlv@latest
+   go install honnef.co/go/tools/cmd/staticcheck@latest
+   go install golang.org/x/tools/gopls@latest
+   ```
 
 ### Install Podman
 
@@ -81,20 +81,20 @@ Docker and podman are popular tools to build Linux container images. We will use
 
 1. Install podman via the package manager
 
-```shell
-sudo apt-get install -y podman podman-docker
-```
+   ```shell
+   sudo apt-get install -y podman podman-docker
+   ```
 
 1. Configure podman to enable access to [Dockerhub](https://hub.docker.com/)
 
-```shell
-sudo touch /etc/containers/nodocker
-echo 'unqualified-search-registries = ["docker.io"]' | sudo tee -a /etc/containers/registries.conf
-```
+   ```shell
+   sudo touch /etc/containers/nodocker
+   echo 'unqualified-search-registries = ["docker.io"]' | sudo tee -a /etc/containers/registries.conf
+   ```
 
 ### Install miscellaneous command line tools
 
-In the course we use `jq` to output JSON files in a human-readable form. In addition, the homeworks rely on the `make` utility. To install these tools via the package manager, execute this command in your terminal:
+We will often use `jq` to output JSON files in a human-readable form, the `make` utility to generate and test the homework exercises. To install these tools via the package manager, execute this command in your terminal:
 
 ```code
 sudo apt-get install -y make jq
@@ -105,24 +105,25 @@ sudo apt-get install -y make jq
 The `kubectl` utility is our main tool to interact with our Kubernetes clusters. Execute the following commands in your terminal to install and configure `kubectl`.
 
 1. Install `kubectl` via the package manager
-```code
-sudo curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
-sudo apt-get install -y kubectl
-```
+
+   ```code
+   sudo curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+   echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+   sudo apt-get install -y kubectl
+   ```
 
 1. Enable shell completion for bash
 
-```code
-echo "source <(kubectl completion bash)" >> ~/.bashrc
-```
+   ```code
+   echo "source <(kubectl completion bash)" >> ~/.bashrc
+   ```
 
 > **Note**  
 > If you use a different shell (e.g., zsh) , check configuration steps with `kubectl completion -h`
 
 ### Install Minikube
 
-Minikube is a single-node Kubernetes distribution, which will allow us to run a Kubernetes cluster locally. In your terminal execute the following commands to download and install the latest version of Minikube:
+Minikube is a lightweight Kubernetes distribution that create allows you to deploy a simple local Kubernetes cluster containing only one node (your own laptop). In your terminal execute the following commands to download and install the latest version of Minikube:
 
 ```code
 curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
@@ -260,3 +261,10 @@ git commit -m 'first exercise solved'
 ```
 
 You can test *all* your solutions from the main directory by issuing `make test`. Currently only the first test will succeed: at the end of the course you should have *all the tests* pass.
+
+<!-- Local Variables: -->
+<!-- mode: markdown; coding: utf-8 -->
+<!-- auto-fill-mode: nil -->
+<!-- visual-line-mode: 1 -->
+<!-- markdown-enable-math: t -->
+<!-- End: -->

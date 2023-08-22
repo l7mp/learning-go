@@ -1,6 +1,6 @@
 # Learning Go: Basic Go exercises
 
-A series of basic Go exercises inspired from the [Go: Bootcamp Course](https://github.com/inancgumus/learngo). Solving all exercises will not make you a Go ninja but it is enough to get the basics and start to learn the advanced stuff on your own.
+A series of basic Go exercises inspired from the [Go: Bootcamp Course](https://github.com/inancgumus/learngo). Solving all exercises will not make you a Go ninja but it should be enough to get you started.
 
 ## Getting started
 
@@ -8,6 +8,8 @@ Change to the root of the git repo and generate the exercises:
 
 ``` console
 echo <MY-STUDENT-ID> > STUDENT_ID
+git add STUDENT_ID
+git commit -m 'stident id added'
 make generate
 ```
 
@@ -17,7 +19,7 @@ Your student id should always be available in the file named `STUDENT_ID` in the
 STUDENT_ID=MY-STUDENT-ID> make generate
 ```
 
-## Solve exercises
+## Solve the exercises
 
 ### Write code
 
@@ -42,10 +44,10 @@ make test
 
 ### Keep track of repo updates
 
-Sometimes we update the main git repo to fix bugs or add new exercises. We will try to make sure to keep these annoyances at the minimum. The below workflow shows how to update your local working copy without overwriting your solutions.
+Sometimes we update the main git repo to fix bugs or add new exercises. The below workflow shows how to update your local working copy from the master without overwriting your solutions already written.
 
-> **Warning**:  
-> Make sure to commit all your code into git: this will guarantee that you will never lose your solutions even if some of the below steps go wrong. You can also back up your git repo but please make sure that your solutions are kept private (a private GitHUb repo will do it).
+> **Warning**   
+> Make sure to commit all your code into git: this will guarantee that you will never lose your solutions even if some of the below steps go wrong. You can also back up your git repo but please make sure your solutions are kept private (a private GitHUb repo will do it).
 
 #### With all local changes committed to git
 
@@ -91,9 +93,9 @@ If you add a new top-level directory, don't forget to include it in the `EXERCIS
 
 Then run `make clean`, this will add the placeholders for the exercise (these will be overwritten by `make generate`), add all files in the exercise dir to the git repo, and git-push.
 
-## Do the labs
+## Complete the labs
 
-Labs tasks are located in the [99-labs](99-labs/) folder. The labs give you hands-on development and deployment experience. You will learn how to build and containerize Go programs as well as how to run them in Kubernetes. Each lab contains a README that gives you context and specifies the lab exercise. Labs depend on each other. For that, it is recommended to do labs one after the other.
+Labs tasks are located in the [99-labs](99-labs/) folder. The labs give you hands-on development and deployment experience. You will learn how to build and containerize Go programs as well as how to run them in Kubernetes. Each lab contains a README that gives you context and specifies the lab exercises. The labs depend on each other, so it is recommended to complete them one after the other.
 
 ## Clean up
 
@@ -123,3 +125,10 @@ Copyright 2021-2023 by its authors. Some rights reserved. See [AUTHORS](AUTHORS)
 ## Acknowledgments
 
 Examples adopted from the [Go: Bootcamp Course](https://github.com/inancgumus/learngo).
+
+<!-- Local Variables: -->
+<!-- mode: markdown; coding: utf-8 -->
+<!-- auto-fill-mode: nil -->
+<!-- visual-line-mode: 1 -->
+<!-- markdown-enable-math: t -->
+<!-- End: -->

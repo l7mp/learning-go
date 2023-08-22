@@ -104,10 +104,9 @@ EOF
 > ✅ **Check**
 > Test your Kubernetes deployment. Some useful commands for testing from the shell:
 
-<!--
-Local Variables:
-eval: (auto-fill-mode -1)
-eval: (visual-line-mode t)
-markdown-enable-math: t
-End:
--->
+<!-- Local Variables: -->
+<!-- mode: markdown; coding: utf-8 -->
+<!-- auto-fill-mode: nil -->
+<!-- visual-line-mode: 1 -->
+<!-- markdown-enable-math: t -->
+<!-- End: -->

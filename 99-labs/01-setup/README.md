@@ -209,6 +209,19 @@ kubectl cluster-info
 
 The course comes with a set of exercises that allow you to practice the basics of Go programming (syntax, type system, concurrency primitives, etc.). The exercises are customized per each student to increase the required effort to copy your solutions. Each exercises is randomly generated from a template using your student id as the random seed. Once the exercises are generated, you can start to add your solutions and then run `make test` to check your solutions.
 
+### Prerequisites
+
+Create a local clone of this git repo:
+
+``` shell
+git clone https://github.com/l7mp/learning-go.git
+cd learning-go
+```
+You should always add commit your solutions to this repo (see below) to avoid losing your work. 
+
+> **Note**  
+> We recommend you keep a safe copy of your git tree somewhere safe. The simplest way to create a GitHUb private fork and use that to back up your solutions. We ask you to keep your GitHub repo private to prevent others from copying your work.
+
 ### Generate the exercises
 
 Change to the root of the git repo and make sure to read the instructions in the `README.md` file. The below summarizes the main steps.
@@ -259,6 +272,12 @@ After all the tests pass, git-commit your solution: this makes sure it remains t
 git add exercise.go
 git commit -m 'first exercise solved'
 ```
+
+> **Note**  
+> If you use a remote git repo to back up your work then make sure you push all your commits there using:
+> ``` shell
+> git push
+> ```
 
 You can test *all* your solutions from the main directory by issuing `make test`. Currently only the first test will succeed: at the end of the course you should have *all the tests* pass.
 

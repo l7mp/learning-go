@@ -9,7 +9,7 @@ EXERCISE_DIRS=\
 	08-arrays \
 	19-structs \
 	22-goroutines \
-	23-input-scanning \
+	23-misc \
 	26-pointers
 
 # LAB subdirs
@@ -36,7 +36,7 @@ generate:
 # run the tests
 test:
 	export STUDENT_ID=$(STUDENT_ID)
-	go test ./... -v
+	go test ./... -v -count 1
 
 # clean up generated files
 clean:

@@ -6,7 +6,7 @@ Vagrant.configure("2") do |config|
   config.vm.provider "virtualbox" do |vb|
     vb.name = "CloudNativeGo"
     vb.gui = true
-    vb.memory = "5120"
+    vb.memory = "6144"
     vb.cpus = "3"
 
     vb.customize ['modifyvm', :id, '--clipboard-mode', 'bidirectional']
@@ -51,13 +51,6 @@ Vagrant.configure("2") do |config|
     rm -rf $GO_TAR
   SHELL
 
-  config.vm.provision "minikube-install", type: "shell", privileged: false, inline: <<-SHELL
-    curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-    sudo install minikube-linux-amd64 /usr/local/bin/minikube
-    rm minikube-linux-amd64
-    echo "source <(minikube completion bash)" >> ~/.bashrc
-  SHELL
-
   config.vm.provision "kubectl-install", type: "shell", privileged: false, inline: <<-SHELL
     echo "deb [signed-by=/etc/apt/keyrings/kubernetes.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
     curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes.gpg
@@ -87,6 +80,17 @@ Vagrant.configure("2") do |config|
     go install github.com/go-delve/delve/cmd/dlv@latest
     go install honnef.co/go/tools/cmd/staticcheck@latest
     go install golang.org/x/tools/gopls@latest
+  SHELL
+
+  config.vm.provision "minikube-install", type: "shell", privileged: false, inline: <<-SHELL
+    curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+    sudo install minikube-linux-amd64 /usr/local/bin/minikube
+    rm minikube-linux-amd64
+    echo "source <(minikube completion bash)" >> ~/.bashrc
+    minikube config set WantUpdateNotification false
+    minikube start --driver=podman --container-runtime=cri-o --delete-on-failure --wait-timeout 180s
+    minikube stop
+    minikube delete --all
   SHELL
 
   config.vm.provision "final-touches", type: "shell", privileged: false, inline: <<-SHELL

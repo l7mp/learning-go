@@ -15,6 +15,8 @@ The below tasks guide you in writing a simple web app that implements the barebo
 1. [Transfer](#transfer)
 1. [Accounts](#accounts)
 1. [Clear](#clear)
+1. [Test](#test)
+1. [Deploy to Kubernetes](#deploy-to-kubernetes)
 
 ## Basics
 
@@ -482,6 +484,39 @@ Although not entirely trivial, this algorithm is not that difficult: just find a
 > ```
 > Make sure the web service is running: the test issues requests to the HTTP server and checks whether the response is as expected.
 
+## Test
+
+At this point the web app should be functionally ready. Try some simple tests.
+
+- make sure the app is running: `go run main.go`
+- store the address and the port in an environment variable for simple access:
+  ```shell
+  export EXTERNAL_IP=localhost
+  export EXTERNAL_PORT=8080
+  ```
+- transfer 1 unit of currency from user `a` to user `b`; recall, this is meant to register the fact that from this point `b` owes 1 unit to `a`:
+  ```shell
+  curl -H "Content-Type: application/json" --request POST --data '{"sender":"a","receiver":"b","amount":1}' http://${EXTERNAL_IP}:${EXTERNAL_PORT}/api/transfer
+  ```
+- transfer 1 unit of currency from user `b` to user `c` to register that `c` owes 1 unit to `b`:
+  ```shell
+  curl -H "Content-Type: application/json" --request POST --data '{"sender":"a","receiver":"b","amount":1}' http://${EXTERNAL_IP}:${EXTERNAL_PORT}/api/transfer
+  ```
+- query the current balances:
+  ```shell
+  curl http://${EXTERNAL_IP}:${EXTERNAL_PORT}/api/accounts
+  [{"holder":"a","balance":1},{"holder":"b","balance":0},{"holder":"c","balance":-1}]
+  ```
+- clear the debts: this should report that the easiest way to clear all debts is for `c` to transfer 1 unit of currency to `a`:
+  ```shell
+  curl http://${EXTERNAL_IP}:${EXTERNAL_PORT}/api/clear
+  [{"sender":"c","receiver":"a","amount":1}]
+  ```
+- reset the balances; recall, "clear" is hypothetical: it is just reporting what would be the simplest way to clear the balances but it does not do any money transfer at all
+  ```shell
+  curl http://${EXTERNAL_IP}:${EXTERNAL_PORT}/api/reset
+  ```
+
 > ✅ **Check**
 >
 > Run the below test to check whether you have successfully completed *all* the exercises above. If all goes well, you should see the output `PASS`.
@@ -491,16 +526,16 @@ Although not entirely trivial, this algorithm is not that difficult: just find a
 > ```
 > Make sure the web service is running: the test issues requests to the HTTP server and checks whether the response is as expected.
 
-## Deploy
+## Deploy to Kubernetes
 
 The last step is to package up everything into a Docker container, deploy into Kubernetes, and test via `curl` or the browser GUI. 
 
 1. Create an image build manifest in `deploy/Dockerfile` and build the container image.
 1. Create a Kubernetes manifest called `deploy/kubernetes-local-db.yaml` that contains 
    - a Deployment called `splitdim` to run one replica of the `splitdim` container image and
-   - a Service of type `LoadBalancer` that exposes the `splitdim` Deployment for external address on port port 80.
-1. Test with `curl`.
-
+   - a Service called `splitdim` of type `LoadBalancer` that exposes the `splitdim` Deployment externally on port port 80,
+   - make sure to add `targetPort:8080` to the Service to indicate that the pods are in fact listening on port 8080.
+1. Test with `curl` or your favorite browser.
 
 > ✅ **Check**
 > 
@@ -508,18 +543,8 @@ The last step is to package up everything into a Docker container, deploy into K
 > - store the external IP assigned by Kubernetes to the `splitdim` service:
 >   ``` sh
 >   export EXTERNAL_IP=$(kubectl get service splitdim -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
->   ```
-> - register a transfer from sender `a` to receiver `b` of amount 1:
->   ``` sh
->   curl -H "Content-Type: application/json" --request POST --data '{"sender":"a","receiver":"b","amount":1}' http://${EXTERNAL_IP}/api/transfer
->   ```
-> - list the account database: 
->   ``` sh
->   curl http://${EXTERNAL_IP}/api/accounts
->   ```
-> - reset the account database: 
->   ``` sh
->   curl http://${EXTERNAL_IP}/api/reset
+>   export EXTERNAL_PORT=80
+>   go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v
 >   ```
 
 <!-- Local Variables: -->

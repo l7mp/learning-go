@@ -539,12 +539,12 @@ The last step is to package up everything into a Docker container, deploy into K
 
 > ✅ **Check**
 > 
-> Test your Kubernetes deployment. Some useful commands for testing from the shell:
-> - store the external IP assigned by Kubernetes to the `splitdim` service:
+> Test your Kubernetes deployment. If all goes well, you should see the output `PASS`.
 >   ``` sh
 >   export EXTERNAL_IP=$(kubectl get service splitdim -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 >   export EXTERNAL_PORT=80
 >   go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v
+>   PASS
 >   ```
 
 <!-- Local Variables: -->

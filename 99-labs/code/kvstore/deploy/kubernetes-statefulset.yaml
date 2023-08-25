@@ -1,0 +1,71 @@
+# The kvstore
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kvstore
+  labels:
+    app: kvstore
+spec:
+  serviceName: "kvstore"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kvstore
+  template:
+    metadata:
+      labels:
+        app: kvstore
+    spec:
+      containers:
+      - name: kvstore
+        image: localhost/kvstore
+        ports:
+        - containerPort: 8081
+          name: kvstore
+        resources:
+          requests:
+            cpu: "100m"
+          limits:
+            cpu: "100m"
+        volumeMounts:
+        - name: translog
+          mountPath: "/tmp"
+  volumeClaimTemplates:
+    - metadata:
+        name: translog
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: "5Mi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kvstore
+spec:
+  selector:
+    app: kvstore
+  clusterIP: None
+  ports:
+  - port: 8081
+    protocol: TCP
+    name: kvstore
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata: { name: translog-volume }
+spec:
+  capacity: { storage: "5Mi" }
+  accessModes: [ ReadWriteOnce ]
+  hostPath: { path: "/tmp" }
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: { name: translog-claim }
+spec:
+  accessModes: [ ReadWriteOnce ]
+  resources: { requests: {  storage: "5Mi" }}

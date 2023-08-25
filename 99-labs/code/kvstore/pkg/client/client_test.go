@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -24,6 +25,9 @@ func TestClient(t *testing.T) {
 
 	addr := ":8081"
 	assert.NoError(t, s.Run(ctx, addr))
+
+	// let the server start
+	time.Sleep(100 * time.Millisecond)
 
 	c := NewClient(addr)
 

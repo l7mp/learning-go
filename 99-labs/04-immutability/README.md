@@ -11,7 +11,7 @@ Currently the app uses a local database maintained in memory: we know that this 
 1. [Preliminaries](#preliminaries)
 2. [A key-value store client](#a-key-value-store-client)
 3. [A persistent datalayer](#a-key-value-store-datalayer)
-4. [Loose coupling](#loose-coupling)
+4. [Deploy to Kubernetes](#deploy-to-kubernetes)
 
 ## Preliminaries
 
@@ -112,13 +112,157 @@ Make sure to familiarize yourself with the workings of `kvstore`:
 
 # A key-value store client
 
+Currently, querying the key-value store is somewhat cumbersome, since we have to marshal Go types to JSON before making each call, then make the actual HTTP call to the key-value store server, remembering that `get` is implemented as a HTTP POST request whole `list` and `reset` use HTTP GET, and then again unmarshaling the result into an appropriate Go struct, check errors, etc. This gets boring (and error-prone) very soon.
+
+Wouldn't it be nice to just call the key-value store through a client library that would expose the entire key-value store API as simple-to-use Go functions, and then do the heavy lifting in the background? Wouldn't it be even nicer, if the key-value store itself would provide that client library?
+
+This what we are going to implement next. Enter the directory of the key-value store (`99-labs/code/kvstore`) and consider the `client` package in `/pkg/client/`. This already contains the below API (see `api.go`), which we should implement, and a set of tests (see `client_test.go`) that we will want eventually to pass.
+
+``` go
+package client
+
+import "kvstore/pkg/api"
+
+// Client is a generic client interface to the key-value store.
+type Client interface {
+	// Get returns the the value and version stored for the given key, or an error if something goes wrong.
+	Get(key string) (api.VersionedValue, error)
+	// Put tries to insert the given key-value pair with the specified version into the store.
+	Put(vkv api.VersionedKeyValue) error
+	// List returns all values stored in the database.
+	List() ([]api.VersionedKeyValue, error)
+	// Reset removes all key-value pairs.
+	Reset() error
+}
+```
+
+Your task is to implement this interface. Some help:
+1. Open a new file, say, `client.go`, declare that the file belongs to the `client` package, and add some necessary package imports:
+   ``` go
+   package client
+   
+   import (
+       "bytes"
+       "encoding/json"
+       "fmt"
+       "log"
+       "net/http"
+   
+       "kvstore/pkg/api"
+   )
+   ```
+
+2. Create a struct, this will become the implementation of the `Client` interface when we add all the methods specified in the interface. The single field called `url` in the `client` struct will store the URL where the key-value store server is available. Note that `client` will *not* be exported from the package:
+   ``` go
+   type client struct {
+       url string
+   }
+   ```
+
+3. Create a constructor. Recall, this entails writing a `NewClient` function that takes the arguments necessary to instantiate the `client` struct (currently, this will be the address:port of the key-value store server), constructs the struct, and then *returns a pointer to the struct*. This makes sore that the caller of our `NewClient` function can  call only the methods exposed by the `Client` interface on the returned pointer, but nothing else:
+   ``` go
+   func NewClient(addr string) Client {
+       return &client{url: "http://" + addr}
+   }
+   ```
+
+4. At this point, we are ready to actually implement the `Client` interface. Let us add the implementation of the `get` method first; recall, this receives a string key as an argument and returns the corresponding key and version as an `api.VersionedValue`:
+   ``` go
+   // Get returns the the value and version stored for the given key, or an error if something goes wrong.
+   func (c *client) Get(key string) (api.VersionedValue, error) { 
+       // this will package the requested key into the body of the HTTP request
+       body := []byte(fmt.Sprintf("\"%s\"", key))
+   
+       ...
+   }
+   ```
+
+   The function itself will have to perform the following steps:
+   - make a HTTP POST call to the HTTP server at the url `c.url` and the API endpoint `/api/get`:
+     ```go
+     r, err := http.Post(c.url+"/api/get", "application/json", bytes.NewReader(body))
+     ```
+   - return an empty `api.VersionedValue{}` and an error if something goes wrong,
+   - check if the return status is 200 (`http.StatusOK`) and return an empty `api.VersionedValue{}` and an error if not,
+   - unmarshal the HTTP response body into a value of type `api.VersionedValue` and return an empty `api.VersionedValue{}` and an error if something goes wrong,
+   - return the unpacked value and a `nil` error.
+
+4. Implement the `put` method next; recall, this function receives a tuple of a key, value and version as value of type `api.VersionedKeyValue` and tries to insert it into the key-value store:
+   ``` go
+   // Put tries to insert the given key-value pair with the specified version into the store.
+   func (c *client) Put(vkv api.VersionedKeyValue) error {
+   
+       ...
+   }
+   ```
+
+   The function itself will have to perform the following steps:
+   - marshal argument `vkv` into JSON and return the error if something goes wrong,
+   - make a HTTP POST call to the API endpoint `/api/put` (don't forget to prefix the URL with the server address, `c.url`), encoding the JSON as a request body,
+   - return an error if something went wrong or the response status is not HTTP 200,
+   - return a `nil` error.
+
+4. Implement the `list` method; recall, this function returns the list of all key-value-version tuples as a slice of type `[]api.VersionedKeyValue`
+   ``` go
+   // List returns all values stored in the database.
+   func (c *client) List() ([]api.VersionedKeyValue, error) {
+       ...
+   }
+   ```
+
+   The function will have to perform the following steps:
+   - make a HTTP GET call to the API endpoint `/api/list`
+   - return an empty slice and an error if something went wrong or the response status is not HTTP 200,
+   - unmarshal the response body (a JSON byte slice) into a value of type `[]api.VersionedKeyValue`,
+   - return an empty slice and an error if something went wrong,
+   - return the unmarshaled value and a nil error.
+
+5. Finally, implement the `reset` method, which, recall, will remove all key-value pairs from the store:
+   ``` go
+   // Reset removes all key-value pairs.
+   func (c *client) Reset() error {
+       ...
+   }
+   ```
+
+   The function is very simple: make a HTTP GET call to the the API endpoint `/api/reset` and return an error if the status is not HTTP 200.
+   
+And that is all. At this point, we would have a `kvstore/pkg/client` library of functions that any code that wants to talk to the key-value store can import and use it right away without having to worry about marshaling/unmarshaling parameters in/out from the HTTP requests/responses.
+
+> ✅ **Check**
+>
+> Run the below test in `99-labs/code/kvstore` to check whether you have successfully completed the exercise. If all goes well, you should see the output `PASS`.
+> ``` sh
+> go test ./pkg/client/... -v
+> PASS
+> ```
+> You don't have to start the key-value store server for the test to run: the test will conveniently fire up a server for you and deletes it once ready.
+
 # A key-value store datalayer
 
-So let us write a Redis datalayer for our web app.
+So let us write a key-value store datalayer for our SplitDim web app. Recall, the current version keeps the accounts in memory; now we want to move this *resource state* into the key-value store. We app will have to talk a lot to the key-value store; luckily, this will be significantly simpler thanks to the client library we have just developed.
 
-1. Enter the directory under `99-labs/code/splitdim` for our Go project from the previous lab. Make sure all tests pass at this point.
+1. Enter the directory under `99-labs/code/splitdim`. Make sure all tests from the previous lab pass at this point.
 
-2. Since we are going to implement multiple datalayers side by side, we need a way for the user to select among them (*manageability*) when starting the app. We will use two environment variables for that purpose:
+2. Next, we have to make our package imports right. 
+
+   In particular, we are going to use the key-value store client library so we will have to add that to the dependencies of `splitdim`, and since the key-value store uses the `transactionlog` package we have an implicit dependency to that too, and we also need to add the necessary "replace" rules to make sure Go finds our modules in the local file system (note that transitive dependencies are usually handled by Go automatically, but this time we need to do this manually due to the "replace" rules):
+   ``` shell
+   go get kvstore
+   go mod edit -replace kvstore=../kvstore
+   go get transactionlog
+   go mod edit -replace transactionlog=../transactionlog
+   go mod tidy
+   go mod vendor
+   ```
+   
+   This will throw some errors along the way, but the eventual `go mod tidy` will get everything right
+
+   > **Note**
+   > 
+   > The final `go mod vendor` makes sure that all dependencies get copied into the local `vendor/` directly, which will greatly building the container image later.
+
+3. Since we are going to implement multiple data layers side by side, we need a way to select among them (*manageability*) when starting the app. We will use two environment variables for that purpose:
 
    ``` go
    // KVStoreMode defines the data layer mode (local/redis/kvstore).
@@ -156,13 +300,236 @@ So let us write a Redis datalayer for our web app.
    }
    ```
    
-   The `local` datalayer will start as default, but starting the app with `KVSTORE_MODE=kvstore` will start the key-value store datalyer )once we write it).
+   The `local` datalayer will start as the default, but starting the app with `KVSTORE_MODE=kvstore go run main.go` will start the key-value store datalyer instead (once we get to write it).
 
+4. Create a new (sub)package under `pkg/db/kvstore`; this will implement the data layer of the web app with the account database moved to the key-value store.
 
+   ``` go
+   package kvstore
+   
+   import (
+       "fmt"
+       "log"
+       "strconv"
+   
+       clientapi "kvstore/pkg/api"
+       "kvstore/pkg/client"
+   
+       "splitdim/pkg/api"
+   )
+   ```
+   
+   Some explanation: first we import some standard Go libs, that's completely normal. Then we import the key-value store API and client packages; recall, we will use these to actually talk to the key-value store. Then we implement our own API. A small caveat: we would have two packages in the local namespace called `api` (one for the key-value store client library and another one for our own API): to remove the name-clash we alias the package import from `kvstore/pkg/api` using the shorthand name `clientapi`. This will nicely distinguish the two API packages.
+
+5. Create a struct that will hold the new data layer.
+
+   ``` go
+   type kvstore struct {
+       client.Client
+   }
+   
+   // NewDataLayer creates a new database of scores.
+   func NewDataLayer(kvStoreAddr string) api.DataLayer {
+       return &kvstore{Client: client.NewClient(kvStoreAddr)}
+   }
+   ```
+
+   A small trick: the `kvstore` struct embeds the key-value store client: `type kvstore struct { client.Client }`. Recall, composition in Go is extremely powerful, since from this point all the methods defined on the embedded client are also callable on the `kvstore` that embeds is, that is, instead of calling the tedious `kvstore.client.Get(...)` we can shortcut to `kvstore.Get(...)` and things will just magically work.
+
+6. Next we write a simple helper called `setBalance`, which will simplify the process of writing a new balance into the key-value store. 
+
+   ``` go
+   func (db *kvstore) setBalance(user string, amount int) error { ... }
+   ```
+
+   Recall: setting a new balance `amount` is a sequence of a consecutive e `get` to obtain the current `balance` plus the version from the key-value store, followed by a `put(balance+amount)` to set the new balance. It is completely normal for the `put` to fail: this happens when another `splitdim` instance (when we scale the app out to several pods) has made a concurrent transaction between the `get` and the `put` call.
+
+   The `setBalance` function therefore performs the following steps:
+   - call `db.Get(user)` to obtain the current balance for the user (and handle errors!),
+   - increase/decrease (based on whether the argument `amount` is positive or negative) the balance of the user:
+     ```go
+     balance, _ := strconv.Atoi(vv.Value)
+     vv.Value = fmt.Sprintf("%d", balance+amount)
+     vkv := clientapi.VersionedKeyValue{user, vv}
+     ```
+   - call `db.Put(vkv)` to upload the new balance to the key-value store and return an error if this fails,
+   - return a `nil` error to indicate that the balance has been set.
+
+7. Write the `Transfer` function: recall, this function moves `t.Amount` from `t.Sender` to `t.Receiver`:
+   ```go
+   func (db *kvstore) Transfer(t api.Transfer) error { ... }
+   ```
+
+   The function performs the following steps:
+   - make a quick sanity check: return an "invalid transfer" error if the `Sender` or the `Receiver` field of the transfer argument `t` is empty,
+   - call the `db.setBalance(t.Sender, t.Amount)` *in an infinite loop until it succeeds without an error* to remove `t.Amount` from the balance of `t.Sender`,
+   - call the `db.setBalance(t.Receiver, -t.Amount)` *in an infinite loop until it succeeds without an error* to add `t.Amount` to the balance of `t.Receiver`.
+
+   > **Warning**
+   > 
+   > Don't do this in real-life: if the first `setBalance` call succeeds but the second fails for some reason, then we get a halfway applied transaction: we have already removed the amount from the balance of the sender but failed to add it to the balance of the reviewer. This will then make it impossible to clear the debts and leaves the database in an inconsistent state. 
+   >
+   > In a real-life application these two steps should be performed as a single *transaction*; since our key-value store does not implement transactions for simplicity we spare this step for now. 
+
+8. Write the `AccountList` function: recall, this function will return the list of all accounts as pairs of a holder and a balance:
+   ```go
+   func (db *kvstore) AccountList() ([]api.Account, error) { ... }
+   ```
+
+   The function performs the following steps:
+   - list the key-value store to get all the accounts: `accounts, err := db.List()` (and handle errors!),
+   - create an slice that we will return: `ret := []api.Account{}`
+   - iterate through `accounts` and for each item first convert the value (the balance) to an int using `strconv.Atoi` and then add a new account to the returned list: `ret = append(ret, api.Account{key, balance})`,
+   - return the resultant slice `ret` and a nil error.
+
+8. Our most problematic call was  `Clear`: recall, this function returns the minimal list of transfers that allow our users to clear all debts. 
+   ```go
+   func (db *kvstore) Clear() ([]api.Transfer, error) { ... }
+   ```
+
+   The function itself is not that complex: we again need to list the account database from the key-value store, convert it into a `make(map[string]int)`, and then reuse the same algorithm as in the previous lab to obtain the list of transfers. 
+
+   > **Note**
+   > 
+   > Since we seem to be reusing the same algorithm from the previous lab to perform the "clearing", we can even move that functionality out into a separate package (say, `splitdim/pkg/clear`) and call that lib every time we want to obtain the transfer list. The signature of the function could be, say:
+   > ```go
+   > // Clear clears the debts for the accounts given as argument. Meanwhile, it updates "accounts", so always pass a copy to this function.
+   > func Clear(accounts map[string]int) ([]api.Transfer, error) { ... }
+   > ```
+   > 
+   > Feel free to experiment with this package.
+
+9. Finally, the `Reset` function if the data layer is so simple that we reproduce it below verbatim:
+   ```go
+   // Reset sets all balances to zero.
+   func (db *kvstore) Reset() error {
+       	return db.Client.Reset()
+   }
+   ```
+
+   This is thanks to the key-client library we have written above! Sometimes it is worth doing some extra work to make our lives easier later!
+
+   > **Note**
+   > 
+   > Calling `db.Reset()` above would not work. Remember, `kvstore` embeds the key-value store client and, curiously, in this case both the embedding struct `kvstore` (of the `Datalayer` interface) and the embedded `Client` interface implements a `Reset` function. If we called `db.Reset()` directly in the outer object then we would recursively call ourselves in an infinite loop. Calling `db.Client.Reset()` makes sure that we call the `Reset` function of the embedded object.
+
+If all goes well (and all compile errors are taken care of), then we can make a local test:
+- start the key-value store in a new terminal:
+  ```shell
+  cd 99-labs/code/kvstore
+  go run kvstore.go 
+  server.go:184: Starting HTTP server at :8081
+  ```
+- start the `splitdim` app: note the environment variables passed in to the app so that it actually starts with our shiny new key-value store data layer that will talk to the key-value store:
+  ```shell
+  KVSTORE_MODE=kvstore KVSTORE_ADDR=localhost:8081 go run main.go
+  ```
+- perform some transactions and check the results:
+  ```shell
+  export EXTERNAL_IP=localhost
+  export EXTERNAL_PORT=8080
+  curl -H "Content-Type: application/json" --request POST --data '{"sender":"a","receiver":"b","amount":1}' http://${EXTERNAL_IP}:${EXTERNAL_PORT}/api/transfer
+  curl -H "Content-Type: application/json" --request POST --data '{"sender":"b","receiver":"c","amount":1}' http://${EXTERNAL_IP}:${EXTERNAL_PORT}/api/transfer
+  curl http://${EXTERNAL_IP}:${EXTERNAL_PORT}/api/clear
+  [{"sender":"c","receiver":"a","amount":1}]
+  ```
+
+> ✅ **Check**
+>
+> Run the below test in `99-labs/code/splitdim` to check whether you have successfully completed the exercise. If all goes well, you should see the output `PASS`.
+> ``` sh
+> go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v
+> PASS
+> ```
+> Note that the splitdim app and the key-value must both run for the tests to pass
+
+## Deploy to Kubernetes
+
+Once the local tests run, we can actually deploy the application to Kubernetes. To simplify this, we package the manifests necessary to build the container image for the key-value store and deploy it to Kubernetes; your job will be to build, deploy and expose the `splitdim` web app component. 
+
+1. Make sure that Kubernetes is running (`minikube start`) and the Minikube load-balancer is functional (`minikube tunnel` is running in a terminal).
+
+2. Build the `kvstore` image. This will make the container image available in the container registry of Minikube with the name `localhost/kvstore`:
+   ```shell
+   cd 99-labs/code/kvstore
+   go mod vendor
+   minikube image build -t kvstore -f deploy/Dockerfile .
+   ```
+
+3. Deploy the key-value store to Kubernetes.
+   ```shell
+   cd 99-labs/code/kvstore
+   kubectl apply -f deploy/kubernetes-statefulset.yaml
+   ```
+
+4. Re-build the `splitdim` image (you should have the `Dockerfile` readily available from the previous lab):
+   ```shell
+   cd 99-labs/code/splitdim
+   go mod vendor
+   minikube image build -t kvstore -f deploy/Dockerfile .
+   ```
+
+5. Copy the Kubernetes manifests we created during the previous lab (this is supposed to be called `deploy/kubernetes-local-db.yaml`) into a new file, say, `deploy/kubernetes-kvstore.yaml`, and modify it to make sure the `splitdim` app running inside the containers starts with the key-value store backend. This is, recall, achieved by passing in to environment variables to the Go program: `KVSTORE_MODE=kvstore` makes sure we select the key-value store backend and `KVSTORE_ADDR="kvstore.default:8081"` will contain the address of the key-value store (note that the fill DNS name of the key-value store service is `kvstore.default.svc.cluster.local`). The only modification is, correspondingly, in the pod template of the `splitdim` Deployment:
+   ```yaml
+   apiVersion: apps/v1
+   kind: Deployment
+   metadata:
+     name: splitdim
+     labels:
+       app: splitdim
+   spec:
+     selector:
+       matchLabels:
+         app: splitdim
+     template:
+       metadata:
+         labels:
+           app: splitdim
+       spec:
+         containers:
+         - name: splitdim
+           image: localhost/splitdim:latest
+           ports:
+             - containerPort: 8080
+           env:
+           - name: KVSTORE_MODE
+             value: kvstore
+           - name: KVSTORE_ADDR
+             value: "kvstore.default:8081"
+   ```
+
+6. Apply the manifests: `kubectl apply -f deploy/kubernetes-kvstore.yaml`. Listing the pods and services should result something like the below:
+   ```shell
+   kubectl get pod,service -o wide
+   NAME                            READY   STATUS    RESTARTS   AGE   IP           NODE       NOMINATED NODE   READINESS GATES
+   pod/kvstore-0                   1/1     Running   0          23m   10.244.0.4   minikube   <none>           <none>
+   pod/splitdim-6dd5565899-krldz   1/1     Running   0          11m   10.244.0.5   minikube   <none>           <none>
+   
+   NAME                 TYPE           CLUSTER-IP     EXTERNAL-IP    PORT(S)        AGE    SELECTOR
+   service/kubernetes   ClusterIP      10.96.0.1      <none>         443/TCP        7d5h   <none>
+   service/kvstore      ClusterIP      None           <none>         8081/TCP       23m    app=kvstore
+   service/splitdim     LoadBalancer   10.100.109.0   10.100.109.0   80:30033/TCP   13h    app=splitdim
+   ```
+
+7. Store the external IP and port and do some quick tests with `curl`:
+   ```shell
+   export EXTERNAL_IP=$(kubectl get service splitdim -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+   export EXTERNAL_PORT=80
+   curl -H "Content-Type: application/json" --request POST --data '{"sender":"a","receiver":"b","amount":1}' http://${EXTERNAL_IP}:${EXTERNAL_PORT}/api/transfer
+   curl -H "Content-Type: application/json" --request POST --data '{"sender":"b","receiver":"c","amount":1}' http://${EXTERNAL_IP}:${EXTERNAL_PORT}/api/transfer
+   curl http://${EXTERNAL_IP}/api/clear
+   [{"sender":"c","receiver":"a","amount":1}]
+   ```
 
 > ✅ **Check**
 > 
-> Test your Kubernetes deployment. 
+> Test your Kubernetes deployment. If all goes well, you should see the output `PASS`.
+>   ``` sh
+>   export EXTERNAL_IP=$(kubectl get service splitdim -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+>   export EXTERNAL_PORT=80
+>   go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v
+>   PASS
+>   ```
 
 <!-- Local Variables: -->
 <!-- mode: markdown; coding: utf-8 -->

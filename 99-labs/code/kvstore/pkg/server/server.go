@@ -187,9 +187,10 @@ func (s *Server) Run(ctx context.Context, addr string) error {
 		if err := s.server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
 			log.Fatalf("HTTP server error: %v", err)
 		}
+
+		<-ctx.Done()
+		s.server.Close()
 	}()
 
-	<-ctx.Done()
-
-	return s.server.Close()
+	return nil
 }

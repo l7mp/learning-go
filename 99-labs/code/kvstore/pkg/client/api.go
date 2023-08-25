@@ -9,7 +9,7 @@ type Client interface {
 	// Put tries to insert the given key-value pair with the specified version into the store.
 	Put(vkv api.VersionedKeyValue) error
 	// List returns all values stored in the database.
-	List() ([]api.VersionedValue, error)
+	List() ([]api.VersionedKeyValue, error)
 	// Reset removes all key-value pairs.
 	Reset() error
 }

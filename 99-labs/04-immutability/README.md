@@ -369,7 +369,7 @@ So let us write a key-value store datalayer for our SplitDim web app. Recall, th
    - call the `db.setBalance(t.Sender, t.Amount)` *in an infinite loop until it succeeds without an error* to remove `t.Amount` from the balance of `t.Sender`,
    - call the `db.setBalance(t.Receiver, -t.Amount)` *in an infinite loop until it succeeds without an error* to add `t.Amount` to the balance of `t.Receiver`.
 
-   Calling the `setBalance` function in an infinite loop is necessary at this point, since it is completely normal for the `put` call after the `get` to fail due to a version mismatch (this is the price we pay for using a retriable *idempotent* API). Later, we will implement some simple *resilience* patterns to make this more robust. 
+   Calling the `setBalance` function in an infinite loop is necessary at this point, since it is completely normal for the `put` call after the `get` to fail due to a version mismatch (this is the price we pay for using a *loosely coupled idempotent* API). Later, we will implement some simple *resilience* patterns to make this more robust. 
 
    > **Warning**
    > 
@@ -540,19 +540,19 @@ curl http://${EXTERNAL_IP}:${EXTERNAL_PORT}/api/clear
 
 ### Scaling the web app
 
-We have worked a lot, added a lot of functionality, even implemented a key-value store client, but it seems that we are back at where we left at the end of the previous labs: the same tests pass fine. It is worthy stop at this point for a moment to reminisce why we did the whole thing in the first place: to be able to scale the web app (this is impossible with a stateful `splitdim`) and to let our data survive a pod restart.
+We have worked a lot, added a lot of functionality, even implemented a key-value store client, but it seems that we are back at where we left at the end of the previous lab: the same tests pass just fine. It is worth stopping at this point for a moment to reminisce why we did the whole thing in the first place: to be able to scale the web app (this is impossible with a stateful `splitdim`) and to let our data survive a pod restart. Let's do some quick tests to check whether we have reached our goal!
 
-So let us scale the `splitdim` Deployment to 3 pods:
+Scale the `splitdim` Deployment to 3 pods:
 
 ``` shell
 kubectl scale deployment splitdim --replicas=3
 ```
 
-Try the same `curl` tests as above: if all goes well, you should see the same results
+Try the same `curl` tests as above: if all goes well, you should see the same results.
 
 > ✅ **Check**
 > 
-> Test your Kubernetes deployment. If all goes well, you should see the output `PASS`.
+> Test your Kubernetes deployment with 3 `splitdim` pods. If all goes well, you should see the output `PASS`.
 >   ``` sh
 >   export EXTERNAL_IP=$(kubectl get service splitdim -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 >   export EXTERNAL_PORT=80
@@ -562,7 +562,7 @@ Try the same `curl` tests as above: if all goes well, you should see the same re
 
 ### Persistence
 
-Our little web app should at this point survive a full system restart. You can even stop Minikube and restart it, and the account database should be there.
+Our little web app should at this point survive a full system restart. You can even stop Minikube and restart it, and the account database should still be there.
 
 Fill the database with test data:
 
@@ -587,7 +587,6 @@ Wait a couple of seconds until all components restart and clear the balances aga
 ```shell
 curl http://${EXTERNAL_IP}:${EXTERNAL_PORT}/api/clear
 [{"sender":"c","receiver":"a","amount":1}]
-```
 ```
 
 This ends this lab: we now have a persistent datalayer for tested thoroughly in Kubernetes, and may even have had some fun along the way!

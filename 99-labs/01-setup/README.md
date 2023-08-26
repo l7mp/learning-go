@@ -247,7 +247,7 @@ If any of these files is missing, you forgot to generate the homeworks, so go ba
 Issue the below command to run the tests: this should fail as there is no solution yet.
 
 ``` shell
-go test ./... -v
+go test ./... -v -count 1
 ./exercise_test.go:10:18: undefined: helloWorld
 FAIL	github.com/l7mp/learning-go/01-getting-started/01-hello-world [build failed]
 FAIL
@@ -270,7 +270,7 @@ func helloWorld() string {
 >
 > Once correctly solved, all tests in the exercise should pass:
 > ``` shell
-> go test ./... -v
+> go test ./... -v -count 1
 > === RUN   TestHelloWorld
 > --- PASS: TestHelloWorld (0.00s)
 > PASS

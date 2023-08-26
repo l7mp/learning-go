@@ -89,7 +89,7 @@ Modify the program to return the hostname of the server it is running at. This r
 >
 > Run the below test to make sure that you have successfully completed the first exercise. If all goes well, you should see the output `PASS`.
 > ``` sh
-> go test --tags=main -run TestHelloWorldLocal
+> go test --tags=main -run TestHelloWorldLocal -count 1
 > PASS
 > ```
 
@@ -549,7 +549,7 @@ Extend the web app to also return the version of Go used to compile the web serv
 >
 > Run the below test to make sure that you have successfully completed the exercise. If all goes well, you should see the output `PASS`.
 > ``` sh
-> go test --tags=kubernetes -run TestHelloWorldKubernetes
+> go test --tags=kubernetes -run TestHelloWorldKubernetes -count 1
 > PASS
 > ```
 

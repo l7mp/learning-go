@@ -33,7 +33,10 @@ func TestAccounts(t *testing.T) {
 	a := []api.Account{}
 	err = json.NewDecoder(res.Body).Decode(&a)
 	assert.NoError(t, err, "account list unmarshal")
-	assert.Equal(t, a, []api.Account{{"a", 4}, {"b", -4}}, "a")
+	// order does not matter
+	assert.Len(t, a, 2)
+	assert.Contains(t, a, api.Account{"a", 4})
+	assert.Contains(t, a, api.Account{"b", -4})
 
 	res, err = testHTTP(t, "api/transfer", "POST", `{"sender":"a", "receiver":"b", "amount": 4}`)
 	assert.NoError(t, err, "POST: api/transfer")
@@ -46,7 +49,9 @@ func TestAccounts(t *testing.T) {
 	a = []api.Account{}
 	err = json.NewDecoder(res.Body).Decode(&a)
 	assert.NoError(t, err, "account list unmarshal")
-	assert.Equal(t, a, []api.Account{{"a", 8}, {"b", -8}}, "a")
+	assert.Len(t, a, 2)
+	assert.Contains(t, a, api.Account{"a", 8})
+	assert.Contains(t, a, api.Account{"b", -8})
 
 	res, err = testHTTP(t, "api/transfer", "POST", `{"sender":"b", "receiver":"c", "amount": 2}`)
 	assert.NoError(t, err, "POST: api/transfer")
@@ -59,7 +64,11 @@ func TestAccounts(t *testing.T) {
 	a = []api.Account{}
 	err = json.NewDecoder(res.Body).Decode(&a)
 	assert.NoError(t, err, "account list unmarshal")
-	assert.Equal(t, a, []api.Account{{"a", 8}, {"b", -6}, {"c", -2}}, "a")
+	// assert.Equal(t, a, []api.Account{{"a", 8}, {"b", -6}, {"c", -2}}, "a")
+	assert.Len(t, a, 3)
+	assert.Contains(t, a, api.Account{"a", 8})
+	assert.Contains(t, a, api.Account{"b", -6})
+	assert.Contains(t, a, api.Account{"c", -2})
 
 	// clear
 	res, err = testHTTP(t, "api/transfer", "POST", `{"sender":"c", "receiver":"a", "amount": 2}`)
@@ -73,7 +82,11 @@ func TestAccounts(t *testing.T) {
 	a = []api.Account{}
 	err = json.NewDecoder(res.Body).Decode(&a)
 	assert.NoError(t, err, "account list unmarshal")
-	assert.Equal(t, a, []api.Account{{"a", 6}, {"b", -6}, {"c", 0}}, "a")
+	// assert.Equal(t, a, []api.Account{{"a", 6}, {"b", -6}, {"c", 0}}, "a")
+	assert.Len(t, a, 3)
+	assert.Contains(t, a, api.Account{"a", 6})
+	assert.Contains(t, a, api.Account{"b", -6})
+	assert.Contains(t, a, api.Account{"c", 0})
 
 	res, err = testHTTP(t, "api/transfer", "POST", `{"sender":"b", "receiver":"a", "amount": 6}`)
 	assert.NoError(t, err, "POST: api/transfer")
@@ -86,7 +99,11 @@ func TestAccounts(t *testing.T) {
 	a = []api.Account{}
 	err = json.NewDecoder(res.Body).Decode(&a)
 	assert.NoError(t, err, "account list unmarshal")
-	assert.Equal(t, a, []api.Account{{"a", 0}, {"b", 0}, {"c", 0}}, "a")
+	// assert.Equal(t, a, []api.Account{{"a", 0}, {"b", 0}, {"c", 0}}, "a")
+	assert.Len(t, a, 3)
+	assert.Contains(t, a, api.Account{"a", 0})
+	assert.Contains(t, a, api.Account{"b", 0})
+	assert.Contains(t, a, api.Account{"c", 0})
 
 	res, err = testHTTP(t, "api/reset", "GET", "")
 	assert.NoError(t, err, "GET: api/rest")

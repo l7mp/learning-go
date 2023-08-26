@@ -118,9 +118,9 @@ This means your server is ready to accept HTTP requests.
 
 > ✅ **Check**
 >
-> Run the below test to check whether you have successfully completed the exercise. If all goes well, you should see the output `PASS`.
+> Run the below test to check whether you have successfully completed the task. If all goes well, you should see the output `PASS`.
 > ``` sh
-> go test ./... --tags=httphandler -run '^TestAPIEndpoints' -v
+> go test ./... --tags=httphandler -run '^TestAPIEndpoints' -v -count 1
 > PASS
 > ```
 > Make sure the web service is running: the test issues requests to the HTTP server and checks whether the response is as expected.
@@ -141,9 +141,9 @@ Substitute `http.MethodPost` with `http.MethodGet` for handlers that accept only
 
 > ✅ **Check**
 >
-> Run the below test to check whether you have successfully completed the exercise. If all goes well, you should see the output `PASS`.
+> Run the below test to check whether you have successfully completed the task. If all goes well, you should see the output `PASS`.
 > ``` sh
-> go test ./... --tags=httphandler -run '^TestAPIMethods' -v
+> go test ./... --tags=httphandler -run '^TestAPIMethods' -v -count 1
 > PASS
 > ```
 > Make sure the web service is running: the test issues requests to the HTTP server and checks whether the response is as expected.
@@ -220,9 +220,9 @@ The next task is to design the public SplitDim API, that is, the Go structs (and
 
 > ✅ **Check**
 >
-> Run the below test to check whether you have successfully completed the exercise. If all goes well, you should see the output `PASS`.
+> Run the below test to check whether you have successfully completed the task. If all goes well, you should see the output `PASS`.
 > ``` sh
-> go test ./... --tags=api -v
+> go test ./... --tags=api -v -count 1
 > PASS
 > ```
 
@@ -304,9 +304,9 @@ The next step is to define our internal `DataLayer`: the internal representation
 
 > ✅ **Check**
 >
-> Run the below test to check whether you have successfully completed the exercise. If all goes well, you should see the output `PASS`.
+> Run the below test to check whether you have successfully completed the task. If all goes well, you should see the output `PASS`.
 > ``` sh
-> go test ./... --tags=localconstructor -v
+> go test ./... --tags=localconstructor -v -count 1
 > PASS
 > ```
 
@@ -347,9 +347,9 @@ Before we start, below is a list of useful functions that help dealing with enco
    
 > ✅ **Check**
 >
-> Run the below test to check whether you have successfully completed the exercise. If all goes well, you should see the output `PASS`.
+> Run the below test to check whether you have successfully completed the task. If all goes well, you should see the output `PASS`.
 > ``` sh
-> go test ./... --tags=reset -v
+> go test ./... --tags=reset -v -count 1
 > PASS
 > ```
 > Make sure the web service is running: the test issues requests to the HTTP server and checks whether the response is as expected.
@@ -382,9 +382,9 @@ Before we start, below is a list of useful functions that help dealing with enco
 
 > ✅ **Check**
 >
-> Run the below test to check whether you have successfully completed the exercise. If all goes well, you should see the output `PASS`.
+> Run the below test to check whether you have successfully completed the task. If all goes well, you should see the output `PASS`.
 > ``` sh
-> go test ./... --tags=transfer -v
+> go test ./... --tags=transfer -v -count 1
 > PASS
 > ```
 > Make sure the web service is running: the test issues requests to the HTTP server and checks whether the response is as expected.
@@ -425,9 +425,9 @@ The `api/accounts` API should return the current balance of each registered user
 
 > ✅ **Check**
 >
-> Run the below test to check whether you have successfully completed the exercise. If all goes well, you should see the output `PASS`.
+> Run the below test to check whether you have successfully completed the task. If all goes well, you should see the output `PASS`.
 > ``` sh
-> go test ./... --tags=accounts -v
+> go test ./... --tags=accounts -v -count 1
 > PASS
 > ```
 > Make sure the web service is running: the test issues requests to the HTTP server and checks whether the response is as expected.
@@ -477,9 +477,9 @@ Although not entirely trivial, this algorithm is not that difficult: just find a
    
 > ✅ **Check**
 >
-> Run the below test to check whether you have successfully completed the exercise. If all goes well, you should see the output `PASS`.
+> Run the below test to check whether you have successfully completed the task. If all goes well, you should see the output `PASS`.
 > ``` sh
-> go test ./... --tags=clear -v
+> go test ./... --tags=clear -v -count 1
 > PASS
 > ```
 > Make sure the web service is running: the test issues requests to the HTTP server and checks whether the response is as expected.
@@ -519,9 +519,9 @@ At this point the web app should be functionally ready. Try some simple tests.
 
 > ✅ **Check**
 >
-> Run the below test to check whether you have successfully completed *all* the exercises above. If all goes well, you should see the output `PASS`.
+> Run the below test to check whether you have successfully completed *all* the tasks above. If all goes well, you should see the output `PASS`.
 > ``` sh
-> go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v
+> go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1
 > PASS
 > ```
 > Make sure the web service is running: the test issues requests to the HTTP server and checks whether the response is as expected.
@@ -543,9 +543,11 @@ The last step is to package up everything into a Docker container, deploy into K
 >   ``` sh
 >   export EXTERNAL_IP=$(kubectl get service splitdim -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 >   export EXTERNAL_PORT=80
->   go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v
+>   go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1
 >   PASS
 >   ```
+
+This ends this lab: we have successfully developed a barebones `splitdim` web app and deployed it to Kubernetes, and it didn't even hurt that much, did it?
 
 <!-- Local Variables: -->
 <!-- mode: markdown; coding: utf-8 -->

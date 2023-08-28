@@ -395,7 +395,7 @@ So let us write a key-value store datalayer for our SplitDim web app. Recall, th
 
    Luckily, we have already written the difficult part (the algorithm) during the previous lab. Here, we will need to list the account database again from the key-value store, convert it into a `make(map[string]int)`, and then reuse the same algorithm as in the previous lab to obtain the list of transfers. 
 
-   > **Note**
+   > :bulb: Tip
    > 
    > Since we seem to be reusing the same algorithm from the previous lab to perform the "clearing", we can even refactor that functionality out into a separate package (say, `splitdim/pkg/clear`) and call that lib every time we want to obtain the transfer list. The signature of the function could be, say:
    > ```go

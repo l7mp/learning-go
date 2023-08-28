@@ -458,10 +458,7 @@ helloworld.default.svc.cluster.local has address 10.98.135.40
 Observe that the resolved address is exactly the `ClusterIP`.
 
 > **Note**    
-> The fully qualified domain name (FQDN) of our Service is `helloworld.default.svc.cluster.local`, but any subdomain of that will correctly resolve the cluster IP as long as the subdomain unambiguously identifies a Service. 
-
-> **Note**   
-> The `default` in the above FQDN refers to the Kubernetes namespace called `default`. Namespaces are an extremely useful Kubernetes concept to isolate workloads running in the same cluster but we won't have time to go into the details.
+> The fully qualified domain name (FQDN) of our Service is `helloworld.default.svc.cluster.local`, but any subdomain of that will correctly resolve the cluster IP as long as the subdomain unambiguously identifies a Service.  The `default` in the above FQDN refers to the Kubernetes namespace called `default`. Namespaces are an extremely useful Kubernetes concept to isolate workloads running in the same cluster but we won't have time to go into the details.
 
 But perhaps even more importantly, the two HTTP queries to the Service were responded by different pods (first by `helloworld-67f7d78ccd-2fklj` and then by `helloworld-67f7d78ccd-qn6wk`). This highlights one of the most important properties of Kubernetes Services: they spread requests randomly across the pods of the Service, which makes sure the load is evenly distributed between the replicas.
 
@@ -502,10 +499,7 @@ helloworld   LoadBalancer   10.98.135.40   10.98.135.40   80:31275/TCP   105s
 ```
 
 > **Note**   
-> The cluster IP is the same as the external IP in the above case, but this is just a Minikube subtlety. Usually the cluster IP will be chosen as an unroutable private IP and only the external IP will be global.
-
-> **Warning**   
-> If the external IP in the output of `kubectl get` shows the status `<pending>` for more than a minute then `minikube tunnel` is not running. Just start it and everything should work fine. At least on Minikube. Otherwise, contact your Kubernetes provider.
+> The cluster IP is the same as the external IP in the above case, but this is just a Minikube subtlety. Usually the cluster IP will be chosen as an unroutable private IP and only the external IP will be global. If the external IP in the output of `kubectl get` shows the status `<pending>` for more than a minute then `minikube tunnel` is not running. Just start it and everything should work fine. At least on Minikube. Otherwise, contact your Kubernetes provider.
 
 Now we can issue a HTTP query to the Service from the host:
 

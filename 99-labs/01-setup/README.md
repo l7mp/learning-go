@@ -219,7 +219,8 @@ cd learning-go
 ```
 You should always add commit your solutions to this repo (see below) to avoid losing your work. 
 
-> **Note**  
+> :bulb: Tip
+> 
 > We recommend you keep a copy of your git tree somewhere safe to back up your solutions. The simplest way is to use a GitHub private fork for this purpose. We ask you to keep your GitHub repo private, in order to prevent others from copying your work.
 
 ### Generate the exercises

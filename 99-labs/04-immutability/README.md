@@ -413,9 +413,7 @@ So let us write a key-value store datalayer for our SplitDim web app. Recall, th
    }
    ```
 
-   > **Note**
-   > 
-   > Calling simply `db.Reset()` in the above would not work. Remember, `kvstore` embeds the key-value store client and, curiously, in this case both the embedding struct `kvstore` (of the `Datalayer` interface) and the embedded `Client` interface implements a `Reset` function. If we called `db.Reset()` directly on the outer object then we would recursively call ourselves in an infinite loop. Calling `db.Client.Reset()` makes sure that we call the `Reset` function of the embedded object.
+   Calling simply `db.Reset()` in the above would not work. Remember, `kvstore` embeds the key-value store client and, curiously, in this case both the embedding struct `kvstore` (of the `Datalayer` interface) and the embedded `Client` interface implements a `Reset` function. If we called `db.Reset()` directly on the outer object then we would recursively call ourselves in an infinite loop. Calling `db.Client.Reset()` makes sure that we call the `Reset` function of the embedded object.
 
 If all goes well (and all compile errors are taken care of), then we can make a local test:
 - start the key-value store in a new terminal:

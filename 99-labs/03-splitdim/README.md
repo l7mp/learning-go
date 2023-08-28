@@ -148,7 +148,7 @@ Substitute `http.MethodPost` with `http.MethodGet` for handlers that accept only
 > ```
 > Make sure the web service is running: the test issues requests to the HTTP server and checks whether the response is as expected.
 
-> **Note**
+> :bulb: Tip
 > 
 > Currently `http.HandleFunc("/api/transfer", TransferHandler)` will route *all* HTTP requests with a path that starts with `/api/transfer` to the `TransferHandler`, including `/api/transfer/random/api` or `/api/transfer/some/malicious/attack`. To make sure *only* the required API is served, you can check for the HTTP path inside the handler.
 
@@ -323,7 +323,7 @@ Before we start, below is a list of useful functions that help dealing with enco
 - `fmt.Fprintf(w, "API request failed: %s", err)`: write an error message into the HTTP response body;
 - `log.Printf("format", args...)`: log a request.
 
-> **Note**
+> :bulb: Tip
 > 
 > If unsure about the use of any of these functions, remember that all Go libraries come with excellent documentation at [`pkg.go.dev`](https://pkg.go.dev). For instance, the documentation of the `net/http` package is [here](https://pkg.go.dev/net/http), [here](https://pkg.go.dev/encoding/json) is the docs for the JSON encoding/decoding functions, etc.
 

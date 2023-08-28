@@ -230,7 +230,8 @@ The next task is to design the public SplitDim API, that is, the Go structs (and
 
 The next step is to define our internal `DataLayer`: the internal representation our service uses to represent accounts and balances. There are countless ways to do this: we chose the below simple in-memory representation as it will be straightforward to rewrite over the persistent key-value store `set-put` API later. 
 
-![SplitDim with local data layer.](/99-labs/fig/splitdim-local-db.png)
+<!-- <p align="center"><img width="460" height="300" src="https://picsum.photos/460/300"></p> -->
+<!-- ![SplitDim with local data layer.](/99-labs/fig/splitdim-local-db.png) -->
 
 1. Create a new package `pkg/db/local` and import some useful Go packages:
 

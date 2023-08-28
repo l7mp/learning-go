@@ -25,10 +25,10 @@ SplitDim helps housemates, friends, and family members maintain their internal m
 Enter SplitDim, a simple web app that allows friends to register their transfers (e.g., "Joe paid Alice's coffee for 5 USD", and then "Alice paid Joe's train ticket for 3 USD") and see (1) the current balance of each registered user (how much debt or credit they have) and (2) the minimal list of mutual money transfers that would allow them the clear all debts ("Alice would need to pay Joe 2 USD to clear the debt").
 
 We are going to build SplitDim as a Go web app. During this lab we will write only the barebones web service that keeps the balances in memory; later we will extend it into a proper cloud-native app. The web service will implement 4 APIs:
-- `POST: /api/transfer`: register a transfer between two users of a given amount (this API uses the POST HTTP method to let users post the transfer's details in JSON format),
-- `GET: /api/accounts`: return the list of current balances for each registered user,
-- `GET: /api/clear`: return the list of transfers that would allow users to clear their debts between themselves, and
-- `GET: /api/reset`: reset all balances to zero.
+- `POST /api/transfer`: register a transfer between two users of a given amount (this API uses the POST HTTP method to let users post the transfer's details in JSON format),
+- `GET /api/accounts`: return the list of current balances for each registered user,
+- `GET /api/clear`: return the list of transfers that would allow users to clear their debts between themselves, and
+- `GET /api/reset`: reset all balances to zero.
 
 So let's start, shall we?
 

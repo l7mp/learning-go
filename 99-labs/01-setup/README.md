@@ -294,7 +294,7 @@ You can test *all* your solutions from the main directory by issuing `make test`
 
 <!-- Local Variables: -->
 <!-- mode: markdown; coding: utf-8 -->
-<!-- auto-fill-mode: nil -->
+<!-- eval: (auto-fill-mode -1) -->
 <!-- visual-line-mode: 1 -->
 <!-- markdown-enable-math: t -->
 <!-- End: -->

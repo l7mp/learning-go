@@ -43,7 +43,10 @@ func TestClear(t *testing.T) {
 	a := []api.Account{}
 	err = json.NewDecoder(res.Body).Decode(&a)
 	assert.NoError(t, err, "account list unmarshal")
-	assert.Equal(t, a, []api.Account{{"a", 4}, {"b", -4}}, "a")
+	// assert.Equal(t, a, []api.Account{{"a", 4}, {"b", -4}}, "a")
+	assert.Len(t, a, 2)
+	assert.Contains(t, a, api.Account{"a", 4})
+	assert.Contains(t, a, api.Account{"b", -4})
 
 	res, err = testHTTP(t, "api/transfer", "POST", `{"sender":"a", "receiver":"b", "amount": 4}`)
 	assert.NoError(t, err, "POST: api/transfer")

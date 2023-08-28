@@ -591,7 +591,7 @@ This ends this lab: we now have a persistent datalayer for tested thoroughly in 
 
 <!-- Local Variables: -->
 <!-- mode: markdown; coding: utf-8 -->
-<!-- auto-fill-mode: nil -->
+<!-- eval: (auto-fill-mode -1) -->
 <!-- visual-line-mode: 1 -->
 <!-- markdown-enable-math: t -->
 <!-- End: -->

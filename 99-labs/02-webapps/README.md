@@ -549,7 +549,7 @@ Extend the web app to also return the version of Go used to compile the web serv
 
 <!-- Local Variables: -->
 <!-- mode: markdown; coding: utf-8 -->
-<!-- auto-fill-mode: nil -->
+<!-- eval: (auto-fill-mode -1) -->
 <!-- visual-line-mode: 1 -->
 <!-- markdown-enable-math: t -->
 <!-- End: -->

@@ -10,8 +10,8 @@ The below tasks guide you in making the web app (a little bit more) resilient. T
 
 1. [Preliminaries](#preliminaries)
 2. [Retry](#retry)
-3. [Health checks](#health-checks)
-4. [Graceful shutdown](#graceful-shutdown)
+3. [Graceful shutdown](#graceful-shutdown)
+4. [Health checks](#health-checks)
 
 ## Preliminaries
 
@@ -211,6 +211,10 @@ So below is a sequence of steps that will make sure `Transfer` survives key-valu
 > 
 > Recall, you can always use the transaction log to restore the key-value store. This is why we made in *persistent* in the first place!
 
+> **Note**
+> 
+> We wouldn't need to worry that much if our key-value store supported transactions. It seems this that issue will keep haunting us until we get it right and add the missing transaction support to `kvstore`.
+
 > :bulb: Tip
 > 
 > One way to make absolutely sure that we are never left with a halfway applied transfer is to implement transactions in the key-value store. For instance, we cloud create a `/api/transaction` API that would take a list of `put` requests and perform all in a single go (that is, while holding the database lock):
@@ -263,10 +267,93 @@ kubectl rollout restart deployment splitdim
 kubectl rollout restart statefulset kvstore
 ```
 
+## Graceful shutdown
+
+A closer look at the code reveals another problem: what if the app dies between the two calls to the key-value store required to process a transfer? Say, the first call that increases the balance of the sender succeeds, but then the app dies for some reason and the second call that would decrease the balance of the receiver fails? We are again left with an inconsistent account database. What is worse, in Kubernetes such cases can happen completely legitimately; e.g., when scaling in the `splitdim` application as demand drops and we need less pods, or during a software upgrade when we transition to a new version of `splitdim` and we kill the pods using the old version. Easily, we need a way to guarantee that even if the `splitdim` pod is terminated it will keep running until it finishes serving all outstanding client request. This is called *graceful shutdown*, and it is one of the most critical resilience features a cloud native app should implement.
+
+Recall, implementing graceful shutdown in an app means to (1) listen to `SIGTERM` signals from Kubernetes, (2) finish processing outstanding client requests, and then (3) exit voluntarily when ready shutting down. Below are a couple of pointers that will guide you in adding the required modifications to the `main` function of the `splitdim` app to implement graceful shutdown:
+- Run the HTTP server from a separate goroutine using `server.ListenAndServe()`. This will require to create the server first by calling, e.g., `s = &http.Server{Addr: ":8080"}`. The goroutine will exit when the underlying TCP socket is closed from the main thread of the program: make sure the signal an error only if the returned error is not a "server connection closed" error (`http.ErrServerClosed`).
+- Let the main thread wait until it receives a `SIGTERM` or a `SIGINT`. In Go this amounts to creating a channel that will become readable when one of the indicated signals is caught by the process:
+  ```go
+  sigChan := make(chan os.Signal, 1)
+  signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+  <-sigChan
+  ```
+- Call `server.Shutdown(ctx)` with a context `ctx` that will time out after a certain grace period (say, 10 minutes): this will keep the server alive until either (1) all outstanding client requests are served (e.g., all transfers are fully processed) or (2) the grace period passes. Once any of the two conditions become true, the app exits.
+- Add `terminationGracePeriodSeconds: 600` to the [pod spec](https://kubernetes.io/docs/tutorials/services/pods-and-endpoint-termination-flow) in the `splitdim` Deployment manifest to tell Kubernetes that it should wait 10 minutes after sending the termination signal to the pod before actually killing it. 
+  ```yaml
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: splitdim
+    labels: { app: splitdim }
+  spec:
+    selector: ...
+    template: ...
+      spec:
+        terminationGracePeriodSeconds: 600
+        containers:
+        - name: splitdim
+          image: localhost/splitdim:latest
+          ...
+  ```
+  During this time Kubernetes will not send new HTTP requests to the pod. The 10 mins grace period should give comfortable time for the app to process all queued requests and exit by itself.
+
+Rebuild the container image, redeploy the `splitdim` Deployment, and rerun some manual tests with curl. If all goes well, you should see no major difference from a normal test, but the code should be more robust now. You can try to scale up/down the `splitdim` Deployment app while sending it a lot of requests: if we got everything right we should never be left with an inconsistent database.
+
+> :bulb: Tip
+> 
+> You can check the consistency of the accounts database by calling the `/api/clear`. Recall, the first thing `Clear` does is to check whether the account balances add up to zero. A halfway applied transfer will most probably leave behind state where this condition does not hold.
 
 > ✅ **Check**
 > 
 > Test your Kubernetes deployment. 
+>   ``` sh
+>   export EXTERNAL_IP=$(kubectl get service splitdim -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+>   export EXTERNAL_PORT=80
+>   go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1
+>   PASS
+>   ```
+
+## Health checks
+
+The last thing we will do is to add health checking to the `splitdim` app. This makes sure Kubernetes has a way to check that our application is up and running. For simplicity we will use the same HTTP server for serving the main SplitDim API and health check requests: this is a common practice that simplifies configuration a lot, but may create false negatives under heavy load (i.e., when there are lots of client requests the app may starts to drop health check probes). For brevity, we won't make deep health checks and won't check downstream availability: deep health checks are made irrelevant by Kubernetes selectively health-checking all downstream dependencies by itself anyway.
+
+Adding health-checking to a Go web service is extremely simple: (1) just add a new HTTP handler that serves GET requests on the the `/healthz` path and returns status 200 (`http.StatusOK`) and, optionally, writes `"OK"` into the response body, and then tell Kubernetes that it can use the pod's main HTTP server port (currently TCP 8080) to check its health:
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: splitdim
+  labels: { app: splitdim }
+spec:
+  selector: ...
+  template: ...
+    spec:
+      terminationGracePeriodSeconds: 600
+      containers:
+      - name: splitdim
+        image: localhost/splitdim:latest
+        ...
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 2
+```
+
+And this should be it. Rebuild the `splidim` image, reapply the Kubernetes manifest and watch for the status of the `splitdim` pods: if you see lots of restarts then you misconfigured something: the sign that health checks do not work is Kubernetes restarting a pod every 5-10 seconds (watch for the `RESTARTS` column in the output of `kubectl get pods`).
+
+> ✅ **Check**
+> 
+> Test your Kubernetes deployment. 
+>   ``` sh
+>   export EXTERNAL_IP=$(kubectl get service splitdim -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+>   export EXTERNAL_PORT=80
+>   go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1
+>   PASS
+>   ```
 
 <!-- Local Variables: -->
 <!-- mode: markdown; coding: utf-8 -->

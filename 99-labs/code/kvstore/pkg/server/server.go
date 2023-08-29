@@ -183,8 +183,9 @@ func (s *Server) transaction(opList []api.VersionedKeyValue) error {
 	for _, v := range opList {
 		val, ok := s.store[v.Key]
 		if !ok {
-			v.Version = 1
-			s.store[v.Key] = v
+			val.Version = 1
+			val.Value = v.Value
+			s.store[v.Key] = val
 			continue
 		}
 
@@ -215,6 +216,19 @@ func (s *Server) initTransactionLog() error {
 			if err := s.put(vkv.Key, vkv.VersionedValue); err != nil {
 				log.Printf("error registering %#v from transaction log value: %s",
 					vkv, err.Error())
+				continue
+			}
+		case "transaction":
+			var vkvs []api.VersionedKeyValue
+			if err := json.Unmarshal([]byte(e.Value), &vkvs); err != nil {
+				log.Printf("error decoding transaction log value %q: %s",
+					e.Value, err.Error())
+				continue
+			}
+
+			if err := s.transaction(vkvs); err != nil {
+				log.Printf("error registering %#v from transaction log value: %q",
+					vkvs, err.Error())
 				continue
 			}
 		case "reset":

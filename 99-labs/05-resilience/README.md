@@ -75,7 +75,7 @@ func (db *kvstore) setBalance(user string, amount int) error {
 It is completely normal for the `put` to fail; this happens, e.g., when another `splitdim` instance makes a `put` to the same account between our `get` and `put` queries.
 
 There are two problems with the current code:
-- Currently we cannot ensure the "at the same time" property above: since our key-value store does not support transactions, it is certainly possible that the first `db.setBalance` operation succeeds while the second `db.setBalance` fails, which will leave the account database in an inconsistent state (let this be a reminder of the importance of using a transactional database whenever possible!). The most we can do is to try to avoid such situations as much as we can: see below.
+- Currently we cannot ensure the "at the same time" property above: since our key-value store does not support transactions, it is certainly possible that the first `db.setBalance` operation succeeds while the second `db.setBalance` fails, which will leave the account database in an inconsistent state. The most we can do is to try to avoid such situations as much as we can: see below.
 - Perhaps less obvious, but there is another problem lurking in the code: if `db.SetBalance` fails and this failure persists, then `Transfer` falls into an infinite loop trying to update the key-value store to no avail.
 
 It is easy to test this:
@@ -211,14 +211,6 @@ So below is a sequence of steps that will make sure `Transfer` survives key-valu
 > 
 > Recall, you can always use the transaction log to restore the key-value store. This is why we made in *persistent* in the first place!
 
-> :bulb: Tip
-> 
-> We wouldn't need to worry that much if our key-value store supported transactions. It seems this that issue will keep haunting us until we get it right and add the missing transaction support to `kvstore`. For instance, we cloud create a `/api/transaction` API endpoint that would take a list of `put` requests and perform all in a single go (that is, while holding the database lock):
-> ```go
-> func transaction(opList []api.VersionedKeyValue) error
-> ```
-> If any of the operations in the `opList` fails then the whole transaction fails, in which case we have to revert all earlier operations of the transaction and return an error. Feel free to experiment with the API and rewrite the key-value store data layer to make use of the new API (optional).
-
 To actually make use of the improved code, first try a local build with a missing key-value store backend (this will make all transfers fail) and check that a `curl` call to `/api/transfer` will fail in a controlled way (instead of falling into an infinite retry loop). Then, test with Kubernetes:
 
 1. Enable the Istio service mesh in the cluster and apply the below *fault injection* policy that will fail roughly every third call to the `/api/put` API (make sure Istio is installed!):
@@ -350,6 +342,20 @@ And this should be it. Rebuild the `splidim` image, reapply the Kubernetes manif
 >   go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1
 >   PASS
 >   ```
+
+We have seen how much trouble we have to go through just to work around a major limitation of our key-value store, namely that it does not seem to support transactional updates. To be absolutely fair, this is not entirely true: in fact it supports a simplified form of transactions that would already be enough to overcome the problems we have seen above.
+
+In particular, the key-value store serves a `/api/transaction` API endpoint that takes a list of `put` requests and performs all in a single go, while holding the database lock. The Go code signature is as follows:
+```go
+func transaction(opList []api.VersionedKeyValue) error
+```
+If any of the `put` operations in the `opList` fails then the whole transaction fails, in which case we revert all earlier operations of the transaction and return an error. We could have used this API from the outset but that would have removed much of the educational takeaway from this lab: the cloud native resilience patterns are so powerful that we can even work around deficient downstream apps and make our apps significantly more robust by using them!
+
+Let this serve as a reminder of the importance of using a transactional databases, they serve a good purpose!
+
+> :bulb: Tip
+> 
+> Feel free to experiment with the transactional API and rewrite the key-value store data layer in `splitdim` to make use of the new API. You can also implement a database client to make calling this API easier. This exercise is optional, but it serves as a perfect way to exercise your Go skills!
 
 <!-- Local Variables: -->
 <!-- mode: markdown; coding: utf-8 -->

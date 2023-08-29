@@ -8,7 +8,7 @@ The below tasks guide you in writing a simple web app that implements the barebo
 
 ## Table of Contents
 
-1. [Basics]([#basics])
+1. [Preliminaries]([#preliminaries])
 1. [API](#database-api)
 1. [Local data layer](#local-data-layer)
 1. [Reset](#reset)
@@ -18,7 +18,7 @@ The below tasks guide you in writing a simple web app that implements the barebo
 1. [Test](#test)
 1. [Deploy to Kubernetes](#deploy-to-kubernetes)
 
-## Basics
+## Preliminaries
 
 SplitDim helps housemates, friends, and family members maintain their internal money transfers and keep track of who owns who. Imagine you are at a trip with your friends, you invite one of your friends for a coffee, they pay the taxi fee for the entire group, and then someone else from the group pays your train ticket. After a while, it becomes practically impossible to remember all mutual payments and clear the debts. 
 

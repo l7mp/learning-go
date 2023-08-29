@@ -12,6 +12,7 @@ The below tasks guide you in making the web app (a little bit more) resilient. T
 2. [Retry](#retry)
 3. [Graceful shutdown](#graceful-shutdown)
 4. [Health checks](#health-checks)
+5. [Transactions revisited](#transactions-revisited)
 
 ## Preliminaries
 
@@ -342,6 +343,8 @@ And this should be it. Rebuild the `splidim` image, reapply the Kubernetes manif
 >   go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1
 >   PASS
 >   ```
+
+## Transactions revisited
 
 We have seen how much trouble we have to go through just to work around a major limitation of our key-value store, namely that it does not seem to support transactional updates. To be absolutely fair, this is not entirely true: in fact it supports a simplified form of transactions that would already be enough to overcome the problems we have seen above.
 

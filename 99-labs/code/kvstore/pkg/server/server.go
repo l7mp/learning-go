@@ -90,6 +90,25 @@ func NewServer(logFile string) (*Server, error) {
 		json.NewEncoder(w).Encode(s.list())
 	})
 
+	http.HandleFunc("/api/transaction", func(w http.ResponseWriter, r *http.Request) {
+		vkvs := []api.VersionedKeyValue{}
+		defer r.Body.Close()
+		if err := json.NewDecoder(r.Body).Decode(&vkvs); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		log.Printf("transaction: ops=%d\n", len(vkvs))
+		if err := s.transaction(vkvs); err != nil {
+			w.WriteHeader(http.StatusPreconditionRequired) // 418
+			return
+		}
+
+		json, _ := json.Marshal(vkvs)
+		s.logger.Write("transaction", string(json))
+
+		w.WriteHeader(http.StatusOK)
+	})
+
 	return &s, nil
 }
 
@@ -142,6 +161,39 @@ func (s *Server) list() []api.VersionedKeyValue {
 	}
 
 	return ret
+}
+
+func (s *Server) transaction(opList []api.VersionedKeyValue) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	// check if all versions are OK
+	for _, v := range opList {
+		val, ok := s.store[v.Key]
+		if !ok {
+			continue
+		}
+		if val.Version != v.Version {
+			return fmt.Errorf("transaction: version mismatch on op %q: %d != %d",
+				val, val.Version, v.Version)
+		}
+	}
+
+	// at this point we know the transaction can be applied
+	for _, v := range opList {
+		val, ok := s.store[v.Key]
+		if !ok {
+			v.Version = 1
+			s.store[v.Key] = v
+			continue
+		}
+
+		val.Value = v.Value
+		val.Version += 1
+		s.store[v.Key] = val
+	}
+
+	return nil
 }
 
 func (s *Server) initTransactionLog() error {

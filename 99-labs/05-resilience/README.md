@@ -51,30 +51,30 @@ func (db *kvstore) Transfer(t Transfer) error {
 }
 ```
 
-Recall, this function takes an `Transfer` API object and increases the balance of the sender by the requested amount and *at the same time* decreases the balance of the receiver by the same amount. The `db.setBalance` function is our own helper that makes a pair of consecutive `get` to obtain the current versioned balance from the key-value store and then tries to `put` the increased balance back again. 
+Recall, this function takes a `Transfer` API object and increases the balance of the sender by the requested amount and *at the same time* decreases the balance of the receiver by the same amount. The `db.setBalance` function is our own helper that makes a pair of consecutive `get` to obtain the current versioned balance from the key-value store and then tries to `put` the new balance (with the same version) back again.
 
 ```go
 func (db *kvstore) setBalance(user string, amount int) error {
-	vv, err := db.Get(user)
-	if err != nil { 
-		return err
-	}
+    vv, err := db.Get(user)
+    if err != nil { 
+        return err
+    }
 
     vv.balance += amount      // With the int-conversion removed
     vkv := clientapi.VersionedKeyValue{user, vv}
 
-	err = db.Put(vkv)
-	if err != nil {
-		return err
-	}
+    err = db.Put(vkv)
+    if err != nil {
+        return err
+    }
 
-	return nil
+    return nil
 }
 ```
 
-It is completely normal for the `put` to fail; this happens, e.g., when another `splitdim` instance makes a `put` to the same account between our `get` and `put` queries:
+It is completely normal for the `put` to fail; this happens, e.g., when another `splitdim` instance makes a `put` to the same account between our `get` and `put` queries.
 
-There are two problems with our code for `Transfer`:
+There are two problems with the current code:
 - Currently we cannot ensure the "at the same time" property above: since our key-value store does not support transactions, it is certainly possible that the first `db.setBalance` operation succeeds while the second `db.setBalance` fails, which will leave the account database in an inconsistent state (let this be a reminder of the importance of using a transactional database whenever possible!). The most we can do is to try to avoid such situations as much as we can: see below.
 - Perhaps less obvious, but there is another problem lurking in the code: if `db.SetBalance` fails and this failure persists, then `Transfer` falls into an infinite loop trying to update the key-value store to no avail.
 
@@ -136,9 +136,9 @@ It is easy to test this:
 
 ## Retry
 
-Easily, trying to apply an operation to a downstream dependency in an infinite loop, like `splitdim` attempting desperately to talk to `kvstore` in the above, will not work when the downstream dependency fails, since this will push the upstream into an infinite loop. A straightforward solution to make our web app *resilient* to such downstream failures is to *retry* the failing operation in the hope that one of the attempts will succeed, and report failure and give up only after a certain number of failures.  Meanwhile, we have to make sure that we do not worsen the situation by, say, causing a "retry storm". 
+Easily, trying to apply an operation to a downstream dependency in an infinite loop, like `splitdim` attempting desperately to talk to `kvstore` in the above, will not work when the downstream dependency fails. A straightforward solution to make our web app *resilient* to such downstream failures is to control the *retry* process: say, we could resend the failing query a certain (small) number of times in the hope that one of the attempts will succeed, and report failure and give up only after that.  Meanwhile, we have to make sure that we do not worsen the situation by, say, causing a "retry storm". 
 
-Below, we will substitute the failure-prone infinite loop with a configurable retry policy. But before that, here is an important point worth remaking.
+Below, we will substitute the failure-prone infinite loop with a configurable retry policy. But before that, an important fact worth remaking at this point.
 
 > **Warning**
 > 
@@ -183,7 +183,7 @@ go mod vendor
 > 
 > Make sure you understand the use of `go mod`; from this point we will omit package imports all together.
 
-So let's try to make `Transfer` resilient to downstream failures using the `resilient` package.  The naive solution to avoid the infinite loop would be to apply `resilient.WithRetry` with an adequate backoff policy to the `setBalance` call in `Transfer` to obtain a function which, when called, will automatically retry itself as many times as we want. Unfortunately, this will not work: `resilient.WithRetry` only accepts functions of type `func() error`, while the type of `setBalance` is `func (string, int) error`. There is a simple way to overcome such issues: define a new closure called `setBalanceForUser` that returns a specialized function that sets the balance for *one particular user* with *one particular amount*:
+So let's try to make `Transfer` resilient to downstream failures using the `resilient` package.  The naive solution to avoid the infinite loop would be to apply `resilient.WithRetry` with an adequate backoff policy to the `setBalance` calls in `Transfer` to obtain a function which, when called, will automatically retry itself as many times as we want. Unfortunately, this will not work: `resilient.WithRetry` only accepts functions of type `func() error`, while the type of `setBalance` is `func (string, int) error`. There is a simple way to overcome such issues: define a new closure called `setBalanceForUser` that returns a specialized function that sets the balance for *one particular user* with *one particular amount*:
 
 ```go
 func (db *kvstore) setBalanceForUser(user string, amount int) resilient.Closure {
@@ -204,24 +204,20 @@ So below is a sequence of steps that will make sure `Transfer` survives key-valu
 3. Use `resilient.WithRetry` on the closure obtained in the previous step using the default backoff policy to decorate it with a retry policy.
 4. Call the decorated closure to actually run it: if this fails that means that all retries have failed so we can safely return an error.
 5. Now repeat the same steps for the receiver: call `db.setBalanceForUser(t.Receiver, -t.Amount)` to obtain a `Closure` that will decrease the balance of the receiver by the requested amount, use `resilient.WithRetry` with the default backoff policy to obtain a retrier, and call it.
-6. If this fails then we are in trouble: we have a halfway applied transfer transaction. The only thing we can do is to undo the first operation (i.e., decrease the balance of the sender by the same amount). Make sure to use more aggressive retry policy this time.
+6. If this fails then we are in trouble: we have a halfway applied transfer transaction. The only thing we can do is to try to undo the first operation (i.e., decrease the balance of the sender by the same amount). Make sure to use more aggressive retry policy this time.
 7. If this undo operation fails then *we are left with an inconsistent account database*. If this is the case, return an unmissable error and fail all subsequent transfers, until the system operator restores the database.
 
 > **Note**
 > 
 > Recall, you can always use the transaction log to restore the key-value store. This is why we made in *persistent* in the first place!
 
-> **Note**
-> 
-> We wouldn't need to worry that much if our key-value store supported transactions. It seems this that issue will keep haunting us until we get it right and add the missing transaction support to `kvstore`.
-
 > :bulb: Tip
 > 
-> One way to make absolutely sure that we are never left with a halfway applied transfer is to implement transactions in the key-value store. For instance, we cloud create a `/api/transaction` API that would take a list of `put` requests and perform all in a single go (that is, while holding the database lock):
+> We wouldn't need to worry that much if our key-value store supported transactions. It seems this that issue will keep haunting us until we get it right and add the missing transaction support to `kvstore`. For instance, we cloud create a `/api/transaction` API endpoint that would take a list of `put` requests and perform all in a single go (that is, while holding the database lock):
 > ```go
 > func transaction(opList []api.VersionedKeyValue) error
 > ```
-> If any operation in the `opList` fails then the whole transaction fails, in which case we have to revert all earlier operations of the transaction. Feel free to experiment with the API and rewrite the key-value store data layer to make use of the new API (optional).
+> If any of the operations in the `opList` fails then the whole transaction fails, in which case we have to revert all earlier operations of the transaction and return an error. Feel free to experiment with the API and rewrite the key-value store data layer to make use of the new API (optional).
 
 To actually make use of the improved code, first try a local build with a missing key-value store backend (this will make all transfers fail) and check that a `curl` call to `/api/transfer` will fail in a controlled way (instead of falling into an infinite retry loop). Then, test with Kubernetes:
 

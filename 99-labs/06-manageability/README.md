@@ -145,7 +145,7 @@ Your job is now to add the necessary settings to the `splitdim` container templa
 >     name: splitdim-config
 >   data:
 >     kvstoreMode: "kvstore"
->     kvstoreAddr: "kvstore.default:8081"`
+>     kvstoreAddr: "kvstore.default:8081"
 >   EOF
 >   kubectl rollout restart deployment splitdim
 >   ```

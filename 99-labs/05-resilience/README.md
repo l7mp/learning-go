@@ -52,7 +52,7 @@ func (db *kvstore) Transfer(t Transfer) error {
 }
 ```
 
-Recall, this function takes a `Transfer` API object and increases the balance of the sender by the requested amount and *at the same time* decreases the balance of the receiver by the same amount. The `db.setBalance` function is our own helper that makes a pair of consecutive `get` to obtain the current versioned balance from the key-value store and then tries to `put` the new balance (with the same version) back again.
+Recall, this function takes a `Transfer` API object and increases the balance of the sender by the requested amount and decreases the balance of the receiver by the same amount. Theoretically, this should occur *at the same time* to complete the transfer. The `db.setBalance` function is our little helper that makes a `get` to obtain the current versioned balance from the key-value store followed by a `put` that tries to register the new balance (with the same version) in the accounts database.
 
 ```go
 func (db *kvstore) setBalance(user string, amount int) error {
@@ -76,7 +76,7 @@ func (db *kvstore) setBalance(user string, amount int) error {
 It is completely normal for the `put` to fail; this happens, e.g., when another `splitdim` instance makes a `put` to the same account between our `get` and `put` queries.
 
 There are two problems with the current code:
-- Currently we cannot ensure the "at the same time" property above: since our key-value store does not support transactions, it is certainly possible that the first `db.setBalance` operation succeeds while the second `db.setBalance` fails, which will leave the account database in an inconsistent state. The most we can do is to try to avoid such situations as much as we can: see below.
+- Currently we cannot ensure the "at the same time" property above: since our key-value store does not support transactions, it is certainly possible that the first `db.setBalance` operation succeeds while the second one fails, which will leave the account database in an inconsistent state. The most we can do is to try to avoid such situations as much as we can: see below.
 - Perhaps less obvious, but there is another problem lurking in the code: if `db.SetBalance` fails and this failure persists, then `Transfer` falls into an infinite loop trying to update the key-value store to no avail.
 
 It is easy to test this:
@@ -137,7 +137,7 @@ It is easy to test this:
 
 ## Retry
 
-Easily, trying to apply an operation to a downstream dependency in an infinite loop, like `splitdim` attempting desperately to talk to `kvstore` in the above, will not work when the downstream dependency fails. A straightforward solution to make our web app *resilient* to such downstream failures is to control the *retry* process: say, we could resend the failing query a certain (small) number of times in the hope that one of the attempts will succeed, and report failure and give up only after that.  Meanwhile, we have to make sure that we do not worsen the situation by, say, causing a "retry storm". 
+Easily, trying to apply an operation to a downstream dependency in an infinite loop, like `splitdim` attempting desperately to talk to `kvstore` in the above, will not work when the downstream dependency fails. A straightforward solution to make our web app *resilient* to such downstream failures is to control the *retry* process: say, we could resend the failing query a certain (small) number of times in the hope that one of the attempts will succeed, and give up and report a failure only after that.  Meanwhile, we have to make sure that we do not worsen the situation by, say, causing a "retry storm".
 
 Below, we will substitute the failure-prone infinite loop with a configurable retry policy. But before that, an important fact worth remaking at this point.
 

@@ -256,6 +256,10 @@ kubectl rollout restart deployment splitdim
 kubectl rollout restart statefulset kvstore
 ```
 
+> :bulb: Tip
+> 
+> Feel free to add a retrier for the rest of the API calls in `splitdim`. 
+
 ## Graceful shutdown
 
 A closer look at the code reveals another problem: what if the app dies between the two calls to the key-value store required to process a transfer? Say, the first call that increases the balance of the sender succeeds, but then the app dies for some reason and the second call that would decrease the balance of the receiver fails? We are again left with an inconsistent account database. What is worse, in Kubernetes such cases can happen completely legitimately; e.g., when scaling in the `splitdim` application as demand drops and we need less pods, or during a software upgrade when we transition to a new version of `splitdim` and we kill the pods using the old version. Easily, we need a way to guarantee that even if the `splitdim` pod is terminated it will keep running until it finishes serving all outstanding client request. This is called *graceful shutdown*, and it is one of the most critical resilience features a cloud native app should implement.

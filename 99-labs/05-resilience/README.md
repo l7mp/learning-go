@@ -52,7 +52,7 @@ func (db *kvstore) Transfer(t Transfer) error {
 }
 ```
 
-Recall, this function takes a `Transfer` API object and increases the balance of the sender by the requested amount and decreases the balance of the receiver by the same amount. Theoretically, this should occur *at the same time* to complete the transfer. The `db.setBalance` function is our little helper that makes a `get` to obtain the current versioned balance from the key-value store followed by a `put` that tries to register the new balance (with the same version) in the accounts database.
+Recall, this function takes a `Transfer` API object and increases the balance of the sender by the requested amount and decreases the balance of the receiver by the same amount. Theoretically, the two operations should occur *at the same time* to complete the transfer. The `db.setBalance` function is our little helper that makes a `get` to obtain the current versioned balance from the key-value store followed by a `put` that tries to register the new balance (with the same version) in the accounts database.
 
 ```go
 func (db *kvstore) setBalance(user string, amount int) error {
@@ -76,7 +76,7 @@ func (db *kvstore) setBalance(user string, amount int) error {
 It is completely normal for the `put` to fail; this happens, e.g., when another `splitdim` instance makes a `put` to the same account between our `get` and `put` queries.
 
 There are two problems with the current code:
-- Currently we cannot ensure the "at the same time" property above: since our key-value store does not support transactions, it is certainly possible that the first `db.setBalance` operation succeeds while the second one fails, which will leave the account database in an inconsistent state. The most we can do is to try to avoid such situations as much as we can: see below.
+- Currently we cannot ensure the "at the same time" property above: since our key-value store does not support transactions, it is certainly possible that the first `db.setBalance` operation succeeds while the second one fails, which will leave the account database in an inconsistent state. The most we can do is to try to avoid such situations as much as we can.
 - Perhaps less obvious, but there is another problem lurking in the code: if `db.SetBalance` fails and this failure persists, then `Transfer` falls into an infinite loop trying to update the key-value store to no avail.
 
 It is easy to test this:
@@ -143,9 +143,13 @@ Below, we will substitute the failure-prone infinite loop with a configurable re
 
 > **Warning**
 > 
-> In order to be able to retry a failing API call, the API has to be **idempotent**. This makes sure that even if the caller mistakenly assumes that a call failed (e.g., by failing to get an acknowledgment) and inadvertently reapplies the same operation more than once, the resultant downstream state will not change. Only idempotent APIs provide this property: an idempotent operation can be performed repeatedly as many times as we want, and we still get the same result.
+> In order to be able to retry a failing API call, the API has to be **retriable** in the first place. Most APIs (especially legacy ones) do not possess this property. Do not blindly retry an API operation unless you are absolutely sure it is safe, otherwise you may cause more trouble than if you immediately failed the operation in the first place!
+
+One property that allows safe retriability is *idempotence*; an idempotent call can be repeated as many times as we want and the resultant state would not differ.  This makes sure that even if the caller mistakenly assumes that a call failed (e.g., by failing to get an acknowledgment) and inadvertently reapplies the same operation more than once, the resultant downstream state will not change. For instance, ~put~ is idempotent, while `db.setBalance` is not: applying it, say, twice, will increase/decrease the user's balance by twice the requested amount. Yet, we can still retry a failed `db.setBalance` call, provided that we immediately stop the retry loop as we receive a positive response (i.e., 200 HTTP status).
+
+> **Note**
 >
-> We have deliberately designed our get-put API to be idempotent, but most APIs (especially legacy APIs) do not possess this property. Do not blindly retry an API operation unless you are absolutely sure it is idempotent, otherwise you may cause more trouble than if you immediately failed the operation in the first place!
+> Retriability is a much more complex question than what we can cover here. 
 
 In order to simplify the implementation of the retry policy, we have packaged a small library called `resilient` next to `splitdim` (see `99-labs/code/resilient`). The API exposed by this library is as follows:
 ```go

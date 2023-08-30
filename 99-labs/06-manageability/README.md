@@ -56,8 +56,8 @@ Once everything is ready, you can play a bit with a local build to see if everyt
 > Test your solution through the following steps:
 > - start the key-value store: `cd 99-labs/code/kvstore && go run kvstore.go`;
 > - build an executable from the `splitdim` app with `cd 99-labs/code/splitdim && go build -o splitdim main.go`;
-> - set default address:port pair for `splitdim`: `export EXTERNAL_IP=localhost; export EXTERNAL_PORT=8080`;
 > - start the app with the local data layer in the background: `./splitdim -mode local&`;
+> - set the reachability info for `splitdim`: `export EXTERNAL_IP=localhost; export EXTERNAL_PORT=8080`;
 > - run the tests:
 >   ```go
 >   go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1`
@@ -72,7 +72,7 @@ Once everything is ready, you can play a bit with a local build to see if everyt
 
 ## Configuration files
 
-Managing our application through environment variables and command line arguments is nice, but it gets complex after a certain point: what if we have dozens of important parameters, do we really want to configure each via a separate command line argument or environment variable? The solution is a configuration file, summarizing an entire config in a single human-readable file. We recommend the JSON or the YAML format for storing the config file: we already know how to automatically marshal/unmarshal them to/from Go structs.
+Managing our application through environment variables and command line arguments is nice, but it gets complex after a certain point: what if we have dozens of important parameters, do we really want to configure each via a separate command line argument or environment variable? The solution is a configuration file of course, which can hold the entire config in a single human-readable file. We recommend the JSON or the YAML format for storing the config file: we already know how to automatically marshal/unmarshal them to/from Go structs.
 
 Below we will implement something functionally equivalent with config files but, perhaps somewhat surprisingly, we will not have to deal with any files at all! This magic is made possible by Kubernetes ConfigMaps. In particular, we want to be able to collect all our relevant config parameters in a single Kubernetes resource, a ConfigMap. For instance, the below would mean to start `splitdim` in Kubernetes with the `local` data layer:
 ```yaml
@@ -82,7 +82,6 @@ metadata:
   name: splitdim-config
 data:
   kvstoreMode: "local"
-  kvstoreAddr: ""
 ```
 
 In contrast, the below would choose the `kvstore` data layer with the key-value store available at `kvstore.default:8081`:
@@ -97,6 +96,10 @@ data:
 ```
 
 Our job is now to map the entries of the ConfigMap to the corresponding environment variables of the `splitdim` pod. 
+
+> **Note**
+>
+> Note that mapping ConfigMaps to command line arguments is not so trivial, that is why we prefer environment variables over command line flags for managing the startup parameters of cloud native apps.
 
 In general, the entry called `my-configmap-key` in the `my-configmap` ConfigMap can be mapped into the environment variable called `MY_ENV` when starting a container called `my-container` as follows:
 ```yaml
@@ -133,7 +136,6 @@ Your job is now to add the necessary settings to the `splitdim` container templa
 >     name: splitdim-config
 >   data:
 >     kvstoreMode: "local"
->     kvstoreAddr: ""
 >   EOF
 >   kubectl rollout restart deployment splitdim
 >   ```

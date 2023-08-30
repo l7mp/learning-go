@@ -21,7 +21,7 @@ spec:
         image: localhost/kvstore
         ports:
         - containerPort: 8081
-          name: kvstore
+          name: http-kvstore
         resources:
           requests:
             cpu: "100m"
@@ -49,7 +49,8 @@ spec:
     app: kvstore
   clusterIP: None
   ports:
-  - port: 8081
+  - name: http-kvstore
+    port: 8081
     protocol: TCP
     name: kvstore
 

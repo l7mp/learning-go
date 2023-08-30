@@ -1,6 +1,6 @@
 # Deploying web applications into Kubernetes
 
-During this lab, we will build a simple web app in Go and learn how to deploy it into Kubernetes. Each section is closed with an exercise and a test, absolve each to complete the lab.
+During this lab, we will build a simple web app in Go and learn how to deploy it into Kubernetes. Each section is closed with an exercise and a test, pass each to complete the lab.
 
 ## Table of Contents
 

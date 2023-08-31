@@ -1,6 +1,6 @@
 # Service mesh
 
-So far, we have gradually improved our toy web app, SplitDim, into a real cloud native microservice application. We moved resource state out from the app into a key-value store data layer, making our app effectively stateless, we added various resilience mechanism to make the communication between the app and the key-value store more robust, and we showed several ways to manage the app without having to modify and redeploy the any Go code. These improvements were greatly supported, and in large parts made possible, by the built-in cloud native features offered by Kubernetes; for instance, Kubernetes lets is specify config files in ConfigMaps and map these easily and declaratively into the app's startup parameters, allow the app to reach the key-value store via a DNS name eliminating the tight coupling that would be created by communicating over a fix IP address, etc. 
+So far, we have gradually improved our toy web app, SplitDim, into a real cloud native microservice application. We moved resource state out from the app into a key-value store data layer, making our app effectively stateless, we added various resilience mechanisms to make the communication between the app and the key-value store more robust, and we showed several ways to manage the app without having to modify and redeploy any Go code. These improvements were greatly supported, and in large parts made possible, by the built-in cloud native features offered by Kubernetes. For instance, Kubernetes lets us specify full configuration in ConfigMaps and map these easily and declaratively into the app's startup parameters, allows the app to reach the key-value store via a DNS name eliminating the tight coupling that would be created by communicating over a fix IP address, etc. 
 
 In this lab we show that the cloud native support provided by Kubernetes does not stop here: in fact, *many resilience, manageability and observability patterns are readily provided by service meshes* on top of Kubernetes, without us having to write any specific code (in fact, most of the time we must even *remove* cloud native support from our app in order to avoid interfering with the cloud native features implemented in the service mesh). We will demonstrate the use of service meshes using our SplitDim web app and we will also take this occasion to cover the last remaining cloud native pillar: *observability*.
 
@@ -11,16 +11,16 @@ The below tasks let you familiarize yourself with one of the most popular servic
 ## Table of Contents
 
 1. [Preliminaries](#preliminaries)
-2. [Command line parameters](#command-line-parameters)
-3. [Configuration files](#configuration-files)
+2. [Traffic management](#traffic management)
+3. [Security](#security)
 
 ## Preliminaries
 
-The service mesh concept emerged from the need to obtain better tools to more efficiently manage modern applications, typically architected as distributed collections of microservices that together perform some concrete business function. A service mesh is a dedicated infrastructure layer on top of Kubernetes that can transparently add capabilities like observability, traffic management, and security, without having to add them to your own code. It is the communication between microservices that makes a distributed application possible. Correspondingly, most of the service mesh features address some critical aspect of internal and external *network communications* in Kubernetes, like HTTP request routing, load balancing, failure recovery, rate limiting, access control, encryption, and end-to-end authentication.
+The service mesh concept emerged from the need to obtain better tools to more efficiently manage modern applications, typically architected as distributed collections of microservices that together perform some complex business function. A service mesh is a dedicated infrastructure layer on top of Kubernetes that can transparently add capabilities like observability, traffic management, and security, without having to add them to your own code. It is the communication between microservices that makes a distributed application possible. Correspondingly, most of the service mesh features address some critical aspect of internal and external *network communications* in Kubernetes, like HTTP request routing, load balancing, failure recovery, rate limiting, access control, encryption, and end-to-end authentication.
 
-Below we use Istio and to demonstrate some of the useful features provided by a modern service mesh. We will use SplitDim to 
+Below we use Istio to demonstrate some of the useful features provided by a modern service mesh, using our handy SplitDim app a use case.
 
-At this point, you should have Istio installed in your cluster. If not, go back to the first lab and make sure Istio, the command line config tool called `istioctl`, and the Kubernetes Gateway API are [installed](https://github.com/l7mp/learning-go/blob/master/99-labs/01-setup/README.md#install-istio). Next, we customize Istio to unlock some useful features which are not available in the minimal profile we have used this far.
+At this point, you should have Istio installed in your cluster. If not, go back to the first lab and make sure Istio, the command line config tool called `istioctl`, and the Kubernetes Gateway API are [installed](https://github.com/l7mp/learning-go/blob/master/99-labs/01-setup/README.md#install-istio). Next, we customize Istio to unlock some useful features which are not available in the minimal profile we have used so far.
 
 1. Make sure `istioctl` is available in your shell.
 
@@ -29,13 +29,13 @@ At this point, you should have Istio installed in your cluster. If not, go back 
    export PATH=${ISTIO_DIR}/bin:${PATH}
    ```
    
-   Check that `istioctl` works fine; if yes, you should see some version info dumped by `istioctl` to the console.
+   Check that `istioctl` works fine; if yes, you should see some version info dumped by `istioctl` to the console:
    
    ```shell
    istioctl version
    ```
    
-   You can enable `istioctl` bash autocompletion in the current shell using the below
+   You can enable `istioctl` bash autocompletion in the current shell using the below:
    
    ```shell
    source <(istioctl completion bash)
@@ -49,28 +49,9 @@ At this point, you should have Istio installed in your cluster. If not, go back 
    
    > **Note**
    >
-   > It make take a while until all Istio components come up online. Meanwhile, some Istio features may not be available. Watch the pod statuses in the `istio-system` namespace to test whether everything works fine: `kubectl get pods -n istio-system -o wide`.
+   > It may take a while until all Istio components come up online. Meanwhile, some Istio features may not be available. You can watch the pod statuses in the `istio-system` namespace using `watch -d -n 1 kubectl get pods -n istio-system -o wide`.
 
-3. Enable tracing. In particular, the below configuration will instruct Istio to collect traces for every 2nd HTTP request in Jaeger.
-
-   ``` bash
-   istioctl install -y -f - <<EOF
-   apiVersion: install.istio.io/v1alpha1
-   kind: IstioOperator
-   spec:
-     meshConfig:
-       enableTracing: true
-       defaultConfig:
-         tracing:
-           sampling: 50
-   EOF
-   ```
-
-   > **Note**
-   >
-   > Do not use this in production: tracing has substantial resource requirements that may easily overwhelm your cluster.
-
-4. Enable Istio in the `default` namespace. This amounts to switching Istio *sidecar injection* on, which means that Istio will automatically process the traffic of each pod in the `default` namespace to enforce the traffic management policies configured in Istio.
+3. Enable Istio in the `default` namespace. This amounts to switching Istio *sidecar injection* on, which means that Istio will automatically process the traffic of each pod in the `default` namespace to enforce the traffic management policies we configure.
 
    ```shell
    kubectl label namespace default istio-injection=enabled --overwrite
@@ -79,6 +60,25 @@ At this point, you should have Istio installed in your cluster. If not, go back 
    > **Note**
    >
    > The above will affect only newly created pods in the namespace but *does not* restart any workload already running. You have to manually restart your Deployments and StatefulSets to enable Istio to control them.
+
+<!-- 4. Enable tracing. In particular, the below configuration will instruct Istio to collect traces for every 2nd HTTP request in Jaeger. -->
+
+<!--    ``` bash -->
+<!--    istioctl install -y -f - <<EOF -->
+<!--    apiVersion: install.istio.io/v1alpha1 -->
+<!--    kind: IstioOperator -->
+<!--    spec: -->
+<!--      meshConfig: -->
+<!--        enableTracing: true -->
+<!--        defaultConfig: -->
+<!--          tracing: -->
+<!--            sampling: 50 -->
+<!--    EOF -->
+<!--    ``` -->
+
+<!--    > **Note** -->
+<!--    > -->
+<!--    > Do not use this in production: tracing has substantial resource requirements that may easily overwhelm your cluster. -->
 
 To actually use Istio on a real workload, we will of course use our handy SplitDim app. Deploy SplitDim with the key-value store backend; if it already runs, make sure to restart it (as well as the key-value store) in order for Istio to take effect. At the end your pod listing should show something like the below:
 
@@ -107,9 +107,9 @@ curl -H "Content-Type: application/json" --request POST --data '{"sender":"b","r
 
 ## Observability
 
-One of the most useful features of a service mesh is that it provided deep insight into the actual communication patterns between microservices: you can see which service (that is, Kubernetes Service!) exchanges traffic with which other services, the instantaneous HTTP request rate and response time(!), HTTP status codes (so you can spot frequent HTTP failure statuses like 404 or 500), you can even trace client calls through the mesh. The low level metrics are collected by [Prometheus](https://istio.io/latest/docs/tasks/observability/metrics/querying-metrics), which can then be visualized in fancy dashboards using [Grafana](https://istio.io/latest/docs/tasks/observability/metrics/using-istio-dashboard). However, by far the most useful (and visually appealing!) observability tool provided by Istio is [Kiali](https://istio.io/latest/docs/tasks/observability/kiali). 
+One of the most useful features of a service mesh is that it provides deep and real-time(!) insight into the communication patterns between microservices: you can see which service (that is, Kubernetes Service) exchanges traffic with which other services, the instantaneous HTTP request rate and response time, HTTP status codes (so you can spot HTTP failure statuses like 404 or 500 as the show up), you can even trace client calls through the mesh. The low level metrics are collected by [Prometheus](https://istio.io/latest/docs/tasks/observability/metrics/querying-metrics), which can then be visualized in fancy dashboards using [Grafana](https://istio.io/latest/docs/tasks/observability/metrics/using-istio-dashboard). However, perhaps the most useful (and visually appealing!) observability tool provided by Istio is [Kiali](https://istio.io/latest/docs/tasks/observability/kiali).
 
-Instead of going into the details of the monitoring goodies what Kiali provided, it is best if you experience it firsthand. First, generate some background traffic: the below will query the `/api/clear` API endpoint 5 times per second and dump the output to the console.
+Instead of describing the monitoring goodies what Kiali offers, it is best if you experience it firsthand. First, generate some background traffic: the below will query the `/api/clear` API endpoint 5 times per second and dump the output to the console.
 
 ``` bash
 watch -n .2 curl -o /dev/null -s http://${EXTERNAL_IP}:${EXTERNAL_PORT}/api/clear
@@ -118,25 +118,27 @@ watch -n .2 curl -o /dev/null -s http://${EXTERNAL_IP}:${EXTERNAL_PORT}/api/clea
 Now we are ready to launch Kiali:
 
 ``` bash
-bin/istioctl dashboard kiali
+istioctl dashboard kiali
 ```
 
 Some help:
-- The *Overview* panel gives some overall statistics about the cluster, including the CPU usage of Istio itself, total external traffic of your workloads, etc.
-- The *Graphs* provides several visual representations of the microservice graph. Use the dropdowns at the top to select a namespace to monitor, the types of traffic to watch (HTTP should be enough for now), the visualization type (we recommend the *Workload graph* view), and the metrics to be displayed (enable the "95-th percentile response time" and the "traffic rate" metrics, and you may want to remove the "Service nodes" to get a per-pod view of your microservice graph). The right-hand sidebar shows the total traffic characteristics, including the failure rate of each workload. By default, metrics are shown for the last 1 minute and update every 10 secs: you can override this using the dropdowns in the upper right corner. Click to any of the nodes: you should see the details for that pod/service.
+- The *Overview* panel gives brief overall statistics about the cluster, including the CPU usage of Istio itself, total external traffic of your workloads, etc.
+- The *Graphs* panel provides several visual representations of the microservice graph. Use the dropdowns at the top to select a namespace to monitor, the types of traffic to watch (HTTP should be enough for now), the visualization type (we recommend the *Workload graph* view), and the metrics to be displayed (enable the "95-th percentile response time" and the "traffic rate" metrics, and you may want to remove the "Service nodes" to get a per-pod view of your microservice graph). The right-hand sidebar shows the total traffic characteristics, including the failure rate of each workload. By default, metrics are shown for the last 1 minute and update every 10 secs: you can override this using the dropdowns in the upper right corner. Click at any of the nodes: you should see the details for that pod/service.
 - The *Applications*, *Workloads* and *Services* panels give different views of your Kubernetes resources that define your workload. Click into any of the workload items: you should see an overview of the item, traffic aggregates, live inbound traffic charts, and even traces showing the response times during the last couple of seconds.
+
+Below is a sample workload graph output from a healthy cluster. We encourage you to click through the app yourself and try to understand the info it provides on your own.
 
 ![Service graph from a healthy cluster.](/99-labs/fig/kiali-healthy.png)
 
 > **Note**
 >
-> You won't see any meaningful output unless there is actual traffic in the cluster. This is because Istio traces out the service graph passively from live traffic, so if there is no traffic, no output.
+> You won't see any meaningful output unless there is actual traffic in the cluster. This is because Istio traces out the service graph passively from live traffic, so if there is no traffic there is no output.
 
 ## Ingress gateway
 
-Next, you will see how to expose a Kubernetes service to external clients in a controlled and monitored way using Istio *ingress gateways*. This allows to route client requests based on request headers or other attributes to different microservices, filter incoming traffic, terminate TLS encryption contexts, etc. 
+Next, we show how to expose a Kubernetes service to external clients in a controlled and monitored way using Istio *ingress gateways*. This allows to route client requests based on request headers or other attributes to different microservices, filter incoming traffic, terminate TLS encryption contexts, etc. 
 
-Below, we will expose `splitdim` using the [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io).
+Below, we will expose the `splitdim` app using the [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io).
 
 1. Since Istio ingress gateways create and manage their own LoadBalancer services, we will not need the LoadBalancer service that we created ourselves. Use the below to change the Service type of the `splitdim` Service from `LoadBalancer` to `ClusterIP`, which will remove the external IP address from the service (again, Istio will create its own one).
 
@@ -160,10 +162,11 @@ Below, we will expose `splitdim` using the [Kubernetes Gateway API](https://gate
    EOF
    ```
 
-2. Create an Gateway called `splitdim` that will listen on port 80 for HTTP connections:
+2. Create an Istio Gateway called `splitdim` that will listen on port 80 for HTTP connections. 
 
-   ```shell
-   kubectl apply -f - <<EOF
+   Use `kubectl apply` to deploy the below manifest:
+
+   ```yaml
    apiVersion: gateway.networking.k8s.io/v1beta1
    kind: Gateway
    metadata:
@@ -174,13 +177,13 @@ Below, we will expose `splitdim` using the [Kubernetes Gateway API](https://gate
        - name: http-splitdim
          port: 80
          protocol: HTTP
-   EOF
    ```
 
-3. Create a HTTP route that will be attached to the above Gateway and send all received HTTP requests to a random pod of the `splitdim` Service.
+3. Create a HTTP route that will be attached to the above Gateway and send all received HTTP requests to a random pod of the `splitdim` Service. 
+
+   Use `kubectl apply` to deploy the below manifest:
 
    ```shell
-   kubectl apply -f - <<EOF
    apiVersion: gateway.networking.k8s.io/v1beta1
    kind: HTTPRoute
    metadata:
@@ -192,7 +195,6 @@ Below, we will expose `splitdim` using the [Kubernetes Gateway API](https://gate
        - backendRefs:
            - name: splitdim
              port: 80
-   EOF
    ```
 
 If all goes well, Istio should have created a LoadBalancer service called `splitdim-istio` for the Gateway and expose it to external clients. 
@@ -228,20 +230,22 @@ Make some quick tests to see if everything goes fine. You can also re-enable the
 One of the most powerful features of Istio is that it provides programmatic access to the way Kubernetes forwards HTTP requests/responses between pods. This feature set is collectively called *traffic management*. Examples are:
 - *Request routing*: route HTTP requests based on HTTP host field, header fields, cookies, to multiple versions of a microservice, rewrite HTTP request and response headers, etc.
 - *Load balancing:* choose precisely how to distribute requests across service pods.
-- *Resilience*: the usual assortment of resilience patterns, like retry/timeout, circuit breaking, rate limiting, etc., provided by Istio *automatically* to your microservices, without you having to code anything in your code.
+- *Resilience*: the usual assortment of resilience patterns, like retry/timeout, circuit breaking, rate limiting, etc., provided by Istio *automatically* to your microservices, without you having to code anything in your app.
 - *Fault injection*: randomly inject HTTP faults to test the resiliency of an application.
 - *Traffic shifting, canary deployments and A/B testing*: migrate traffic from an old to new version of a service.
 - *Traffic mirroring*: replicate and route a subset of your traffic from the cluster to an external service for, say, lawful interception, recording or debugging.
 
-Below we highlight a couple of simple examples for Istio traffic management; we encourage you to discover and try all tutorials from the [Istio documentation](https://istio.io/latest/docs/tasks/traffic-management).
+Below we highlight a couple of simple examples for Istio traffic management feature set, We encourage you to discover and try all tutorials from the [Istio documentation](https://istio.io/latest/docs/tasks/traffic-management).
 
 ### Request routing
 
-Suppose that we have developed a new version of our SplitDim app and now we want to test it out *inside* a real, production workload. To minimize the blast radius, we want to route only a subset of API requests to the new version, say, we may want to send the HTTP requests that contain the HTTP header `user:test` to the new software version, let's call that `splitdim-2`, and everything else should go to the legacy code running in the `splitdim` service. We, however, will let the two versions to use the same key-value store service (`kvstore`). Then, the DevOps engineer could simply test out the new version by setting the HTTP header `user:test` on the test requests, without interfering with the normal traffic.
+Suppose that we have developed a new version of our SplitDim app and now we want to test it out *inside* a real, production workload. To minimize the blast radius, we want to route only a subset of API requests to the new version, say, we may want to send the HTTP requests that contain the HTTP header `user:test` to the new software version, let's call that `splitdim-2`, and everything else should go to the legacy code running in the `splitdim` service. We, however, will let the two versions to use the same key-value store service (`kvstore`). Then, the DevOps engineer could simply test out the new version by setting the HTTP header `user:test` on the test requests, which will be directed by Istio to the workload that runs the new version of the code, without interfering with the normal traffic that does not have the header set.
 
 Here is how to realize this setup in Istio:
 
-1. We will use the same SplitDim code for "simulating" the old and a new versions for simplicity (but feel free to build a separate image and add some changes if you want), but the name will be `splitdim-2`. So add a new `splitdim-2` Deployment and Service as a perfect copy of the Kubernetes manifest we used to deploy `splitdim`, but make sure to rename all `splitdim` references to `splitdim-2` (including labels!). 
+1. We will use the same SplitDim code for "simulating" the old and a new versions for simplicity (but feel free to build a separate image and add some changes if you want), but the name will be `splitdim-2`. 
+
+   Aadd a new `splitdim-2` Deployment and Service using a copy of the Kubernetes manifest we used to deploy `splitdim`, but make sure to rename all `splitdim` references to `splitdim-2` (including labels, but not including the ConfigMap so that the two versions will talk to the same `kvstore` service). 
 
    If all goes well, listing your pods and services should show something like the below:
    ```shell
@@ -284,7 +288,7 @@ Here is how to realize this setup in Istio:
              port: 80
    ```
 
-   The idea is that we have two routing rules: the first one matches on the HTTP header field called `user` and if the value is `test` then routes the request to the `splitdim-2` service running the "new" software version, and the second rule applies to everything else (since it comes without an actual `matches` clause) and forwards everything to the `splitdim` service running the "old" version.
+   The idea is that we create two routing rules: the first one matches on the HTTP header field called `user` and if the value is `test` then routes the request to the `splitdim-2` service running the "new" software version, while the second rule applies to everything else (since it comes without an actual `matches` clause) and forwards everything to the `splitdim` service running the "old" version.
    
 3. Start some background traffic. 
 
@@ -296,7 +300,7 @@ Here is how to realize this setup in Istio:
    done
    ```
    
-   The above will send roughly 4-5 requests per second to both the new version (using the command line `curl --header "user:test"` to add the header required for sending test traffic) and the old one.
+   The above will send roughly 4-5 requests per second to both the old version and the new one (using the command line `curl --header "user:test"` to add the header required for sending test traffic).
    
 If all goes well, Kiali should show an output like the below (after a while).
 
@@ -304,7 +308,7 @@ If all goes well, Kiali should show an output like the below (after a while).
 
 ### Fault injection
 
-We have already seen how useful handy Istio's fault injection can be for testing the resilience of our web app. For instance, the below will add a policy to fail every 10th requests to the `/api/list` API endpoint of the key-value store, which, recall, is used by the web app to clear the balances:
+We have already seen how useful Istio's fault injection can be for testing the resilience of a web app. For instance, the below will add a policy to fail every 10th requests to the `/api/list` API endpoint of the key-value store, which, recall, is used by the web app to clear the balances:
 
 ``` yaml
 apiVersion: networking.istio.io/v1alpha3
@@ -327,7 +331,9 @@ If all goes well, Kiali should show that the error rate of our service has incre
 
 ## Security
 
-So far, all our traffic sent between the microservices have been unencrypted, possibly revealing sensitive data to the cloud provider. Istio allows to encrypt all this traffic by adding a single policy, making it possible for third parties to eavesdrop on our communication.
+So far, all traffic sent from one microservice to the other has been unencrypted, possibly revealing sensitive data to the cloud provider. We could easily use the Go [standard library package `crypto/tls`](https://pkg.go.dev/crypto/tls) to upgrade our apps from HTTP to HTTPS, but this would require a tedious work of distributing TLS keys across our pods. Instead, we will let Istio to do the encryption (and key distribution) automatically, without us having to write a single line of code.
+
+Add the below policy to authenticate, authorize, and encrypt all internal microservice communications inside the cluster using mutual TLS. This will make it impossible for third parties to eavesdrop on our communication.
 
 ```yaml
 apiVersion: security.istio.io/v1beta1

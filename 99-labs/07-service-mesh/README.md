@@ -34,6 +34,12 @@ At this point, you should have Istio installed in your cluster. If not, go back 
    ```shell
    istioctl version
    ```
+   
+   You can enable `istioctl` bash autocompletion in the current shell using the below
+   
+   ```shell
+   source <(istioctl completion bash)
+   ```
 
 2. Reconfigure Istio with the `demo` profile. This will enable Prometheus for metric collection, Jaeger for tracing, Kiali for monitoring the service mesh, etc.
 
@@ -128,31 +134,212 @@ Some help:
 
 ## Ingress gateway
 
+Next, you will see how to expose a Kubernetes service to external clients in a controlled and monitored way using Istio *ingress gateways*. This allows to route client requests based on request headers or other attributes to different microservices, filter incoming traffic, terminate TLS encryption contexts, etc. 
+
+Below, we will expose `splitdim` using the [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io).
+
+1. Since Istio ingress gateways create and manage their own LoadBalancer services, we will not need the LoadBalancer service that we created ourselves. Use the below to change the Service type of the `splitdim` Service from `LoadBalancer` to `ClusterIP`, which will remove the external IP address from the service (again, Istio will create its own one).
+
+   ```shell
+   kubectl apply -f - <<EOF
+   apiVersion: v1
+   kind: Service
+   metadata:
+     name: splitdim
+     labels:
+       app: splitdim
+   spec:
+     selector:
+       app: splitdim
+     ports:
+     - name: "http-splitdim"
+       port: 80
+       targetPort: 8080
+       protocol: TCP
+     type: ClusterIP
+   EOF
+   ```
+
+2. Create an Gateway called `splitdim` that will listen on port 80 for HTTP connections:
+
+   ```shell
+   kubectl apply -f - <<EOF
+   apiVersion: gateway.networking.k8s.io/v1beta1
+   kind: Gateway
+   metadata:
+     name: splitdim
+   spec:
+     gatewayClassName: istio
+     listeners:
+       - name: http-splitdim
+         port: 80
+         protocol: HTTP
+   EOF
+   ```
+
+3. Create a HTTP route that will be attached to the above Gateway and send all received HTTP requests to a random pod of the `splitdim` Service.
+
+   ```shell
+   kubectl apply -f - <<EOF
+   apiVersion: gateway.networking.k8s.io/v1beta1
+   kind: HTTPRoute
+   metadata:
+     name: splitdim
+   spec:
+     parentRefs:
+       - name: splitdim
+     rules:
+       - backendRefs:
+           - name: splitdim
+             port: 80
+   EOF
+   ```
+
+If all goes well, Istio should have created a LoadBalancer service called `splitdim-istio` for the Gateway and expose it to external clients. 
+
+```shell
+kubectl get svc splitdim-istio 
+NAME             TYPE           CLUSTER-IP       EXTERNAL-IP      PORT(S)                        AGE
+splitdim-istio   LoadBalancer   10.110.216.108   10.110.216.108   15021:31840/TCP,80:30726/TCP   21m
+```
+
+From now on, we will use this Service to reach our application: let's make sure we remember the external IP and port.
+
+```shell
+export EXTERNAL_IP=$(kubectl get service splitdim-istio -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+export EXTERNAL_PORT=80
+```
+
+Make some quick tests to see if everything goes fine. You can also re-enable the little traffic generator and take a look and the service graphs in Kiali: this time it should show detailed metrics from the new ingress Gateway as well.
+
+> ✅ **Check**
+> 
+> Test your Kubernetes deployment. If all goes well, you should see the output `PASS`.
+> ``` sh
+> cd 99-labs/code/splitdim
+> export EXTERNAL_IP=$(kubectl get service splitdim-istio -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+> export EXTERNAL_PORT=80
+> go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1
+> PASS
+> ```
+
 ## Traffic management
 
-choose "Graph", set namespace to default and choose "Workload graph" and set 
+One of the most powerful features of Istio is that it provides programmatic access to the way Kubernetes forwards HTTP requests/responses between pods. This feature set is collectively called *traffic management*. Examples are:
+- *Request routing*: route HTTP requests based on HTTP host field, header fields, cookies, to multiple versions of a microservice, rewrite HTTP request and response headers, etc.
+- *Load balancing:* choose precisely how to distribute requests across service pods.
+- *Resilience*: the usual assortment of resilience patterns, like retry/timeout, circuit breaking, rate limiting, etc., provided by Istio *automatically* to your microservices, without you having to code anything in your code.
+- *Fault injection*: randomly inject HTTP faults to test the resiliency of an application.
+- *Traffic shifting, canary deployments and A/B testing*: migrate traffic from an old to new version of a service.
+- *Traffic mirroring*: replicate and route a subset of your traffic from the cluster to an external service for, say, lawful interception, recording or debugging.
 
-``` bash
-kubectl apply -f - <<EOF
+Below we highlight a couple of simple examples for Istio traffic management; we encourage you to discover and try all tutorials from the [Istio documentation](https://istio.io/latest/docs/tasks/traffic-management).
+
+### Request routing
+
+Suppose that we have developed a new version of our SplitDim app and now we want to test it out *inside* a real, production workload. To minimize the blast radius, we want to route only a subset of API requests to the new version, say, we may want to send the HTTP requests that contain the HTTP header `user:test` to the new software version, let's call that `splitdim-2`, and everything else should go to the legacy code running in the `splitdim` service. We, however, will let the two versions to use the same key-value store service (`kvstore`). Then, the DevOps engineer could simply test out the new version by setting the HTTP header `user:test` on the test requests, without interfering with the normal traffic.
+
+Here is how to realize this setup in Istio:
+
+1. We will use the same SplitDim code for "simulating" the old and a new versions for simplicity (but feel free to build a separate image and add some changes if you want), but the name will be `splitdim-2`. So add a new `splitdim-2` Deployment and Service as a perfect copy of the Kubernetes manifest we used to deploy `splitdim`, but make sure to rename all `splitdim` references to `splitdim-2` (including labels!). 
+
+   If all goes well, listing your pods and services should show something like the below:
+   ```shell
+   kubectl get pod,deploy,svc 
+   NAME                                  READY   STATUS    RESTARTS   AGE
+   pod/kvstore-0                         2/2     Running   2          21h
+   pod/splitdim-2-645c5d969b-n7rcf       2/2     Running   0          75m
+   pod/splitdim-7bd49f7b94-vvhc2         2/2     Running   0          75m
+   
+   NAME                             READY   UP-TO-DATE   AVAILABLE   AGE
+   deployment.apps/splitdim         1/1     1            1           2d2h
+   deployment.apps/splitdim-2       1/1     1            1           141m
+   
+   NAME                     TYPE           CLUSTER-IP       EXTERNAL-IP      PORT(S)                        AGE
+   service/kubernetes       ClusterIP      10.96.0.1        <none>           443/TCP                        12d
+   service/kvstore          ClusterIP      None             <none>           8081/TCP                       21h
+   service/splitdim         ClusterIP      10.100.168.92    <none>           80/TCP                         20h
+   service/splitdim-2       ClusterIP      10.97.175.181    <none>           80/TCP                         141m
+   ```
+
+2. Reconfigure the HTTPRoute that we used to route requests from the Gateway to the `splitdim` service.
+   ```yaml
+   apiVersion: gateway.networking.k8s.io/v1beta1
+   kind: HTTPRoute
+   metadata:
+     name: splitdim
+   spec:
+     parentRefs:
+       - name: splitdim
+     rules:
+       - matches:
+           - headers:
+               - name: user
+                 value: test
+         backendRefs:
+           - name: splitdim-2
+             port: 80
+       - backendRefs:
+           - name: splitdim
+             port: 80
+   ```
+
+   The idea is that we have two routing rules: the first one matches on the HTTP header field called `user` and if the value is `test` then routes the request to the `splitdim-2` service running the "new" software version, and the second rule applies to everything else (since it comes without an actual `matches` clause) and forwards everything to the `splitdim` service running the "old" version.
+   
+3. Start some background traffic. 
+
+   ```shell
+   while [ true ]; do \
+       curl -s http://${EXTERNAL_IP}:${EXTERNAL_PORT}/api/clear; \
+       curl -s --header "user:test" http://${EXTERNAL_IP}:${EXTERNAL_PORT}/api/clear; \
+       sleep 0.2; \
+   done
+   ```
+   
+   The above will send roughly 4-5 requests per second to both the new version (using the command line `curl --header "user:test"` to add the header required for sending test traffic) and the old one.
+   
+If all goes well, Kiali should show an output like the below (after a while).
+
+![Traffic management: Gateway.](/99-labs/fig/kiali-gateway.png)
+
+### Fault injection
+
+We have already seen how useful handy Istio's fault injection can be for testing the resilience of our web app. For instance, the below will add a policy to fail every 10th requests to the `/api/list` API endpoint of the key-value store, which, recall, is used by the web app to clear the balances:
+
+``` yaml
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata: { name: kvstore-500 }
 spec:
   hosts: [ kvstore ]
   http:
-    # requests to the "/api/list" path will return 500 status every 10th time
+    # requests to the "/api/clear" path will return 500 status every 10th time
     - match: [ uri: { exact: "/api/list" } ]
       fault: { abort: { httpStatus: 500, percentage: { value: 10 } } }
       route: [ destination: { host: kvstore } ]
     # default route: everything that is not a "put" ("list" and "get")
     - route: [ destination: { host: kvstore } ]
-EOF
 ```
 
+If all goes well, Kiali should show that the error rate of our service has increased to about 10%. This real-time visibility into the health of a microservice application is one of the most powerful features provided by a service mesh.
 
+![Service graph from an unhealthy cluster.](/99-labs/fig/kiali-unhealthy.png)
 
-> ✅ **Check**
-> Test your Kubernetes deployment. Some useful commands for testing from the shell:
+## Security
+
+So far, all our traffic sent between the microservices have been unencrypted, possibly revealing sensitive data to the cloud provider. Istio allows to encrypt all this traffic by adding a single policy, making it possible for third parties to eavesdrop on our communication.
+
+```yaml
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata: { name: default }
+spec:
+  mtls:
+    mode: STRICT
+```
+
+Unfortunately, that is all that we could cover from the intriguing (and rapidly evolving) world of service meshes. If interested, we recommend the fantastic [documentation of Istio](https://istio.io/latest/docs), which provides much more information with use cases, tutorials and complete command references.
+
 
 <!-- Local Variables: -->
 <!-- mode: markdown; coding: utf-8 -->

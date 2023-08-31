@@ -250,12 +250,12 @@ To actually make use of the improved code, first try a local build with a missin
 > ✅ **Check**
 > 
 > Test your Kubernetes deployment. If all goes well, you should see the output `PASS`.
->   ``` sh
->   export EXTERNAL_IP=$(kubectl get service splitdim -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
->   export EXTERNAL_PORT=80
->   go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1
->   PASS
->   ```
+> ``` sh
+> export EXTERNAL_IP=$(kubectl get service splitdim -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+> export EXTERNAL_PORT=80
+> go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1
+> PASS
+> ```
 
 After the test passes, you can disable Istio service mesh to save resources.
 ```shell

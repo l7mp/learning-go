@@ -1,6 +1,6 @@
 # Learning Go: Basic Go exercises
 
-A series of basic Go exercises inspired from the [Go: Bootcamp Course](https://github.com/inancgumus/learngo). Solving all exercises will not make you a Go ninja but it should be enough to get you started.
+A series of basic Go exercises inspired from the [Go: Bootcamp Course](https://github.com/inancgumus/learngo). Solving all exercises will not make you a Go ninja, but it should be enough to get you started.
 
 ## Getting started
 
@@ -9,7 +9,7 @@ Change to the root of the git repo and generate the exercises:
 ``` console
 echo <MY-STUDENT-ID> > STUDENT_ID
 git add STUDENT_ID
-git commit -m 'stident id added'
+git commit -m 'student id added'
 make generate
 ```
 
@@ -23,7 +23,7 @@ STUDENT_ID=MY-STUDENT-ID> make generate
 
 ### Write code
 
-Go through the subdirectories, preferably in the same order as the file names, understand the exercise specified in the `README.md` file, and insert your solution into `exercise.go` near the pleaceholder.
+Go through the subdirectories, preferably in the same order as the file names, understand the exercise specified in the `README.md` file, and insert your solution into `exercise.go` near the placeholder.
 
 Once done with the exercise in the directory `<exercise-directory>`, make sure to git-add and git-commit your solution.
 
@@ -46,8 +46,8 @@ make test
 
 Sometimes we update the main git repo to fix bugs or add new exercises. The below workflow shows how to update your local working copy from the master without overwriting your solutions already written.
 
-> **Warning**   
-> Make sure to commit all your code into git: this will guarantee that you will never lose your solutions even if some of the below steps go wrong. You can also back up your git repo but please make sure your solutions are kept private (a private GitHUb repo will do it).
+> **Warning**
+> Make sure to commit all your code into git: this will guarantee that you will never lose your solutions even if some of the below steps go wrong. You can also back up your git repo, but please make sure your solutions are kept private (a private GitHUb repo will do it).
 
 #### With all local changes committed to git
 
@@ -84,6 +84,7 @@ If you have uncommitted changes, follow the below steps.
 ### Add a new exercise
 
 Add a new subdirectory and add the following files:
+
 - `exercise.yaml`: An exercise definition with a set of inputs, from which `make generate` will choose one by hashing on the student id to generate the exercise.
 - `exercise.go`: Placeholder for the solution.
 - `.README.md`: a README template with instructions.

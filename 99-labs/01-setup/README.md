@@ -205,6 +205,19 @@ kubectl cluster-info
 >
 > This command should print the running Kubernetes version with some additional information.
 
+### Test Istio install
+
+In a terminal navigate to the Istio install directory, and execute the below in a terminal to check that Istio is installed properly:
+
+```shell
+bin/istioctl verify-install
+```
+> ✅ **Check**
+>
+> This command should print that Istio is configured correctly.
+> The last line of the output is usually the following:
+> `✔ Istio is installed and verified successfully`
+
 ## Exercises
 
 The course comes with a set of exercises that allow you to practice the basics of Go programming (syntax, type system, concurrency primitives, etc.). The exercises are customized per each student to increase the required effort to copy your solutions. Each exercises is randomly generated from a template using your student id as the random seed. Once the exercises are generated, you can start to add your solutions and then run `make test` to check your solutions.

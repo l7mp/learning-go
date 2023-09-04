@@ -7,7 +7,7 @@ import (
 )
 
 func TestParseChannelControlRegister(t *testing.T) {
-	a,b,c,d := parseChannelControlRegister(0x82abba19)
+	a,b,c,d := parseChannelControlRegister({{index . "CHAN_CTRL"}})
 	assert.Equal(t, {{index . "test0"}}, []byte{a,b,c,d})
 
 	a,b,c,d = parseChannelControlRegister(0xdeadbeef)

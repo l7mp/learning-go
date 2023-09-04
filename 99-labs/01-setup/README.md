@@ -214,8 +214,8 @@ bin/istioctl verify-install
 ```
 > ✅ **Check**
 >
-> This command should print that Istio is configured correctly.
-> The last line of the output is usually the following:
+> This command should print that Istio is configured correctly.  
+> The last line of the output is the following:  
 > `✔ Istio is installed and verified successfully`
 
 ## Exercises

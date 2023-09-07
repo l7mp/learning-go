@@ -15,8 +15,8 @@ We provide instructions for setting up a native workspace on GNU/Linux. Windows 
 
 ### System Parameters
 
-**Operating System:** we provide instructions for Ubuntu 22.04. The lab should work on any major GNU/Linux distribution, feel free to adapt the steps.
-**CPU:** 2-core x86_64 CPU should be sufficient for native installation, at least 4 cores are required for the VM.
+**Operating System:** we provide instructions for Ubuntu 22.04. The lab should work on any major GNU/Linux distribution, feel free to adapt the steps.\
+**CPU:** 2-core x86_64 CPU should be sufficient for native installation, at least 4 cores are required for the VM.\
 **Memory:** 4GB for native install, 8GB is recommended for the VM.
 
 > **Warning**  
@@ -35,7 +35,7 @@ The course requires these software:
 - [Istio and istioctl](https://istio.io/)
 
 > **Note**  
-> If you use the VM, jump to [Insall Istio](#install-istio)
+> If you use the VM, jump to the [Istio installation guide](#install-istio).
 
 ### Install Go
 
@@ -51,7 +51,7 @@ rm -rf $GO_TAR
 
 ### Install VS Code
 
-To ease writing go programs and to editing configuration files, you will need an editor. We use GNU Emacs and Visual Studio Code, but feel free to use any editor that you like and supports Go.
+To ease writing go programs and editing configuration files, you will need an editor. We use GNU Emacs and Visual Studio Code, but feel free to use any editor that you like and supports Go.
 
 To install and setup Code, execute the following commands in your terminal:
 
@@ -77,15 +77,15 @@ To install and setup Code, execute the following commands in your terminal:
 
 ### Install Podman
 
-Docker and podman are popular tools to build Linux container images. We will use podman since it is a bit easier to install (plus, it is written in Go!); feel free to use Docker or any other tool instead. Execute the following commands in your terminal to install and configure podman.
+Docker and podman are popular tools to build Linux container images. We will use podman since it is a bit easier to install (plus, it is written in Go!); feel free to use Docker (which is, surprise!, also written in Go) or any other tool instead. Execute the following commands in your terminal to install and configure podman.
 
-1. Install podman via the package manager
+1. Install podman via the package manager.
 
    ```shell
    sudo apt-get install -y podman podman-docker
    ```
 
-1. Configure podman to enable access to [Dockerhub](https://hub.docker.com/)
+1. Configure podman to enable access to [Dockerhub](https://hub.docker.com).
 
    ```shell
    sudo touch /etc/containers/nodocker
@@ -94,7 +94,7 @@ Docker and podman are popular tools to build Linux container images. We will use
 
 ### Install miscellaneous command line tools
 
-We will often use `jq` to output JSON files in a human-readable form, the `make` utility to generate and test the homework exercises. To install these tools via the package manager, execute this command in your terminal:
+We will often use `jq` to output JSON files in a human-readable form and the `make` utility to generate and test the homework exercises. To install these tools via the package manager, execute this command in your terminal:
 
 ```code
 sudo apt-get install -y make jq
@@ -123,7 +123,7 @@ The `kubectl` utility is our main tool to interact with our Kubernetes clusters.
 
 ### Install Minikube
 
-Minikube is a lightweight Kubernetes distribution that create allows you to deploy a simple local Kubernetes cluster containing only one node (your own laptop). In your terminal execute the following commands to download and install the latest version of Minikube:
+Minikube is a lightweight Kubernetes distribution to deploy a simple local Kubernetes cluster containing only a single node (your own laptop). In your terminal execute the following commands to download and install the latest version of Minikube:
 
 ```code
 curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
@@ -141,10 +141,10 @@ minikube start --memory=4096 --cpus=2 --driver=podman --container-runtime=cri-o
 > **Note**  
 > Cluster creation may take some time.
 
-This will create a local Kubernetes cluster with 4 GB memory and 2 vCPUs using podman as the container driver, and configure `kubectl` to talk to this cluster. Feel free to customize the CPU/memory limits in the abobe; e.g., it is a good idea to increase the amount of CPU and memory available to your cluster to obtain a more responsive Kubernetes.
+This will create a local Kubernetes cluster with 4 GB memory and 2 vCPUs using podman as the container driver, and configure `kubectl` to talk to this cluster. Feel free to customize the CPU/memory limits in the above; e.g., it is a good idea to increase the amount of CPU and memory available to your cluster to obtain a more responsive Kubernetes.
 
 > **Note**  
-> Once done working with Kubernetes make sure to close it with `minikube stop`: Kubernetes may take up considerable resources and this commands frees those resources up. You can always restart your cluster with `minikube start` and continue working from where you left the last time you issued `minikube stop`.
+> Once done working with Kubernetes make sure to stop it with `minikube stop`: Kubernetes may take up considerable resources and this commands frees those resources up. You can always restart your cluster with `minikube start` and continue working from where you left the last time you issued `minikube stop`.
 
 ### Install Istio
 
@@ -169,23 +169,23 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Println("Hello, world")
+    fmt.Println("Hello, world")
 }
 ```
 
 2. Compile/run it in your terminal
 
-```code
+```shell
 go run hello.go
 ```
 
 > ✅ **Check**
 >
-> The compilation should finish without any errors, and the program prints out the good old `Hello, world` on its output.
+> The compilation should finish without any errors and the program should print the good old `Hello, world` greeting to the standard output.
 
 ### Test your Kubernetes cluster
 
-Execute the below in a terminal to check the Minikube's installed version:
+Execute the below in a terminal to check  Minikube's installed version:
 
 ```shell
 minikube version

@@ -26,9 +26,9 @@ We provide instructions for setting up a native workspace on GNU/Linux. Windows 
 
 We provide a ready-to-use Ubuntu 22.04-based virtual machine. [Click here to download VM image](http://lendulet.tmit.bme.hu/~levai/files/go-vm/CloudGoVM.ova). \
 To use the downloaded image, install [VirtualBox](https://www.virtualbox.org/wiki/Downloads) (tested with VirtualBox 7.0) and import the downloaded OVA file with Virtualbox.\
-Login:
-| username | `vagrant` |
-| password | `vagrant` |
+**Login details:**\
+ username: `vagrant`\
+ password: `vagrant`
 
 You can also build the VM with [Vagrant](https://developer.hashicorp.com/vagrant/downloads) from the [Vagrantfile](/env/Vagranfile). The build takes roughly 1 hour.
 

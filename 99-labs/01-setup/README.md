@@ -11,7 +11,7 @@ During this lab we will set up a workspace for developing and testing the Go app
 
 ## System Requirements
 
-We provide instructions for setting up a native workspace on GNU/Linux. Windows Subsystem for Linux, Windows, or macOS might work, but we recommend a GNU/Linux virtual machine instead. A ready-to-use virtual machine will be distributed.
+We provide instructions for setting up a native workspace on GNU/Linux. Windows Subsystem for Linux, Windows, or macOS might work, but we recommend a GNU/Linux virtual machine instead. A ready-to-use [virtual machine](#vm-details) is available.
 
 ### System Parameters
 
@@ -19,8 +19,15 @@ We provide instructions for setting up a native workspace on GNU/Linux. Windows 
 **CPU:** 2-core x86_64 CPU should be sufficient for native installation, at least 4 cores are required for the VM.\
 **Memory:** 4GB for native install, 8GB is recommended for the VM.
 
-> **Warning**  
+> **Warning**
 > Make sure your Internet connection is working, we will download software packages.
+
+### VM Details
+
+An Ubuntu 22.04-based is available: [Click here to download VM image.](http://lendulet.tmit.bme.hu/~levai/files/go-vm/CloudGoVM.ova). To use it, install [Virtualbox](https://www.virtualbox.org/wiki/Downloads) and import the downloaded OVA file.\
+Login: username: `vagrant` , password: `vagrant`.
+
+You can also build this VM with vagrant using this [Vagrantfile](/env/Vagranfile). The build takes roughly 1 hour.
 
 ## Installation
 
@@ -34,7 +41,7 @@ The course requires these software:
 - `make`
 - [Istio and istioctl](https://istio.io/)
 
-> **Note**  
+> **Note**
 > If you use the VM, jump to the [Istio installation guide](#install-istio).
 
 ### Install Go
@@ -118,7 +125,7 @@ The `kubectl` utility is our main tool to interact with our Kubernetes clusters.
    echo "source <(kubectl completion bash)" >> ~/.bashrc
    ```
 
-> **Note**  
+> **Note**
 > If you use a different shell (e.g., zsh) , check configuration steps with `kubectl completion -h`
 
 ### Install Minikube
@@ -138,17 +145,17 @@ Once installed, we create a local Kubernetes cluster. Copy the below into your t
 minikube start --memory=4096 --cpus=2 --driver=podman --container-runtime=cri-o
 ```
 
-> **Note**  
+> **Note**
 > Cluster creation may take some time.
 
 This will create a local Kubernetes cluster with 4 GB memory and 2 vCPUs using podman as the container driver, and configure `kubectl` to talk to this cluster. Feel free to customize the CPU/memory limits in the above; e.g., it is a good idea to increase the amount of CPU and memory available to your cluster to obtain a more responsive Kubernetes.
 
-> **Note**  
+> **Note**
 > Once done working with Kubernetes make sure to stop it with `minikube stop`: Kubernetes may take up considerable resources and this commands frees those resources up. You can always restart your cluster with `minikube start` and continue working from where you left the last time you issued `minikube stop`.
 
 ### Install Istio
 
-We will often use additional functionality from the [Istio service mesh](https://istio.io). Use the below to download and enable Istio:
+We will often use additional functionality from the [Istio service mesh](https://istio.io). After starting minikube, use the below to download and enable Istio:
 
 ``` sh
 curl -L https://istio.io/downloadIstio | sh -
@@ -157,6 +164,9 @@ kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.6.2"
 bin/istioctl install --set profile=minimal -y
 kubectl label namespace default istio-injection=enabled --overwrite
 ```
+
+> **Warning**
+> Make sure that `minikube` runs before starting the Istio install.
 
 ## Test
 
@@ -230,10 +240,10 @@ Create a local clone of this git repo:
 git clone https://github.com/l7mp/learning-go.git
 cd learning-go
 ```
-You should always add and commit your solutions to this repo (see below) to avoid losing your work. 
+You should always add and commit your solutions to this repo (see below) to avoid losing your work.
 
 > :bulb: Tip
-> 
+>
 > We recommend to keep a copy of your git tree somewhere safe to back up your solutions. The simplest way is to use a GitHub private fork for this purpose. We ask you to keep your GitHub repo private, in order to prevent others from copying your work.
 
 ### Generate the exercises
@@ -245,7 +255,7 @@ echo <MY-STUDENT-ID> > STUDENT_ID
 make generate
 ```
 
-> **Warning**   
+> **Warning**
 > You must use your own student id. We will check this, so make sure you do not mistype your id.
 
 ### Solve the first homework
@@ -267,9 +277,9 @@ FAIL	github.com/l7mp/learning-go/01-getting-started/01-hello-world [build failed
 FAIL
 ```
 
-Consult the `README.md` file for how to solve the exercise and place your solution into the file `exercise.go` at the placeholder. 
+Consult the `README.md` file for how to solve the exercise and place your solution into the file `exercise.go` at the placeholder.
 
-> **Note**  
+> **Note**
 > It is usually not worth copying someone else's solution: most probably your exercises will be quite different for theirs (that is what `make generate` is for).
 
 For instance, you may be asked to write a `helloWorld` function in Go that will return the string `Hello world!` (your exercise may differ, so make sure you read the README carefully!). In this case, insert the below code into `exercise.go`:
@@ -280,7 +290,7 @@ func helloWorld() string {
 }
 ```
 
-> ✅ **Check** 
+> ✅ **Check**
 >
 > Once correctly solved, all tests in the exercise should pass:
 > ``` shell
@@ -297,7 +307,7 @@ git add exercise.go
 git commit -m 'first exercise solved'
 ```
 
-> **Note**  
+> **Note**
 > If you use a remote git repo to back up your work then make sure you push all your commits there using:
 > ``` shell
 > git push

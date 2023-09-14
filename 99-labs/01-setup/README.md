@@ -52,7 +52,7 @@ The course requires these software:
 The following snippet implements the [official install](https://go.dev/doc/install). Copy-paste it into a terminal window.
 
 ```shell
-export GO_TAR="$(curl -s https://go.dev/VERSION?m=text).linux-amd64.tar.gz"
+export GO_TAR="$(curl -s https://go.dev/VERSION?m=text | head -n 1).linux-amd64.tar.gz"
 wget "https://go.dev/dl/$GO_TAR"
 sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf $GO_TAR
 echo "export PATH=$PATH:/usr/local/go/bin" | sudo tee /etc/profile

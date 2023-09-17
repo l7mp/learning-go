@@ -2,14 +2,14 @@ name: pathsplit
 input:
 - component: "file"
   instruction: |
-    If the path consists of a single filename with no directory, then return the full path. 
+    If the path consists of a single filename with no directory, then return the full path.
   example:
-    - input: "usr/bin/go"
+    - input: "/usr/bin/go"
       output: "go"
     - input: "vmlinuz"
       output: "vmlinuz"
   tests:
-    - fullpath: "static/js/jquery.js"  
+    - fullpath: "static/js/jquery.js"
       output: "jquery.js"
     - fullpath: "multi_langs.js"
       output: "multi_langs.js"
@@ -23,7 +23,7 @@ input:
   instruction: |
     If the path consists of a single filename with no directory, then return an empty directory.
   example:
-    - input: "usr/bin/go"
+    - input: "/usr/bin/go"
       output: "/usr/bin"
     - input: "vmlinuz"
       output: ""
@@ -38,4 +38,3 @@ input:
       output: "css/"
     - fullpath: "image/favicon.ico"
       output: "image/"
- 

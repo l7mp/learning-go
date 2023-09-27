@@ -15,7 +15,7 @@ One of the greatest strengths of Go lies in the its suitability for developing w
 
 First we create a new Go module. This is not strictly necessary for building and running Go programs locally, but unavoidable if we want to later package them up into a container. 
 
-First, go to the root of this repo and initialize a new Go project under `99-labs/code/helloworld`. We will work in this directory throughout this lab.
+First, go to the root of this repo and initialize a new Go project under `99-labs/code/helloworld`. We will work in this directory throughout this lab. The directory contains some code (mostly tests) we prepared for you to simplify your work so do not remove anything you find there.
 
 ``` sh
 cd 99-labs/code/helloworld
@@ -51,16 +51,16 @@ func main() {
 }
 ```
 
-The first line, `package main` declares that the code belongs to the `main` package. In the next few lines, the `net/http` and `fmt` packages are imported: the former provides the HTTP server implementation and the latter helps formatting strings. The `HelloHandler` function is a standard HTTP request handler with the signature `func(w http.ResponseWriter, r *http.Request)`, where `r` can be used to access the details of the HTTP request being served and `w` is used to write the response. Below we use `fmt.Fprint` to write the string `Hello, world!` into the HTTP response. When not specifying otherwise, Go will automatically set the HTTP status 200 OK in the response.
+The first line, `package main` declares that the code belongs to the `main` package. In the next few lines, the `net/http` and `fmt` packages are imported: the former provides the HTTP server implementation and the latter helps formatting strings. The `HelloHandler` function is a standard HTTP request handler with the signature `func(w http.ResponseWriter, r *http.Request)`, where `r` can be used to access the details of the HTTP request being served and `w` is used to write the response. We use `fmt.Fprint` to write the string `Hello, world!` into the HTTP response. When not specifying otherwise, Go will automatically set the HTTP status 200 OK in the response.
 
 The `main` function first assigns the `HelloHandler` request handler to the HTTP path `/`, meaning that whenever the server is called with an empty path (say, using the URL `http://example.com/`) it will call our handler that will respond with the `Hello, world!` greeting. Finally, `http.ListenAndServe` spawns the HTTP server on port 8080. This function is blocking, so the program won't exit unless it encounters en error (or it is explicitly killed)
 
 ### Test
 
-Copy the code into a new file named `main.go` and execute it with `go run main.go` (you can also use `go build` that will build the `main` package into an executable). If all goes well, the prompt should disappear: the HTTP server silently starts and awaits requests. Send one using the omnipotent `curl` tool:
+Copy the code into a new file named `main.go` and execute it with `go run main.go` (you can also use `go build` that will build the `main` package into an executable). If all goes well, the prompt should disappear: the HTTP server silently starts and awaits requests. Send one from another terminal using the omnipotent `curl` tool:
 
 ``` sh
-curl http://localhost:8080
+curl http://localhost:8080/
 Hello, world!
 ```
 
@@ -97,7 +97,7 @@ Modify the program to return the hostname of the server it is running at. This r
 
 Kubernetes is undoubtedly the present and the near future of managing containerized microservice applications.
 
-A Kubernetes *cluster* consists of a set of worker machines (*nodes*) that run containerized applications, plus a *control plane* that manages the worker nodes and the containers running on them. The control plane components make global decisions about the cluster and maintain cluster state. In production settings some nodes are dedicated to run the control plane separately from the worker nodes that execute the *workload* (the containers, called *pods* in Kubernetes), but control plane components can be run on any node and can share the same node as the workers. This allows to run Kubernetes on a single node (like in Minikube).
+A Kubernetes *cluster* consists of a set of worker machines (*nodes*) that run containerized applications, plus a *control plane* that manages the worker nodes and the containers running on them. The control plane components make global decisions about the cluster and maintain cluster state. In production setting some nodes are dedicated to run the control plane separately from the worker nodes that execute the *workload* (the containers, called *pods* in Kubernetes), but control plane components can be run on any node and can share the same node as the workers. This allows to run Kubernetes on a single node (like in Minikube).
 
 ![Kubernetes architecture, https://commons.wikimedia.org/wiki/File:Kubernetes.png.](fig/kubernetes_arch.png)
 
@@ -107,9 +107,9 @@ Each node runs a `kubelet` daemon, which manages the containers/pods running on 
 
 ### Using Minikube
 
-Minikube is a simple tool to create a single-node Kubernetes cluster offering lots of convenience functions for dealing with the boring part of cluster management. Minikube is perfect for development and running local tests, so we will use it exclusively during the labs.
+Minikube is a simple tool to create a single-node Kubernetes cluster offering lots of convenience functions for dealing with the boring part of cluster management. Minikube is perfect for development and running local tests, so we will use it extensively during the labs.
 
-You should have the `minikube` command line utility installed to run the below commands:
+You should have the `minikube` command line utility installed. The following commands are available:
 - `minikube start`: start a new Minikube cluster or restore an existing one;
 - `minikube stop`: stop a cluster (can be restarted later with `minikube start`);
 - `minikube delete`: delete a Minikube cluster and remove all Kubernetes resources and container images built inside the cluster (note that this operation is irreversible so use it only if something went wrong beyond repair);
@@ -171,7 +171,7 @@ Some useful `kubectl` commands:
 - `kubectl delete <resource> <name>`: delete the resource called `<name>` of type `<resource>`;
 - `kubectl describe <resource> <name>`: obtain a longer description of the `<resource>` called `<name>`;
 - `kubectl explain <resource>`: get a human-readable description of a Kubernetes resource;
-- `kubectl edit <resource> <name>`: online edit the YAML configuration of the `<resource>` called `<name>`;
+- `kubectl edit <resource> <name>`: online edit the YAML configuration of the `<resource>` called `<name>` (use `EDITOR=nano kubectl edit...` if you hate vi, which is usually the default editor in bash);
 - `kubectl create deployment <name> --image=<image-name>`: create a Deployment called `<name>` using the image `<image-name>`;
 - `kubectl scale deployment <name> --replicas=<count>`: scale the deployment called `<name>` to `<count>` pods;
 - `kubectl expose <name> --port=<port>`: make the Deployment called `<name>` available on port `<port>`;
@@ -180,11 +180,11 @@ Some useful `kubectl` commands:
 - `kubectl attach <name> -i`: attach to the console of the pod called  `<name>` (type `Ctrl-C` to exit);
 - `kubectl exec <name> -it -- <command>`: execute the shell `<command>` on the pod called `<name>` (works only if the container image has a shell; containers built from Go code usually don't, unless explicitly added during the build);
 - `kubectl cp`: copy files to/from pods;
-- `kubectl port-forward service <name> <port>`: listen on local port 5000 and forward to port 5000 on the service running in Kubernetes.
+- `kubectl port-forward service <name> <localport:remoteport>`: listen on local port `<localport>` and forward to `<remoteport>` on (one of) the service pods running in Kubernetes.
 
 The Kubernetes API is [enormous](https://kubernetes.io/docs/reference/kubernetes-api/) and `kubectl` exposes only a tiny, but useful fraction of the available functionality. 
 
-There are two ways to interact with Kubernetes via `kubectl`. The `kubectl create/delete` and similar commands are *imperative*: for instance creating a new Kubernetes resource via `kubectl create` requires you to know whether the resource is already running, because re-creating an existing resource is an error. Instead, most professional cluster admins use the [*declarative*](https://www.theserverside.com/blog/Coffee-Talk-Java-News-Stories-and-Opinions/Imperative-vs-declarative-Kubernetes-commands-Whats-the-difference) style, by specifying the entire desired state of a resource in a YAML file and then using `kubectly apply -f <file>` to load it. This style is idempotent (you will hear about idempotence a lot later): re-applying the same configuration will leave everything intact. Kubernetes is clever enough to know if you change something and update *only* the changed resource (this is called *reconciliation*).
+There are two ways to interact with Kubernetes via `kubectl`. The `kubectl create/delete/expose` and similar commands are *imperative*: for instance creating a new Kubernetes resource via `kubectl create` requires you to know whether the resource is already running, because re-creating an existing resource is an error. Instead, most professional cluster admins use the [*declarative*](https://www.theserverside.com/blog/Coffee-Talk-Java-News-Stories-and-Opinions/Imperative-vs-declarative-Kubernetes-commands-Whats-the-difference) style, by specifying the entire desired state of a resource in a YAML file and then using `kubectly apply -f <file>` to load it. This style is idempotent (you will hear about idempotence a lot later): re-applying the same configuration will leave everything intact. Kubernetes is clever enough to know if you change something and update *only* the changed resource (this is called *reconciliation*).
 
 ### Building a container image
 

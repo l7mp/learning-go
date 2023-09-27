@@ -547,6 +547,9 @@ Extend the web app to also return the version of Go used to compile the web serv
 > PASS
 > ```
 
+> **Note**  
+> The test is trying its best to build the container image using your Dockerfile and deploy it into Minikube using your manifest, but since there are many moving parts there is a good chance something will go wrong. If the test fails, try to understand what's missing. If it still fails do not worry too much: that's most probably our fault. Just tell us what went wrong and test by hand.
+
 <!-- Local Variables: -->
 <!-- mode: markdown; coding: utf-8 -->
 <!-- eval: (auto-fill-mode -1) -->

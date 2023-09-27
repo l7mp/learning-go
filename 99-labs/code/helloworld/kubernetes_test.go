@@ -3,15 +3,11 @@
 package main
 
 import (
-	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net"
 	"net/http"
-	"os/exec"
 	"regexp"
 	"strings"
 	"testing"
@@ -29,7 +25,8 @@ func TestHelloWorldKubernetes(t *testing.T) {
 	execCmd(t, "kubectl", "delete", "-f", "deploy/kubernetes-service.yaml")
 
 	// build the container image
-	execCmd(t, "minikube", "image", "build", "-t", "l7mp/helloworld", "-f", "deploy/Dockerfile", ".")
+	execCmd(t, "minikube", "image", "build", "-t", "helloworld", "-f", "deploy/Dockerfile", ".")
+	go execCmd(t, "minikube", "tunnel")
 
 	// redeploy
 	execCmd(t, "kubectl", "apply", "-f", "deploy/kubernetes-deployment.yaml")

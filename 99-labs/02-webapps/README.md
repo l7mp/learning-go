@@ -207,7 +207,7 @@ First we create a manifest (a file with the name `Dockerfile`) that describes ho
 ############################################
 # Stage 1: Compile the binary in a containerized Golang environment
 ############################################
-FROM golang:latest as build
+FROM docker.io/golang:latest as build
 
 # Copy the source files from the host
 COPY . /

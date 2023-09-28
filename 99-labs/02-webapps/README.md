@@ -42,7 +42,7 @@ import (
 )
 
 func HelloHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Hello, world!")
+	fmt.Fprint(w, "Hello, world!\n")
 }
 
 func main() {
@@ -83,13 +83,13 @@ Modify the program to return the hostname of the server it is running at. This r
   }
   ```
 - store the returned hostname in the global variable `hostname` so that the HTTP handler, which runs in a separate function and so cannot reach `h`, will access it: `hostname = h`
-- finally, modify the HTTP handler `HelloHandler` to add value of the global `hostname` variable to the response: `fmt.Fprintf(w, "Hello world from %s!", hostname)`
+- finally, modify the HTTP handler `HelloHandler` to add value of the global `hostname` variable to the response: `fmt.Fprintf(w, "Hello world from %s!\n", hostname)`
 
 > ✅ **Check**
 >
 > Run the below test to check whether you have successfully completed the task. If all goes well, you should see the output `PASS`.
 > ``` sh
-> go test ./... --tags=helloworld -v -count 1
+> go test ./... --tags=helloworldhostname -v -count 1
 > PASS
 > ```
 > Make sure the web service is running locally (i.e., execute `go run main.go` before running the test): the test issues requests to the HTTP server and checks whether the response is as expected.
@@ -542,7 +542,7 @@ Extend the web app to also return the version of Go used to compile the web serv
    - use `runtime.Version()` to obtain the Go version as a string (make sure to browse the [documentation of the `runtime` package](https://pkg.go.dev/runtime), there are lots of useful functions in it);
    - don't forget to `import` the `runtime` package first;
    - store the string returned by `runtime.Version()` in a global variable named `version` (make sure you actually declare the variable before calling `main` with `var version string`); 
-   - generate the HTTP response in `HelloHandler` as follows: `fmt.Fprintf(w, "Hello world from %s running Go version %s!", hostname, version)`
+   - generate the HTTP response in `HelloHandler` as follows: `fmt.Fprintf(w, "Hello world from %s running Go version %s!\n", hostname, version)`
    - run locally with `go run main.go` and test with `curl http://localhost:8080`.
 2. Rebuild and redeploy the container image
    - re-run `minikube image build ...`,
@@ -556,7 +556,7 @@ Extend the web app to also return the version of Go used to compile the web serv
 > ``` sh
 > export EXTERNAL_IP=$(kubectl get service helloworld -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 > export EXTERNAL_PORT=80
-> go test ./... --tags=helloworld -v -count 1
+> go test ./... --tags=helloworldgoversion -v -count 1
 > PASS
 > ```
 > Make sure the web service is running inside Kubernetes: the test issues requests to the Kubernetes Service and checks whether the response is as expected.

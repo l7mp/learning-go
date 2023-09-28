@@ -1,4 +1,4 @@
-//go:build helloworld
+//go:build helloworldgoversion
 
 package main
 
@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHelloWorld(t *testing.T) {
+func TestHelloWorldWithGoVersion(t *testing.T) {
 	res, err := testHTTP(t, "/", "GET", "")
 	assert.NoError(t, err, "GET")
 	assert.Equal(t, http.StatusOK, res.StatusCode, "status code")

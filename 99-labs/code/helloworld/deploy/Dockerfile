@@ -1,7 +1,7 @@
 ############################################
 # Stage 1: Compile the binary in a containerized Golang environment
 ############################################
-FROM golang:1.19 as build
+FROM golang:latest as build
 
 # Copy the source files from the host
 COPY . /

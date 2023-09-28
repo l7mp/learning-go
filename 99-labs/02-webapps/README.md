@@ -87,6 +87,17 @@ Modify the program to return the hostname of the server it is running at. This r
 
 > ✅ **Check**
 >
+> Run the below test to check whether you have successfully completed the task. If all goes well, you should see the output `PASS`.
+> ``` sh
+> go test ./... --tags=helloworld -v -count 1
+> PASS
+> ```
+> Make sure the web service is running locally (i.e., execute `go run main.go` before running the test): the test issues requests to the HTTP server and checks whether the response is as expected.
+
+We have also created an experimental test that starts the web service before executing the tests and stops it afterwards. At this point this test merely serves for us to understand how we can write totally self-contained tests; please execute it and tell us whether it worked out fine.
+
+> ✅ **Check (experimental)**
+>
 > Run the below test to make sure that you have successfully completed the first exercise. If all goes well, you should see the output `PASS`.
 > ``` sh
 > go test --tags=main -run TestHelloWorldLocal -count 1
@@ -541,14 +552,24 @@ Extend the web app to also return the version of Go used to compile the web serv
 
 > ✅ **Check**
 >
+> Run the below test to check whether you have successfully completed the task. If all goes well, you should see the output `PASS`.
+> ``` sh
+> export EXTERNAL_IP=$(kubectl get service helloworld -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+> export EXTERNAL_PORT=80
+> go test ./... --tags=helloworld -v -count 1
+> PASS
+> ```
+> Make sure the web service is running inside Kubernetes: the test issues requests to the Kubernetes Service and checks whether the response is as expected.
+
+The next experimental test is trying its best to build the container image using your Dockerfile and deploy it into Minikube using your manifest. Since there are many moving parts there is a good chance something will go wrong, therefore at this point it merely serves for us to gather data points for improving our tests in the future. If the test fails, try to understand what's missing (e.g., if `minikube tunnel` is already running the test will most probably fail). If it still fails do not worry too much: that's most probably our fault. Just tell us what went wrong and move on.
+
+> ✅ **Check (experimental)**
+>
 > Run the below test to make sure that you have successfully completed the exercise. If all goes well, you should see the output `PASS`.
 > ``` sh
 > go test --tags=kubernetes -run TestHelloWorldKubernetes -count 1
 > PASS
 > ```
-
-> **Note**  
-> The test is trying its best to build the container image using your Dockerfile and deploy it into Minikube using your manifest, but since there are many moving parts there is a good chance something will go wrong. If the test fails, try to understand what's missing. If it still fails do not worry too much: that's most probably our fault. Just tell us what went wrong and test by hand.
 
 <!-- Local Variables: -->
 <!-- mode: markdown; coding: utf-8 -->

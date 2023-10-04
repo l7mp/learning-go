@@ -448,7 +448,7 @@ The default Service type is `ClusterIP`, which assigns an IP address (`10.98.135
 To check Service access from the cluster, we deploy a separate pod called `net-debug` that we use to send queries to our web server pods. Attach to the console of the pod and execute a curl request to the cluster IP `10.98.135.40` and port 8080 from inside that pod:
 
 ``` sh
-kubectl run net-debug --image=l7mp/net-debug:latest
+kubectl run net-debug --image=docker.io/l7mp/net-debug:latest
 kubectl exec -it net-debug -- curl http://10.98.135.40:8080
 Hello world from helloworld-67f7d78ccd-2fklj!
 ```

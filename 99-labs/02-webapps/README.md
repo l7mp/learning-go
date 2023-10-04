@@ -330,6 +330,7 @@ metadata:
   labels:
     app: helloworld
 spec:
+  replicas: 2
   selector:
     matchLabels:
       app: helloworld

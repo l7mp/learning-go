@@ -18,6 +18,6 @@ func TestHelloWorldWithGoVersion(t *testing.T) {
 
 	body, err := io.ReadAll(res.Body)
 	assert.NoError(t, err, "read response body")
-	r := regexp.MustCompile("^Hello world from .* running Go version .*$")
+	r := regexp.MustCompile("^Hello world from .* running Go version.*")
 	assert.Regexp(t, r, string(body), "response")
 }

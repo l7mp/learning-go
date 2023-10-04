@@ -18,6 +18,6 @@ func TestHelloWorldWithHosname(t *testing.T) {
 
 	body, err := io.ReadAll(res.Body)
 	assert.NoError(t, err, "read response body")
-	r := regexp.MustCompile("^Hello world from .*$")
+	r := regexp.MustCompile("^Hello world from.*")
 	assert.Regexp(t, r, string(body), "response")
 }

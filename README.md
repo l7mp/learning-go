@@ -16,7 +16,7 @@ make generate
 Your student id should always be available in the file named `STUDENT_ID` in the main directory. You can override this by setting the id in the `STUDENT_ID` environment variable.
 
 ``` console
-STUDENT_ID=MY-STUDENT-ID> make generate
+STUDENT_ID=<MY-STUDENT-ID> make generate
 ```
 
 ## Solve the exercises

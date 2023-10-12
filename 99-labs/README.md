@@ -10,7 +10,7 @@ on service meshes.
 
 1. [Setting up the work environment](01-setup/)
 1. [Deploying web applications into Kubernetes](02-webapps/)
-1. [A silly web app: SplitDim](02-splitdim/)
+1. [A silly web app: SplitDim](03-splitdim/)
 1. [Cloud-native patterns: Immutability and loose coupling](04-immutability/)
 1. [Cloud-native patterns: Resilience](05-resilience/)
 1. [Cloud-native patterns: Manageability](06-manageability/)

@@ -25,7 +25,12 @@ func TestTransfer(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, res.StatusCode, "status")
 
 	// test with wrong JSON
-	res, err = testHTTP(t, "api/transfer", "POST", `{"a":12}`)
+	res, err = testHTTP(t, "api/transfer", "POST", `{"a":12`)
+	assert.NoError(t, err, "POST: api/transfer")
+	assert.Equal(t, http.StatusBadRequest, res.StatusCode, "status")
+
+	// test with same sender and receiver
+	res, err = testHTTP(t, "api/transfer", "POST", `{"sender":"a", "receiver": "a", "amount": 12}`)
 	assert.NoError(t, err, "POST: api/transfer")
 	assert.Equal(t, http.StatusBadRequest, res.StatusCode, "status")
 

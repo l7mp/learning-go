@@ -367,7 +367,7 @@ Before we start, below is a list of useful functions that help dealing with enco
    - return HTTP 400 error status (`http.StatusBadRequest`) if any of these checks fail,
    - log the request, 
    - call `db.Transfer` to process the request (this will currently call the placeholder, we will implement this in the next step),
-   - return HTTP 500 error status (`http.StatusInternalServerError`) if something went wrong and write the error message into the response body,
+   - return HTTP 400 error status (`http.StatusBadRequest`) if something went wrong and write the error message into the response body,
    - if all went well, return HTTP 200 (`http.StatusOK`).
    
 1. Implement the `db.Transfer(t)` call from the above. This will require extending the below function in the `pkg/db/local` package:

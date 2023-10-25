@@ -11,8 +11,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestAPI will simply create the API structs and JSON encode/decode each.
-func TestLocalDBConstrurctor(t *testing.T) {
+// TestLocalDBConstructor will create an empty local DB.
+func TestLocalDBConstructor(t *testing.T) {
 	// this will fail at compile time if something is wrong
 	var db api.DataLayer
 	db = local.NewDataLayer()

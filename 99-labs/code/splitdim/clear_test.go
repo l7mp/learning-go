@@ -33,7 +33,7 @@ func TestClear(t *testing.T) {
 	ts := []api.Transfer{}
 	err = json.NewDecoder(res.Body).Decode(&ts)
 	assert.NoError(t, err, "clear unmarshal")
-	assert.Equal(t, ts, []api.Transfer{{"b", "a", 4}}, "clear transfers")
+	assert.Equal(t, []api.Transfer{{"b", "a", 4}}, ts, "clear transfers")
 
 	// check if accounts are left intact!
 	res, err = testHTTP(t, "api/accounts", "GET", "")
@@ -59,7 +59,7 @@ func TestClear(t *testing.T) {
 	ts = []api.Transfer{}
 	err = json.NewDecoder(res.Body).Decode(&ts)
 	assert.NoError(t, err, "clear unmarshal")
-	assert.Equal(t, ts, []api.Transfer{{"b", "a", 8}}, "clear transfers ")
+	assert.Equal(t, []api.Transfer{{"b", "a", 8}}, ts, "clear transfers ")
 
 	res, err = testHTTP(t, "api/transfer", "POST", `{"sender":"b", "receiver":"c", "amount": 2}`)
 	assert.NoError(t, err, "POST: api/transfer")

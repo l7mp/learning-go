@@ -18,7 +18,7 @@ The below tasks guide you in making the web app (a little bit more) resilient. T
 
 Recall, SplitDim is a web app that lets groups of people keep track of who owns who. The web service implements the following API endpoints:
 - `GET /`: a static HTML/JS artifact that you can use to interact with the app from a browser,
-- `POST /api/transfer`: register a transfer between two users of a given amount,
+- `POST /api/transfer`: register a transfer of a given amount between two users,
 - `GET /api/accounts`: return the list of current balances for each registered user,
 - `GET /api/clear`: return the list of transfers that would allow users to clear their debts, and
 - `GET /api/reset`: reset all balances to zero.
@@ -52,7 +52,7 @@ func (db *kvstore) Transfer(t Transfer) error {
 }
 ```
 
-Recall, this function takes a `Transfer` API object and increases the balance of the sender by the requested amount and decreases the balance of the receiver by the same amount. Theoretically, the two operations should occur *at the same time* to complete the transfer. The `db.setBalance` function is our little helper that makes a `get` to obtain the current versioned balance from the key-value store followed by a `put` that tries to register the new balance (with the same version) in the accounts database.
+Recall, this function takes a `Transfer` API object and increases the balance of the sender by the requested amount and decreases the balance of the receiver by the same amount. Theoretically, the two operations should occur *at the same time* to complete the transfer. The `db.setBalance` function is our little helper that makes a `get` call to obtain the current versioned balance from the key-value store followed by a `put` that tries to register the new balance (with the same version) in the accounts database.
 
 ```go
 func (db *kvstore) setBalance(user string, amount int) error {
@@ -76,7 +76,7 @@ func (db *kvstore) setBalance(user string, amount int) error {
 It is completely normal for the `put` to fail; this happens, e.g., when another `splitdim` instance makes a `put` to the same account between our `get` and `put` queries.
 
 There are two problems with the current code:
-- Currently we cannot ensure the "at the same time" property above: since our key-value store does not support transactions, it is certainly possible that the first `db.setBalance` operation succeeds while the second one fails, which will leave the account database in an inconsistent state. The most we can do is to try to avoid such situations as much as we can.
+- Currently we cannot ensure the "at the same time" property: since our key-value store does not support transactions, it is certainly possible that the first `db.setBalance` operation succeeds while the second one fails, which will leave the account database in an inconsistent state. The most we can do is to try to avoid such situations as much as we can (see [later](#transactions-revisited) on transaction support).
 - Perhaps less obvious, but there is another problem lurking in the code: if `db.SetBalance` fails and this failure persists, then `Transfer` falls into an infinite loop trying to update the key-value store to no avail.
 
 It is easy to test this:
@@ -104,13 +104,14 @@ It is easy to test this:
   ```
 - You should see `curl` hanging for a while just to timeout after a longish wait. Meanwhile the `splitdim` pod is going completely berserk, filling the log with the traces of desperately trying to reach the key-value store:
   ```shell
+  kubectl logs $(kubectl get pods -l app=splitdim -o jsonpath='{.items[0].metadata.name}') -f
   kvstore_db.go:52: transfer: could not set balance for user "a": get: HTTP error: Post "http://kvstore.default:8081/api/get": dial tcp: lookup kvstore.default on 10.96.0.10:53: no such host
   ...
   ```
 
 > :bulb: Tip
 > 
-> In order to avoid that the `splitdim` pod take up all your CPU (and be OOM-killed by Kubernetes), you can apply a resource limit to the `splitdim` container to keep its maximum CPU utilization at 100 mcore (0.1 CPU) at most. This amounts to adding the below `resource` definition to the pod template in the `splitdim` Deployment:
+> In order to avoid that the `splitdim` pod take up all your CPU (and be OOM-killed by Kubernetes), you can apply a resource limit to the `splitdim` container to keep its maximum CPU utilization at below 100 mcore (0.1 CPU). This amounts to adding the following `resource` definition to the pod template in the `splitdim` Deployment:
 > ```yaml
 > apiVersion: apps/v1
 > kind: Deployment
@@ -137,7 +138,7 @@ It is easy to test this:
 
 ## Retry
 
-Easily, trying to apply an operation to a downstream dependency in an infinite loop, like `splitdim` attempting desperately to talk to `kvstore` in the above, will not work when the downstream dependency fails. A straightforward solution to make our web app *resilient* to such downstream failures is to control the *retry* process: say, we could resend the failing query a certain (small) number of times in the hope that one of the attempts will succeed, and give up and report a failure only after that.  Meanwhile, we have to make sure that we do not worsen the situation by, say, causing a "retry storm".
+Easily, trying to apply an operation to a downstream dependency in an infinite loop, like `splitdim` attempting desperately to talk to `kvstore`, will not work when the downstream dependency fails. A straightforward solution to make our web app *resilient* to such downstream failures is to control the *retry* process: say, we could resend the failing query a certain (small) number of times in the hope that one of the attempts will succeed, and give up and report a failure only after that.  Meanwhile, we have to make sure that we do not worsen the situation by, say, causing a "retry storm".
 
 Below, we will substitute the failure-prone infinite loop with a configurable retry policy. But before that, an important fact worth remaking at this point.
 
@@ -207,14 +208,16 @@ So below is a sequence of steps that will make sure `Transfer` survives key-valu
 1. Create a `defaultBackoff` retry policy that will allow at most 6 retries, using the base time of 150 ms and 2 sec timeout.
 2. Call `db.setBalanceForUser(t.Sender, t.Amount)` to create a `Closure` that will increase the balance of the sender by the requested amount that can now be passed to `resilient.WithRetry`.
 3. Use `resilient.WithRetry` on the closure obtained in the previous step using the default backoff policy to decorate it with a retry policy.
-4. Call the decorated closure to actually run it: if this fails that means that all retries have failed so we can safely return an error.
-5. Now repeat the same steps for the receiver: call `db.setBalanceForUser(t.Receiver, -t.Amount)` to obtain a `Closure` that will decrease the balance of the receiver by the requested amount, use `resilient.WithRetry` with the default backoff policy to obtain a retrier, and call it.
-6. If this fails then we are in trouble: we have a halfway applied transfer transaction. The only thing we can do is to try to undo the first operation (i.e., decrease the balance of the sender by the same amount). Make sure to use more aggressive retry policy this time.
-7. If this undo operation fails then *we are left with an inconsistent account database*. If this is the case, return an unmissable error and fail all subsequent transfers until the system operator restores the database.
+4. Call the decorated closure returned from `resilient.WithRetry` to actually set the balance: if this fails that means that all retries have failed so we can safely return an error.
+5. Now repeat the same steps for the receiver: wrap the `db.setBalanceForUser(t.Receiver, -t.Amount)` call in a new `Closure` that, when called, will decrease the balance of the receiver by the requested amount, use `resilient.WithRetry` with the default backoff policy to obtain a retrier from the new closure, and call it.
+6. If this fails then we are in trouble: we have a *halfway applied transfer transaction*. The only thing we can do is to try to undo the first operation (i.e., decrease the balance of the sender by the same amount). Make sure to use more aggressive retry policy this time.
+7. If this undo operation fails then *we are left with an inconsistent account database*. If this is the case, you may return an unmissable error and fail all subsequent transfers until the system operator restores the database (we won't implement that in this lab).
 
 > **Note**
 > 
-> Recall, you can always use the transaction log to restore the key-value store. This is why we made in *persistent* in the first place!
+> Recall, you can always use the transaction log to restore the key-value store. This is why we made it *persistent* in the first place!
+
+You may want to update the existing `kvstore` datalayer (`splitdim/pkg/db/kvstore`) in the `splitdim` app or you can put the new code into a new subpackage (say, `splitdim/pkg/db/resilientkvstore`) as well; the choice is on you.
 
 To actually make use of the improved code, first try a local build with a missing key-value store backend (this will make all transfers fail) and check whether a `curl` call to `/api/transfer` will fail in a controlled way (instead of falling into an infinite retry loop). Then, test with Kubernetes:
 
@@ -270,7 +273,7 @@ kubectl rollout restart statefulset kvstore
 
 ## Graceful shutdown
 
-A closer look at the code reveals another problem: what if the app dies between the both key-value store updates required to fully process a transfer complete? Say, the first call that increases the balance of the sender succeeds, but then the app dies for some reason and the second call that would decrease the balance of the receiver fails? We are again left with an inconsistent account database. What is worse, in Kubernetes such cases can happen completely legitimately; e.g., when scaling down the `splitdim` application as demand drops and we so need less pods, or during a software upgrade when we transition to a new version of `splitdim` and we kill the pods running the old version. Easily, we need a way to guarantee that even if the `splitdim` pod is terminated it will keep running until it finishes serving all outstanding client requests. This is called *graceful shutdown*, and it is one of the most critical resilience features a cloud native app should implement.
+A closer look at the code reveals another problem: what if the app dies between the both key-value store updates required to fully process a transfer complete? Say, the first call that increases the balance of the sender succeeds, but then the app dies for some reason and the second call that would decrease the balance of the receiver fails? We are again left with an inconsistent account database. What is worse, in Kubernetes such cases can happen completely legitimately; e.g., when scaling down the `splitdim` application as demand drops and so we need fewer pods, or during a software upgrade when we transition to a new version of `splitdim` and we kill the pods running the old version. Easily, we need a way to guarantee that even if the `splitdim` pod is terminated it will keep running until it finishes serving all outstanding client requests. This is called *graceful shutdown*, and it is one of the most critical resilience features a cloud native app should implement.
 
 Recall, implementing graceful shutdown in an app means to (1) listen to `SIGTERM` signals received from Kubernetes, (2) finish processing outstanding client requests, and then (3) exit voluntarily when the application is ready to shut down. Below are a couple of pointers that will guide you in adding the required modifications to the `main` function of the `splitdim` app to implement graceful shutdown:
 - Create a HTTP server object by calling, e.g., `s = &http.Server{Addr: ":8080"}`, and start it from a separate goroutine using `server.ListenAndServe()`. The goroutine should exit when the underlying network connection is closed from the main thread of the program: make sure to indicate an error to the user only if the error returned from `server.ListenAndServe` is not a "server connection closed" error (`http.ErrServerClosed`).
@@ -368,7 +371,7 @@ If any of the `put` operations in the `opList` fails then the whole transaction 
 
 > :bulb: Tip
 > 
-> Feel free to experiment with the transactional API and rewrite the key-value store data layer of `splitdim` to make use of the new API. You can also implement a database client to make calling this API easier. This exercise is optional, but it serves as a perfect way to exercise your Go skills!
+> Feel free to experiment with the transactional API and rewrite the key-value store data layer of `splitdim` to make use of the new API. You can also implement a database client to make calling this API easier. This exercise is optional, but it should give you a nice opportunity to exercise your Go skills!
 
 <!-- Local Variables: -->
 <!-- mode: markdown; coding: utf-8 -->

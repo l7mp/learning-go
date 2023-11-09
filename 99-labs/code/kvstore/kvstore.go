@@ -5,17 +5,17 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 
 	"kvstore/pkg/server"
 )
 
-var logFile = "/tmp/translog.log"
-
 func main() {
 	// Include date, time and filename in the log messages
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
+	logFile := filepath.Join(os.TempDir(), "translog.log")
 	server, err := server.NewServer(logFile)
 	if err != nil {
 		log.Fatalf("could not init server: %s", err.Error())

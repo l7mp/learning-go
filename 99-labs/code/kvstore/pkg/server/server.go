@@ -30,7 +30,7 @@ func NewServer(logFile string) (*Server, error) {
 	log.Printf("Using transaction log in %q", logFile)
 	fileLogger, err := translog.NewFileTransactionLogger(logFile)
 	if err != nil {
-		fmt.Errorf("could not open transaction log: %s", err.Error())
+		return nil, fmt.Errorf("could not open transaction log: %w", err)
 	}
 	s.logger = fileLogger
 

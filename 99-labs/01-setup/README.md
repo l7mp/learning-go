@@ -145,7 +145,7 @@ echo "source <(minikube completion bash)" >> ~/.bashrc
 Once installed, we create a local Kubernetes cluster. Copy the below into your terminal:
 
 ```code
-minikube start --memory=4096 --cpus=2 --driver=podman --container-runtime=cri-o
+minikube start --memory=4096m --cpus=2 --driver=podman --container-runtime=cri-o
 ```
 
 > **Note**

@@ -135,7 +135,7 @@ You should have the `minikube` command line utility installed. The following com
 If you haven't done that yet, create a new Minikube cluster using the below:
 
 ``` shell
-minikube start --memory=4096 --cpus=2 --driver=podman --container-runtime=cri-o
+minikube start --memory=4096m --cpus=2 --driver=podman --container-runtime=cri-o
 ```
 
 If you have already created the cluster then `minikube status` will report whether it is running. If not, simply use `minikube start` to start it fro where you left last time you issued `minikube stop`.

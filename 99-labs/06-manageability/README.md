@@ -15,7 +15,7 @@ The below tasks guide you in making the web app (a little bit more) manageable. 
 ## Preliminaries
 
 Recall, SplitDim is a web app that lets groups of people keep track of who owns who. The web service implements the following API endpoints:
-- `GET /`: a static HTML/JS artifact that you can use to interact with the app from a browser,
+- `GET /`: serves a static HTML/JS artifact that you can use to interact with the app from a browser,
 - `POST /api/transfer`: register a transfer between two users of a given amount,
 - `GET /api/accounts`: return the list of current balances for each registered user,
 - `GET /api/clear`: return the list of transfers that would allow users to clear their debts, and
@@ -42,12 +42,12 @@ This allows us to support a number of different data layer implementations, each
 - `resilientkvstore` (optional): If you created a separate data layer implementation for implementing the resilience patterns in the previous lab, then that may also be selectable.
 - `transactionalkvstore` (optional): Likewise, if you implemented the transactional implementation for `Transfer` then that may also live in a separate data layer package.
 
-So far we used environment variables to choose among the different data layers. As we are going to see in a minute that is the **right way** to do it in Kubernetes, but just for the sake of exercise let's add another way too: choosing the data layer via a command line argument. For instance, running the app with `splitdim -mode local` would choose the local mode while `splitdim -mode kvstore -addr localhost:8081` would use the key-value store reachable at `localhost:8081`.
+Recall, we use the usual two environment variables, `KVSTORE_MODE` and `KVSTORE_ADDR`, to choose the key-value store datalayer implementation (say, `local`, `kvstore`, `resilientkvstore`, etc) and (optionally) specify the key-value store address on startup. As we are going to see in a minute that is the **right way** to do it in Kubernetes, but just for the sake of exercise let's add another way too: choosing the data layer via a command line argument. For instance, running the app with `splitdim -mode local` would choose the local mode while `splitdim -mode kvstore -addr localhost:8081` would use the key-value store reachable at `localhost:8081`.
 
 Here is a sequence of steps that you can follow to achieve that:
-- use the standard `flag` package for parsing command line arguments;
+- use the standard [`flag` package](https://pkg.go.dev/flag) for parsing command line arguments;
 - add a string type command line flag called `mode` for specifying the data-layer mode, with the default being the value given in the environment variable `KVSTORE_MODE` and a fallback to the setting `local`;
-- add a string type command line flag called `addr` for specifying the key-value store address, which is relevant only if the key-value store data layer is chosen. Let the default be the value given in the environment variable `KVSTORE_ADDE`, and fall back to `localhost:8081` if neither the environment variable nor the command line flag is given by the user.
+- add a string type command line flag called `addr` for specifying the key-value store address, which is relevant only if the key-value store data layer is chosen. Let the default be the value given in the environment variable `KVSTORE_ADDR`, and fall back to `localhost:8081` if neither the environment variable nor the command line flag is given by the user.
 
 Once everything is ready, you can play a bit with a local build to see if everything went fine.
 
@@ -60,19 +60,19 @@ Once everything is ready, you can play a bit with a local build to see if everyt
 > - set the reachability info for `splitdim`: `export EXTERNAL_IP=localhost; export EXTERNAL_PORT=8080`;
 > - run the tests:
 >   ```go
->   go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1`
+>   go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1
 >   ```
 > - restart the app with the key-value store mode: `killall splitdim; ./splitdim -mode kvstore -addr localhost:8081&`;
 > - rerun the tests:
 >   ```go
->   go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1`
+>   go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1
 >   ```
 > - stop the app: `killall splitdim`.
 > If all goes well, you should see all tests to PASS.
 
 ## Configuration files
 
-Managing our application through environment variables and command line arguments is nice, but it gets complex after a certain point: what if we have dozens of important parameters, do we really want to configure each via a separate command line argument or environment variable? The solution is a configuration file of course, which can hold the entire config in a single human-readable file. We recommend the JSON or the YAML format for storing the config file: we already know how to automatically marshal/unmarshal them to/from Go structs.
+Managing our application through environment variables and command line arguments is nice, but it gets complex after a certain point: what if we have dozens of important parameters, do we really want to configure each via a separate command line argument or environment variable? The solution is a configuration file of course, which can hold the entire config in a single human-readable format. We recommend the JSON or the YAML format for storing the config file: we already know how to automatically marshal/unmarshal them to/from Go structs.
 
 Below we will implement something functionally equivalent with config files but, perhaps somewhat surprisingly, we will not have to deal with any files at all! This magic is made possible by Kubernetes ConfigMaps. In particular, we want to be able to collect all our relevant config parameters in a single Kubernetes resource, a ConfigMap. For instance, the below would mean to start `splitdim` in Kubernetes with the `local` data layer:
 ```yaml
@@ -97,10 +97,6 @@ data:
 
 Our job is now to map the entries of the ConfigMap to the corresponding environment variables of the `splitdim` pod. 
 
-> **Note**
->
-> Note that mapping ConfigMaps to command line arguments is not so trivial, that is why we prefer environment variables over command line flags for managing the startup parameters of cloud native apps.
-
 In general, the entry called `my-configmap-key` in the `my-configmap` ConfigMap can be mapped into the environment variable called `MY_ENV` when starting a container called `my-container` as follows:
 ```yaml
 ...
@@ -117,6 +113,10 @@ spec:
 ```
 
 An additional `optional: true` setting makes sure that Kubernetes will not complain when the ConfigMap does not provide the requested entry.
+
+> **Note**
+>
+> Mapping ConfigMaps to command line arguments (as opposed to environment variables) is not so trivial. This is why we prefer environment variables over command line flags for managing the startup parameters of cloud native apps.
 
 > **Note**
 >
@@ -165,9 +165,9 @@ Your job is now to add the necessary settings to the `splitdim` container templa
 >   ```
 > If all goes well, you should see all tests to PASS.
 
-> **Note**
+> **Warning**
 >
-> Unfortunately, applying a new ConfigMap with a new configuration will not automatically restart the Kubernetes workload (e.g., the Deployment) that depends on it. This means that every time you modify the ConfigMap you have to manually restart the app with `kubectl rollout restart deployment splitdim`. It is, however, simple to add the automation to Kubernetes necessary to support this functionality: this [tutorial](https://book.kubebuilder.io/reference/watching-resources/externally-managed.html) shows how to write a Kubernetes controller that will allow the user to specify pairs of a Deployment and the corresponding ConfigMap whose update should restart the Deployment. This *controller pattern* is the magic sauce that allows Kubernetes to support so many use cases.
+> Unfortunately, applying a new ConfigMap will not automatically restart the Kubernetes workload (e.g., the Deployment) that depends on it. This means that every time you modify the ConfigMap you have to manually restart the app with `kubectl rollout restart deployment splitdim`. It is, however, simple to add the automation to Kubernetes necessary to support this functionality: this [tutorial](https://book.kubebuilder.io/reference/watching-resources/externally-managed.html) shows how to write a Kubernetes operator that will allow the user to specify pairs of a Deployment and a corresponding ConfigMap whose update should restart the Deployment. This *controller pattern* is the magic sauce that allows Kubernetes to support so many use cases.
 
 Unfortunately that is all that we could cover from manageability in a single lab. That doesn't mean Kubernetes does not provide lots of further options for managing your app in the Cloud. If you want to learn more, we recommend the [Kubebuilder book](https://book.kubebuilder.io) and the [Operator SDK documentation](https://sdk.operatorframework.io/docs) as absolutely invaluable resources on the subject of manageability in Kubernetes.
 

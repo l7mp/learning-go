@@ -217,7 +217,7 @@ So below is a sequence of steps that will make sure `Transfer` survives key-valu
 > 
 > Recall, you can always use the transaction log to restore the key-value store. This is why we made it *persistent* in the first place!
 
-You may want to update the existing `kvstore` datalayer (`splitdim/pkg/db/kvstore`) in the `splitdim` app or you can put the new code into a new subpackage (say, `splitdim/pkg/db/resilientkvstore`) as well; the choice is on you.
+You may want to update the existing `kvstore` datalayer (`splitdim/pkg/db/kvstore`) in the `splitdim` app or you can put the new code into a new subpackage (say, `splitdim/pkg/db/resilientkvstore`) as well; the choice is on you. In any way, use the usual two environment variables, `KVSTORE_MODE` and `KVSTORE_ADDR`, to select the key-value store datalayer implementation (say, `local`, `kvstore`, `resilientkvstore`, etc) and (optionally) specify the key-value store address on startup.
 
 To actually make use of the improved code, first try a local build with a missing key-value store backend (this will make all transfers fail) and check whether a `curl` call to `/api/transfer` will fail in a controlled way (instead of falling into an infinite retry loop). Then, test with Kubernetes:
 
@@ -367,11 +367,17 @@ In particular, the key-value store serves a `/api/transaction` API endpoint that
 ```go
 func transaction(opList []api.VersionedKeyValue) error
 ```
-If any of the `put` operations in the `opList` fails then the whole transaction fails. We could have used this API from the outset but that would have removed many of the educational lessons from this lab. Let this serve as a reminder of the importance of using a transactional databases, they serve a good purpose!
+If any of the `put` operations in the `opList` fails then the whole transaction fails. We could have used this API from the beginning but that would have removed many of the educational lessons from this lab. Let this serve as a reminder of the importance of using a transactional databases, they serve a good purpose!
 
 > :bulb: Tip
 > 
-> Feel free to experiment with the transactional API and rewrite the key-value store data layer of `splitdim` to make use of the new API. You can also implement a database client to make calling this API easier. This exercise is optional, but it should give you a nice opportunity to exercise your Go skills!
+> Feel free to experiment with the transactional API. Here are some ideas on possible improvements:
+> - Rewrite the key-value store data layer of `splitdim` to make use of the new API. Put your transactional data-layr implementation into a new package, say, `pkg/db/transactionalkvstore`.
+> - Implement transactions in the kvstore client (`kvstore/pkg/client`) to simplify the calling of the new transactional API. Let the signature added to the client interface be the following:
+>   ```go
+>	Transaction([]api.VersionedKeyValue) error
+>   ```
+> This exercise is optional, but it should give you a nice opportunity to exercise your Go skills!
 
 <!-- Local Variables: -->
 <!-- mode: markdown; coding: utf-8 -->

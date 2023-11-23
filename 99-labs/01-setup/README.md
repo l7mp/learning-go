@@ -44,7 +44,7 @@ The course requires these software:
 - `make`
 - [Istio and istioctl](https://istio.io/)
 
-> **Note**
+> [!NOTE]
 > If you use the VM, jump to the [Istio installation guide](#install-istio).
 
 ### Install Go
@@ -128,7 +128,7 @@ The `kubectl` utility is our main tool to interact with our Kubernetes clusters.
    echo "source <(kubectl completion bash)" >> ~/.bashrc
    ```
 
-> **Note**
+> [!NOTE]
 > If you use a different shell (e.g., zsh) , check configuration steps with `kubectl completion -h`
 
 ### Install Minikube
@@ -148,12 +148,12 @@ Once installed, we create a local Kubernetes cluster. Copy the below into your t
 minikube start --memory=4096m --cpus=2 --driver=podman --container-runtime=cri-o
 ```
 
-> **Note**
+> [!NOTE]
 > Cluster creation may take some time.
 
 This will create a local Kubernetes cluster with 4 GB memory and 2 vCPUs using podman as the container driver, and configure `kubectl` to talk to this cluster. Feel free to customize the CPU/memory limits in the above; e.g., it is a good idea to increase the amount of CPU and memory available to your cluster to obtain a more responsive Kubernetes.
 
-> **Note**
+> [!NOTE]
 > Once done working with Kubernetes make sure to stop it with `minikube stop`: Kubernetes may take up considerable resources and this commands frees those resources up. You can always restart your cluster with `minikube start` and continue working from where you left the last time you issued `minikube stop`.
 
 ### Install Istio
@@ -282,7 +282,7 @@ FAIL
 
 Consult the `README.md` file for how to solve the exercise and place your solution into the file `exercise.go` at the placeholder.
 
-> **Note**
+> [!NOTE]
 > It is usually not worth copying someone else's solution: most probably your exercises will be quite different for theirs (that is what `make generate` is for).
 
 For instance, you may be asked to write a `helloWorld` function in Go that will return the string `Hello world!` (your exercise may differ, so make sure you read the README carefully!). In this case, insert the below code into `exercise.go`:
@@ -310,7 +310,7 @@ git add exercise.go
 git commit -m 'first exercise solved'
 ```
 
-> **Note**
+> [!NOTE]
 > If you use a remote git repo to back up your work then make sure you push all your commits there using:
 > ``` shell
 > git push

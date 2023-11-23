@@ -159,7 +159,7 @@ Your task is to implement this interface. Some help:
    }
    ```
 
-   > **Note**
+   > [!NOTE]
    > 
    > The `client` struct will *not* be exported from the package (letter case matters!).
 
@@ -170,7 +170,7 @@ Your task is to implement this interface. Some help:
    }
    ```
 
-   > **Note**
+   > [!NOTE]
    > 
    > Make sure you understand this constructor pattern, you will find it everywhere in Go code.
 
@@ -263,13 +263,13 @@ So let us write a key-value store datalayer for our SplitDim web app. Recall, th
    go mod vendor
    ```
    
-   > **Note**
+   > [!NOTE]
    > 
    > Transitive dependencies are usually handled by Go automatically, but this time we need to do this manually due to the "replace" rules.
    
    This will throw some errors along the way, but the eventual `go mod tidy` will get everything right
 
-   > **Note**
+   > [!NOTE]
    > 
    > The final `go mod vendor` makes sure that all dependencies get copied into the local `vendor/` directory, which will simplify building the container image later.
 
@@ -473,7 +473,7 @@ Once the local tests run, we can actually deploy the application to Kubernetes. 
    kubectl apply -f deploy/kubernetes-statefulset.yaml
    ```
 
-   > **Note**
+   > [!NOTE]
    > 
    > The full DNS name would be `kvstore.default.svc.cluster.local`, but usually only `kvstore` or `kvstore.default` is enough.
 

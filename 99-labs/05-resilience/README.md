@@ -148,7 +148,7 @@ Below, we will substitute the failure-prone infinite loop with a configurable re
 
 One property that allows safe retriability is *idempotence*; an idempotent call can be repeated as many times as we want and the resultant state would not differ.  This makes sure that even if the caller mistakenly assumes that a call failed (e.g., by failing to get an acknowledgment) and inadvertently reapplies the same operation more than once, the resultant downstream state will not change. For instance, `put` is idempotent while `db.setBalance` is not: applying it, say, twice, will increase/decrease the user's balance by twice the requested amount. Yet, we can still retry a failed `db.setBalance` call, provided that we immediately stop the retry loop as soon as we receive a positive response (i.e., 200 HTTP status).
 
-> **Note**
+> [!NOTE]
 >
 > Retriability is a much more complex topic than what we can cover here. 
 
@@ -199,7 +199,7 @@ func (db *kvstore) setBalanceForUser(user string, amount int) resilient.Closure 
 
 Observe that the function returned from `setBalanceForUser` now conforms to the `resilient.Closure` type, so we can now apply `resilient.WithRetry` to this function.
 
-> **Note**
+> [!NOTE]
 > 
 > Understanding and using closures is tricky. We recommend you to spend some time with the above and try to understand what's going on: closures are en extremely powerful tool once you learn how to use them.
 
@@ -213,7 +213,7 @@ So below is a sequence of steps that will make sure `Transfer` survives key-valu
 6. If this fails then we are in trouble: we have a *halfway applied transfer transaction*. The only thing we can do is to try to undo the first operation (i.e., decrease the balance of the sender by the same amount). Make sure to use more aggressive retry policy this time.
 7. If this undo operation fails then *we are left with an inconsistent account database*. If this is the case, you may return an unmissable error and fail all subsequent transfers until the system operator restores the database (we won't implement that in this lab).
 
-> **Note**
+> [!NOTE]
 > 
 > Recall, you can always use the transaction log to restore the key-value store. This is why we made it *persistent* in the first place!
 

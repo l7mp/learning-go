@@ -114,11 +114,11 @@ spec:
 
 An additional `optional: true` setting makes sure that Kubernetes will not complain when the ConfigMap does not provide the requested entry.
 
-> **Note**
+> [!NOTE]
 >
 > Mapping ConfigMaps to command line arguments (as opposed to environment variables) is not so trivial. This is why we prefer environment variables over command line flags for managing the startup parameters of cloud native apps.
 
-> **Note**
+> [!NOTE]
 >
 > You can also [map the entire ConfigMap data as a single file](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#add-configmap-data-to-a-volume) into the filesystem of the pod and use the standard filesystem operations to read it.
 

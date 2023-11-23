@@ -47,7 +47,7 @@ At this point, you should have Istio installed in your cluster. If not, go back 
    istioctl install --set profile=demo -y
    ```
    
-   > **Note**
+   > [!NOTE]
    >
    > It may take a while until all Istio components come up online. Meanwhile, some Istio features may not be available. You can watch the pod statuses in the `istio-system` namespace using `watch -d -n 1 kubectl get pods -n istio-system -o wide`.
 
@@ -57,7 +57,7 @@ At this point, you should have Istio installed in your cluster. If not, go back 
    kubectl label namespace default istio-injection=enabled --overwrite
    ```
 
-   > **Note**
+   > [!NOTE]
    >
    > The above will affect only newly created pods in the namespace but *does not* restart any workload already running. You have to manually restart your Deployments and StatefulSets to enable Istio to control them.
 
@@ -76,7 +76,7 @@ At this point, you should have Istio installed in your cluster. If not, go back 
 <!--    EOF -->
 <!--    ``` -->
 
-<!--    > **Note** -->
+<!--    > [!NOTE] -->
 <!--    > -->
 <!--    > Do not use this in production: tracing has substantial resource requirements that may easily overwhelm your cluster. -->
 
@@ -91,7 +91,7 @@ splitdim-58c48cf87b-wgdfp   2/2     Running   0          89s
 
 What is important here is the readiness status: for instance the `READY` column output `2/2` for the `splitdim` pod shows that the pod is running *two* containers, one is of course `splitdim` itself and the other is a *sidecar proxy* injected by Istio to process the pod's ingress/egress traffic.
 
-> **Note**
+> [!NOTE]
 >
 > You may see different output if you use, e.g., [Istio Ambient Mesh](https://istio.io/latest/docs/ops/ambient/getting-started).
 
@@ -130,7 +130,7 @@ Below is a sample workload graph output from a healthy cluster. We encourage you
 
 ![Service graph from a healthy cluster.](/99-labs/fig/kiali-healthy.png)
 
-> **Note**
+> [!NOTE]
 >
 > You won't see any meaningful output unless there is actual traffic in the cluster. This is because Istio traces out the service graph passively from live traffic, so if there is no traffic there is no output.
 

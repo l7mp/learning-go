@@ -64,7 +64,7 @@ curl http://localhost:8080/
 Hello, world!
 ```
 
-> **Note**   
+> [!NOTE]   
 > The address `localhost` is the short name for the loopback interface address, which defaults to `127.0.0.1`. Also note that the trailing slash is optional, so the following request would be equivalent: `curl http://127.0.0.1:8080`
 
 Congratulations, you have built and run your first Go web app! Now fire up your favorite browser and direct it to the URL `localhost:8080` and see your first webpage rendered in full glory.
@@ -171,7 +171,7 @@ Make sure that `kubectl` is installed locally.
 <!--   ``` -->
 Like all Go command line utilities, `kubectl` also comes with an extensive autocomplete feature. Simply type `kubectl clu<TAB>` to check if autocompletion works: the shell should automatically complete your command to `kubectl cluster-info`, which will dump some useful info about your cluster.
 
-> **Note**   
+> [!NOTE]   
 > Never use CLI tools without autocompletion and always reach out for `<TAB>` while typing. If a tool does not provide autocompletion, don't use it.
 
 Some useful `kubectl` commands:
@@ -239,7 +239,7 @@ The standard way to build container images is via the following steps (do not is
 - login to the default container image repository: `podman login`;
 - upload the `<image>` at `<version>` to the default container repository: `podman push <image>:<version>`.
 
-> **Note**   
+> [!NOTE]   
 > Just swap `podman` with `docker` if you are using Docker, the two should be equivalent. In addition, Linux will require you to run `podman` with superuser rights, so prefix all `podman` commands with `sudo`.
 
 Once pushed, the image would be available for Kubernetes to create new pods. However, this roundtrip from a local build via a central container image repository and then back again to a local Kubernetes cluster can become tedious if we modify/update an image at fast pace. Minikube simplifies building and deploying new images for us: you can build an image *inside* the Minikube cluster and use the local image right away without having to go through a container registry. 
@@ -354,7 +354,7 @@ helloworld-67f7d78ccd-9tjw6   1/1     Running   0          2m51s
 helloworld-67f7d78ccd-lvbl6   1/1     Running   0          2m51s
 ```
 
-> **Note**   
+> [!NOTE]   
 > The `kubectl get deployment helloworld` would return the status of the Deployment, not the pods that belong to it. In order to query the pods, we have to use `kubectl get pods` and identify the pods we are interested in by filtering on the label `app:helloworld` automatically applied by `kubectl create deployment` to all the pods running in the Deployment.
 
 Observe how the name of the pods is now a semi-random hash appended to `helloworld`; this reinforces that pods in a Deployment are ephemeral and disposable. To demonstrate this, kill one of the pods and then `kubectl get` the pod list again:
@@ -442,7 +442,7 @@ helloworld   ClusterIP   10.98.135.40   <none>        8080/TCP   4m27s   app=hel
 
 The default Service type is `ClusterIP`, which assigns an IP address (`10.98.135.40` above, but note that your ClusterIP will probably differ) from a pool of IP addresses that your cluster has reserved for that purpose. From this point, you can use this single IP address to reach the pods of the Service. Note that Services of type `ClusterIP` are reachable only *from inside the cluster*: external clients will not be able to reach them.
 
-> **Note**   
+> [!NOTE]   
 > Curiously, Minikube allows local access to `ClusterIP` services, but this is only a Minikube subtlety and in general this will not work.
 
 To check Service access from the cluster, we deploy a separate pod called `net-debug` that we use to send queries to our web server pods. Attach to the console of the pod and execute a curl request to the cluster IP `10.98.135.40` and port 8080 from inside that pod:
@@ -469,7 +469,7 @@ helloworld.default.svc.cluster.local has address 10.98.135.40
 
 Observe that the resolved address is exactly the `ClusterIP`.
 
-> **Note**    
+> [!NOTE]    
 > The fully qualified domain name (FQDN) of our Service is `helloworld.default.svc.cluster.local`, but any subdomain of that will correctly resolve the cluster IP as long as the subdomain unambiguously identifies a Service.  The `default` in the above FQDN refers to the Kubernetes namespace called `default`. Namespaces are an extremely useful Kubernetes concept to isolate workloads running in the same cluster but we won't have time to go into the details.
 
 But perhaps even more importantly, the two HTTP queries to the Service were responded by different pods (first by `helloworld-67f7d78ccd-2fklj` and then by `helloworld-67f7d78ccd-qn6wk`). This highlights one of the most important properties of Kubernetes Services: they spread requests randomly across the pods of the Service, which makes sure the load is evenly distributed between the replicas.
@@ -510,7 +510,7 @@ NAME         TYPE           CLUSTER-IP     EXTERNAL-IP    PORT(S)        AGE
 helloworld   LoadBalancer   10.98.135.40   10.98.135.40   80:31275/TCP   105s
 ```
 
-> **Note**   
+> [!NOTE]   
 > The cluster IP is the same as the external IP in the above case, but this is just a Minikube subtlety. Usually the cluster IP will be chosen as an unroutable private IP and only the external IP will be global. If the external IP in the output of `kubectl get` shows the status `<pending>` for more than a minute then `minikube tunnel` is not running. Just start it and everything should work fine. At least on Minikube. Otherwise, contact your Kubernetes provider.
 
 Now we can issue a HTTP query to the Service from the host:
@@ -520,7 +520,7 @@ curl http://10.98.135.40
 Hello world from helloworld-67f7d78ccd-qn6wk!
 ```
 
-> **Note**   
+> [!NOTE]   
 > This time you don't need to explicitly specify the port in the HTTP URL because port 80 is the default.
 
 And that is all. We have built and deployed a Go web app into Kubernetes and had a lot of fun along the way. Kubernetes and Go are so cool!

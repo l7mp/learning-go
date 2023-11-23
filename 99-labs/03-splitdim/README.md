@@ -148,7 +148,7 @@ Substitute `http.MethodPost` with `http.MethodGet` for handlers that accept only
 > ```
 > Make sure the web service is running: the test issues requests to the HTTP server and checks whether the response is as expected.
 
-> :bulb: Tip
+> [!TIP]
 > 
 > Currently `http.HandleFunc("/api/transfer", TransferHandler)` will route *all* HTTP requests with a path that starts with `/api/transfer` to the `TransferHandler`, including `/api/transfer/random/api` or `/api/transfer/some/malicious/attack`. To make sure *only* the required API is served, you can check for the HTTP path inside the handler.
 
@@ -182,7 +182,7 @@ The next task is to design the public SplitDim API, that is, the Go structs (and
    > 
    > Recall, the JSON tags in the struct fields help marshaling/unmarshaling Go structs to/from JSON. For instance, the struct field `Sender` will receive its value from the JSON key `sender` during unmarshaling, and vice versa.
 
-   > **Warning**
+   > [!WARNING]
    > 
    > Documenting your public APIs is mandatory. Using the [Godoc](https://go.dev/blog/godoc) format will simplify generating easy-to-browse documentation from your code. Below we will sometime omit the docs for brevity, but you should never!
 
@@ -276,7 +276,7 @@ The next step is to define our internal `DataLayer`: the internal representation
    }
    ```
 
-   > **Warning**
+   > [!WARNING]
    > 
    > It is idiomatic Go to make data structure definitions private and let  constructors return an *interface* as a pointer to the struct instead of the actual struct itself (observe that the above returns `api.DataLayer`, not `localDB`). Since `localDB` is private, the caller would not be able to do much with it anyway.
 
@@ -327,7 +327,7 @@ Before we start, below is a list of useful functions that help dealing with enco
 - use `err := fmt.Errorf(formatSring, values...)` to create a formatted error that you can return from a function, or `err := errors.New(errorMessage)` to create an error with a fix error message; 
 - `log.Printf("format", args...)`: log a request.
 
-> :bulb: Tip
+> [!TIP]
 > 
 > If unsure about the use of any of these functions, remember that all Go libraries come with excellent documentation at [`pkg.go.dev`](https://pkg.go.dev). For instance, the documentation of the `net/http` package is [here](https://pkg.go.dev/net/http), and [here](https://pkg.go.dev/encoding/json) is the docs for the JSON encoding/decoding functions, etc.
 

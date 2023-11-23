@@ -109,7 +109,7 @@ It is easy to test this:
   ...
   ```
 
-> :bulb: Tip
+> [!TIP]
 > 
 > In order to avoid that the `splitdim` pod take up all your CPU (and be OOM-killed by Kubernetes), you can apply a resource limit to the `splitdim` container to keep its maximum CPU utilization at below 100 mcore (0.1 CPU). This amounts to adding the following `resource` definition to the pod template in the `splitdim` Deployment:
 > ```yaml
@@ -142,7 +142,7 @@ Easily, trying to apply an operation to a downstream dependency in an infinite l
 
 Below, we will substitute the failure-prone infinite loop with a configurable retry policy. But before that, an important fact worth remaking at this point.
 
-> **Warning**
+> [!WARNING]
 > 
 > In order to be able to retry a failing API call, the API has to be **retriable** in the first place. Most APIs (especially legacy ones) do not possess this property. Do not blindly retry an API operation unless you are absolutely sure it is safe, otherwise you may cause more trouble than if you immediately failed the operation in the first place!
 
@@ -173,7 +173,7 @@ type Backoff struct {
 func WithRetry(f Closure, wait Backoff) Closure
 ```
 
-> :bulb: Tip
+> [!TIP]
 > 
 > You can browse the full documentation of the `resilient` package by starting a local godoc server in the root directory of the `resililient` package with `godoc -http=:6060` and then opening [`http://localhost:6060/pkg/resilient`](http://localhost:6060/pkg/resilient) in your browser.
 
@@ -185,7 +185,7 @@ go mod tidy
 go mod vendor
 ```
 
-> **Warning**
+> [!WARNING]
 > 
 > Make sure you understand the use of `go mod`; from this point we will omit package imports all together.
 
@@ -267,7 +267,7 @@ kubectl rollout restart deployment splitdim
 kubectl rollout restart statefulset kvstore
 ```
 
-> :bulb: Tip
+> [!TIP]
 > 
 > Feel free to add a retrier for the rest of the API calls in `splitdim`. 
 
@@ -305,7 +305,7 @@ Recall, implementing graceful shutdown in an app means to (1) listen to `SIGTERM
 
 Rebuild the container image, redeploy the `splitdim` Deployment, and rerun some manual tests with curl. If all goes well, you should see no major difference from a normal test, but the code should be more robust now. You can try to scale up/down the `splitdim` Deployment app while sending it a lot of requests: if we got everything right we should never be left with an inconsistent database.
 
-> :bulb: Tip
+> [!TIP]
 > 
 > You can check the consistency of the accounts database by calling the `/api/clear`. Recall, the first thing `Clear` does is to check whether the account balances add up to zero. A halfway applied transfer will most probably leave behind state in which this condition does not hold.
 
@@ -369,7 +369,7 @@ func transaction(opList []api.VersionedKeyValue) error
 ```
 If any of the `put` operations in the `opList` fails then the whole transaction fails. We could have used this API from the beginning but that would have removed many of the educational lessons from this lab. Let this serve as a reminder of the importance of using a transactional databases, they serve a good purpose!
 
-> :bulb: Tip
+> [!TIP]
 > 
 > Feel free to experiment with the transactional API. Here are some ideas on possible improvements:
 > - Rewrite the key-value store data layer of `splitdim` to make use of the new API. Put your transactional data-layr implementation into a new package, say, `pkg/db/transactionalkvstore`.

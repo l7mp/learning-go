@@ -19,7 +19,8 @@ We provide instructions for setting up a native workspace on GNU/Linux. Windows 
 **CPU:** 2-core x86_64 CPU should be sufficient for native installation, at least 4 cores are required for the VM.\
 **Memory:** 4GB for native install, 8GB is recommended for the VM.
 
-> **Warning**
+> [!WARNING]
+>
 > Make sure your Internet connection is working, we will download software packages.
 
 ### VM Details
@@ -168,7 +169,8 @@ bin/istioctl install --set profile=minimal -y
 kubectl label namespace default istio-injection=enabled --overwrite
 ```
 
-> **Warning**
+> [!WARNING]
+>
 > Make sure that `minikube` runs before installing Istio.
 
 ## Test
@@ -245,7 +247,7 @@ cd learning-go
 ```
 You should always add and commit your solutions to this repo (see below) to avoid losing your work.
 
-> :bulb: Tip
+> [!TIP]
 >
 > We recommend to keep a copy of your git tree somewhere safe to back up your solutions. The simplest way is to use a GitHub private fork for this purpose. We ask you to keep your GitHub repo private, in order to prevent others from copying your work.
 
@@ -258,7 +260,8 @@ echo <MY-STUDENT-ID> > STUDENT_ID
 make generate
 ```
 
-> **Warning**
+> [!WARNING]
+>
 > You must use your own student id. We will check this, so make sure you do not mistype your id.
 
 ### Solve the first homework

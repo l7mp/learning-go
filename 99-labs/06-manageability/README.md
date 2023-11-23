@@ -165,7 +165,7 @@ Your job is now to add the necessary settings to the `splitdim` container templa
 >   ```
 > If all goes well, you should see all tests to PASS.
 
-> **Warning**
+> [!WARNING]
 >
 > Unfortunately, applying a new ConfigMap will not automatically restart the Kubernetes workload (e.g., the Deployment) that depends on it. This means that every time you modify the ConfigMap you have to manually restart the app with `kubectl rollout restart deployment splitdim`. It is, however, simple to add the automation to Kubernetes necessary to support this functionality: this [tutorial](https://book.kubebuilder.io/reference/watching-resources/externally-managed.html) shows how to write a Kubernetes operator that will allow the user to specify pairs of a Deployment and a corresponding ConfigMap whose update should restart the Deployment. This *controller pattern* is the magic sauce that allows Kubernetes to support so many use cases.
 

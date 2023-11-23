@@ -380,7 +380,7 @@ So let us write a key-value store datalayer for our SplitDim web app. Recall, th
 
    Calling the `setBalance` function in an infinite loop is necessary at this point, since it is completely normal for the `put` call after the `get` to fail due to a version mismatch (this is the price we pay for using a *loosely coupled* API). Later, we will implement some simple *resilience* patterns to make this more robust. 
 
-   > **Warning**
+   > [!WARNING]
    > 
    > Don't do the above in real-life: if the first `setBalance` call succeeds but the second fails for some reason, then we get a halfway applied transaction: we have already removed the amount from the balance of the sender but failed to add it to the balance of the reviewer. This will then make it impossible to clear the debts and leaves the database in an inconsistent state. 
    >
@@ -404,7 +404,7 @@ So let us write a key-value store datalayer for our SplitDim web app. Recall, th
 
    Luckily, we have already written the difficult part (the algorithm) during the previous lab. Here, we will need to list the account database again from the key-value store, convert it into a `make(map[string]int)`, and then reuse the same algorithm as in the previous lab to obtain the list of transfers that clears the debts. 
 
-   > :bulb: Tip
+   > [!TIP]
    > 
    > Since we seem to be reusing the same algorithm from the previous lab to calculate the "clearing" solution, we can even refactor that functionality out into a separate package (say, `splitdim/pkg/clear`) and call that lib every time we want to obtain the transfer list. The signature of the function could be, say:
    > ```go

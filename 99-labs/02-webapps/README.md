@@ -26,7 +26,7 @@ go mod tidy                                       # update module version
 
 The above assumes that you will never publish your code and make it available through `pkg.go.dev` for others to `go get` it.  If you ever want to publish code, make sure to choose a globally unique package name. The best option is to init a new project at GitHub.com, say, under `github.com/<my-user>/<my-package>`, where `<my-user>` is your GitHub id and `<my-package>` is the package name, init the go module with this full name, and publish from GitHub. Since we will not upload the code to GitHub (in fact, we *ask you* not to upload it), the package name can be anything. 
 
-> **Warning**   
+> [!WARNING]   
 > Please do not publish your solutions because you spoil the fun for everyone else (plus, we regularly change the exercises so your published code would not work for other people anyway). 
 
 ### A Go web server
@@ -142,7 +142,7 @@ If you have already created the cluster then `minikube status` will report wheth
 
 <!-- This will download all required artifacts and create a new Minikube cluster using 4GB memory and max 2 CPU cores locally. The cluster will use the `podman` driver and the `cri-o` container runtime.  -->
 
-<!-- > **Warning**   -->
+<!-- > [!WARNING]   -->
 <!-- > Feel free to increase CPU/memory limits above to get a more responsive Kubernetes but refrain from decreasing them significantly, Kubernetes can be resource hungry. -->
 
 <!-- We will often use additional functionality from the [Istio service mesh](https://istio.io). Use the below to download and enable Istio: -->
@@ -230,7 +230,7 @@ COPY --from=build /helloworld .
 CMD ["/helloworld"]
 ```
 
-> **Warning**   
+> [!WARNING]   
 > Make sure you understand what is going on here: later you will be requested to write your own Dockerfiles (see [here](https://docs.docker.com/engine/reference/builder) for more details).
 
 The standard way to build container images is via the following steps (do not issue these command just yet, most probably they won't work anyway):
@@ -264,7 +264,7 @@ localhost/helloworld:latest
 ...
 ```
 
-> **Warning**   
+> [!WARNING]   
 > Make sure you understand and practice the above, throughout the rest of this lab and the subsequent ones we silently assume you're using `minikube image` to build images and use the local image names (i.e., those with the prefix `localhost/`) for Kubernetes.
 
 ### Pods

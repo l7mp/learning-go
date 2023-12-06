@@ -28,8 +28,10 @@ Vagrant.configure("2") do |config|
          podman-docker
     sudo DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -yq \
          ubuntu-desktop \
+         yaru-theme-gtk \
          fonts-ubuntu \
          fonts-ubuntu-console \
+         fonts-noto-color-emoji \
          firefox
 
     export CNI_PLUGIN_DEB="containernetworking-plugins_1.1.1+ds1-3_amd64.deb"

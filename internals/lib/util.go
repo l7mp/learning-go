@@ -27,12 +27,15 @@ func findFile(dir, name string) (string, error) {
 	}
 }
 
-// findStudentId returns the raw student id given in the argument `id`, or in the STUDENT_ID file
-// searched upwards from the current directory, or from the environment variable `STUDENT_ID`, or
-// an error is no id was found or the student id is set as the default
 func findStudentId(id *string) (string, error) {
 	if id != nil && *id != "" {
-		return *id, nil
+		return strings.ToUpper(*id), nil
+	}
+
+	// env overrides stundent-id file
+	env := os.Getenv(StudentEnvVar)
+	if env != "" {
+		return strings.ToUpper(strings.TrimSpace(env)), nil
 	}
 
 	dir, err := os.Getwd()
@@ -46,12 +49,7 @@ func findStudentId(id *string) (string, error) {
 			return "", fmt.Errorf("internal error: could not find student-id file %q returned by findFile",
 				StudentIdFile)
 		}
-		return strings.TrimSpace(string(dat)), nil
-	}
-
-	env := os.Getenv(StudentEnvVar)
-	if env != "" {
-		return strings.TrimSpace(env), nil
+		return strings.ToUpper(strings.TrimSpace(string(dat))), nil
 	}
 
 	return "", fmt.Errorf("no student id file found searhing up from %q", dir)

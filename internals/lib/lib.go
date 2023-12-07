@@ -33,9 +33,9 @@ const (
 // Input is a type alias to the input field of an exercise.
 type Input = map[string]any
 
-// GetStudentId returns the student id given in the argument `id`, or in the STUDENT_ID file
-// searched upwards from the current directory, or from the environment variable `STUDENT_ID`, or
-// an error is no id was found
+// GetStudentId returns the student id given in the argument `id`, from the environment variable
+// `STUDENT_ID`, or from the STUDENT_ID file searched upwards from the current directory (in that
+// order), or an error is no id was found. All student ids are converted to upper case.
 func GetStudentId(id *string) (string, error) {
 	student, err := findStudentId(id)
 	if err != nil {

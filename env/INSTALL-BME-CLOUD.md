@@ -44,7 +44,8 @@ The following command removes most of the extra packages.
 	podman \
 	podman-docker \
 	firefox \
-	wireshark-gtk
+	wireshark-gtk \
+	fonts-noto-color-emoji
 
  export CNI_PLUGIN_DEB="containernetworking-plugins_1.1.1+ds1-3_amd64.deb"
  wget http://hu.archive.ubuntu.com/ubuntu/pool/universe/g/golang-github-containernetworking-plugins/$CNI_PLUGIN_DEB

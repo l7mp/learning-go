@@ -7,5 +7,5 @@ import (
 )
 
 func TestHelloWorld(t *testing.T) {
-	assert.Equal(t, helloWorld(), "{{index . "text"}}", "hello world in {{index . "language"}}")
+	assert.Equal(t, "{{index . "text"}}", helloWorld(), "hello world in {{index . "language"}}")
 }

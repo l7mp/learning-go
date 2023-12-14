@@ -9,5 +9,5 @@ import (
 func TestSleepSort(t *testing.T) {
 	input := []uint{{index . "input"}}
 	result := []uint{{index . "result"}}
-	assert.Equal(t, {{index . "funcName"}}(input), result, "{{index . "dir"}} sleep-sort")
+	assert.Equal(t, result, {{index . "funcName"}}(input), "{{index . "dir"}} sleep-sort")
 }

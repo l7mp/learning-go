@@ -40,7 +40,7 @@ func TestFilterData(t *testing.T) {
 
 	keys = []string{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"}
 	indices = []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
-	assert.Equal(t, [10]string{"a", "c", "e", "g", "i", "", "", "", "", ""}	    , filterData(keys, indices))
+	assert.Equal(t, [10]string{"a", "c", "e", "g", "i", "k", "", "", "", ""}	    , filterData(keys, indices))
 
 	keys = []string{"a", "b"}
 	indices = []int{0, 1}

@@ -159,9 +159,9 @@ Your task is to implement this interface. Some help:
    }
    ```
 
-   > [!NOTE]
-   > 
-   > The `client` struct will *not* be exported from the package (letter case matters!).
+> [!NOTE]
+> 
+> The `client` struct will *not* be exported from the package (letter case matters!).
 
 3. Create a constructor. Recall, this entails writing a `NewClient` function that takes the arguments necessary to instantiate the `client` struct (currently, this will be the `address:port` for the key-value store server), constructs the struct, and then *returns a pointer to the struct as an interface*. This makes sure that the caller of our `NewClient` function can access only the methods exposed by the `Client` interface on the returned pointer, but nothing else:
    ``` go
@@ -170,9 +170,9 @@ Your task is to implement this interface. Some help:
    }
    ```
 
-   > [!NOTE]
-   > 
-   > Make sure you understand this constructor pattern, you will find it everywhere in Go code.
+> [!NOTE]
+> 
+> Make sure you understand this constructor pattern, you will find it everywhere in Go code.
 
 4. At this point, we are ready to actually implement the `Client` interface. Let us add the implementation for the `get` method first; recall, this receives a string key as an argument and returns the corresponding key and version as an `api.VersionedValue`:
    ``` go
@@ -263,15 +263,13 @@ So let us write a key-value store datalayer for our SplitDim web app. Recall, th
    go mod vendor
    ```
    
-   > [!NOTE]
-   > 
-   > Transitive dependencies are usually handled by Go automatically, but this time we need to do this manually due to the "replace" rules.
-   
-   This will throw some errors along the way, but the eventual `go mod tidy` will get everything right
+> [!NOTE]
+> 
+> Transitive dependencies are usually handled by Go automatically, but this time we need to do this manually due to the "replace" rules.
 
-   > [!NOTE]
-   > 
-   > The final `go mod vendor` makes sure that all dependencies get copied into the local `vendor/` directory, which will simplify building the container image later.
+> [!NOTE]
+> 
+> This will throw some errors along the way, but the eventual `go mod tidy` will get everything right. The final `go mod vendor` makes sure that all dependencies get copied into the local `vendor/` directory, which will simplify building the container image later.
 
 3. Since we are going to implement multiple data layers side by side, we need a way to select among them (*manageability*, see later) when starting the app. We will use two environment variables, `KVSTORE_MODE` and `KVSTORE_ADDR`, for that purpose.
 
@@ -380,11 +378,11 @@ So let us write a key-value store datalayer for our SplitDim web app. Recall, th
 
    Calling the `setBalance` function in an infinite loop is necessary at this point, since it is completely normal for the `put` call after the `get` to fail due to a version mismatch (this is the price we pay for using a *loosely coupled* API). Later, we will implement some simple *resilience* patterns to make this more robust. 
 
-   > [!WARNING]
-   > 
-   > Don't do the above in real-life: if the first `setBalance` call succeeds but the second fails for some reason, then we get a halfway applied transaction: we have already removed the amount from the balance of the sender but failed to add it to the balance of the reviewer. This will then make it impossible to clear the debts and leaves the database in an inconsistent state. 
-   >
-   > In a real-life application these two steps should be performed as a single *transaction*; since our key-value store does not implement transactions we spare this step for now (but see the next lab). 
+> [!WARNING]
+> 
+> Don't do the above in real-life: if the first `setBalance` call succeeds but the second fails for some reason, then we get a halfway applied transaction: we have already removed the amount from the balance of the sender but failed to add it to the balance of the reviewer. This will then make it impossible to clear the debts and leaves the database in an inconsistent state. 
+>
+> In a real-life application these two steps should be performed as a single *transaction*; since our key-value store does not implement transactions we spare this step for now (but see the next lab). 
 
 8. Write the `AccountList` function: recall, this function will return the list of all accounts as pairs of a holder and a balance:
    ```go
@@ -404,15 +402,15 @@ So let us write a key-value store datalayer for our SplitDim web app. Recall, th
 
    Luckily, we have already written the difficult part (the algorithm) during the previous lab. Here, we will need to list the account database again from the key-value store, convert it into a `make(map[string]int)`, and then reuse the same algorithm as in the previous lab to obtain the list of transfers that clears the debts. 
 
-   > [!TIP]
-   > 
-   > Since we seem to be reusing the same algorithm from the previous lab to calculate the "clearing" solution, we can even refactor that functionality out into a separate package (say, `splitdim/pkg/clear`) and call that lib every time we want to obtain the transfer list. The signature of the function could be, say:
-   > ```go
-   > // Clear clears the debts for the accounts given as argument. Meanwhile, it updates "accounts", so always pass a copy to this function.
-   > func Clear(accounts map[string]int) ([]api.Transfer, error) { ... }
-   > ```
-   > 
-   > Feel free to experiment with writing this package.
+> [!TIP]
+> 
+> Since we seem to be reusing the same algorithm from the previous lab to calculate the "clearing" solution, we can even refactor that functionality out into a separate package (say, `splitdim/pkg/clear`) and call that lib every time we want to obtain the transfer list. The signature of the function could be, say:
+> ```go
+> // Clear clears the debts for the accounts given as argument. Meanwhile, it updates "accounts", so always pass a copy to this function.
+> func Clear(accounts map[string]int) ([]api.Transfer, error) { ... }
+> ```
+> 
+> Feel free to experiment with writing this package.
 
 9. Finally, the `Reset` function of the data layer is so simple that we reproduce it below verbatim:
    ```go
@@ -473,9 +471,9 @@ Once the local tests run, we can actually deploy the application to Kubernetes. 
    kubectl apply -f deploy/kubernetes-statefulset.yaml
    ```
 
-   > [!NOTE]
-   > 
-   > The full DNS name would be `kvstore.default.svc.cluster.local`, but usually only `kvstore` or `kvstore.default` is enough.
+> [!NOTE]
+> 
+> The full DNS name would be `kvstore.default.svc.cluster.local`, but usually only `kvstore` or `kvstore.default` is enough.
 
 4. Re-build the `splitdim` image; the `Dockerfile` created during the previous lab should be reusable for this:
    ```shell

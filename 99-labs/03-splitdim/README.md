@@ -178,13 +178,13 @@ The next task is to design the public SplitDim API, that is, the Go structs (and
    }
    ```
 
-   > [!NOTE]
-   > 
-   > Recall, the JSON tags in the struct fields help marshaling/unmarshaling Go structs to/from JSON. For instance, the struct field `Sender` will receive its value from the JSON key `sender` during unmarshaling, and vice versa.
+> [!NOTE]
+> 
+> Recall, the JSON tags in the struct fields help marshaling/unmarshaling Go structs to/from JSON. For instance, the struct field `Sender` will receive its value from the JSON key `sender` during unmarshaling, and vice versa.
 
-   > [!WARNING]
-   > 
-   > Documenting your public APIs is mandatory. Using the [Godoc](https://go.dev/blog/godoc) format will simplify generating easy-to-browse documentation from your code. Below we will sometime omit the docs for brevity, but you should never!
+> [!WARNING]
+> 
+> Documenting your public APIs is mandatory. Using the [Godoc](https://go.dev/blog/godoc) format will simplify generating easy-to-browse documentation from your code. Below we will sometime omit the docs for brevity, but you should never!
 
 1. The API endpoint `/api/transfer` will be used to return the current balance of each registered user. The `Account` struct is the basic data model for this API.
 
@@ -214,9 +214,9 @@ The next task is to design the public SplitDim API, that is, the Go structs (and
    }
    ```
 
-   > [!NOTE]
-   > 
-   > This is an internal API: we don't want people to import and use these internal data structures. Technically, therefore, we should place these definitions, and the implementations we will create later, into a new package under `internal/`, which, recall, cannot be imported from outside the main package. We will spare this now for simplicity, but in practice always be aware of what's public and what's private in your code.
+> [!NOTE]
+> 
+> This is an internal API: we don't want people to import and use these internal data structures. Technically, therefore, we should place these definitions, and the implementations we will create later, into a new package under `internal/`, which, recall, cannot be imported from outside the main package. We will spare this now for simplicity, but in practice always be aware of what's public and what's private in your code.
 
 > ✅ **Check**
 >
@@ -247,13 +247,13 @@ The next step is to define our internal `DataLayer`: the internal representation
    )
    ```
 
-   > [!NOTE]
-   > 
-   > We want to use our own API, hence the (sub)package import `splitdim/pkg/api`.
+> [!NOTE]
+> 
+> We want to use our own API, hence the (sub)package import `splitdim/pkg/api`.
 
-   > [!NOTE]
-   > 
-   > From now on we will not show import lists explicitly: remember, just add imports when Go complains during compilation.
+> [!NOTE]
+> 
+> From now on we will not show import lists explicitly: remember, just add imports when Go complains during compilation.
 
 1. Use the below definition for the internal data layer.
 

@@ -456,8 +456,8 @@ Hello world from helloworld-67f7d78ccd-2fklj!
 It seems one of our `helloworld` pods received the request and responded with its own pod name. Even better, we don't even need to remember `ClusterIPs`, as Kubernetes also exposes our services via DNS as well:
 
 ``` sh
-kubectl exec -it net-debug -kubectl exec -it net-debug -- curl http://helloworld:8080
-Hello world from helloworld-67f7d78ccd-qn6wk! 
+kubectl exec -it net-debug -- curl http://helloworld:8080
+Hello world from helloworld-67f7d78ccd-qn6wk!
 ```
 
 Kubernetes will resolve the domain name `helloworld` to the `ClusterIP` of the Service of the same name via `kube-dns` and use that IP to send the request. Use the `host` command to manually resolve the IP for the `helloworld` domain name:

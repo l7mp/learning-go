@@ -47,7 +47,7 @@ The following command removes most of the extra packages.
 	wireshark-gtk \
 	fonts-noto-color-emoji
 
- export CNI_PLUGIN_DEB="containernetworking-plugins_1.1.1+ds1-3_amd64.deb"
+ export CNI_PLUGIN_DEB="containernetworking-plugins_1.1.1+ds1-3ubuntu0.24.04.1_amd64.deb"
  wget http://hu.archive.ubuntu.com/ubuntu/pool/universe/g/golang-github-containernetworking-plugins/$CNI_PLUGIN_DEB
  sudo dpkg -i $CNI_PLUGIN_DEB
  rm $CNI_PLUGIN_DEB
@@ -65,22 +65,29 @@ The following command removes most of the extra packages.
 This snippet installs the latest stable Go version:
 ```console
  export GO_TAR="$(curl -s https://go.dev/VERSION?m=text | head -n 1).linux-amd64.tar.gz"
+ # export GO_TAR="go1.22.6.linux-amd64.tar.gz"
  wget "https://go.dev/dl/$GO_TAR"
  sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf $GO_TAR
  echo "export PATH=$PATH:/usr/local/go/bin" | sudo tee /etc/profile
  rm -rf $GO_TAR
 ```
 
+> **Note**
+>
+> Use the commented-out `export GO_TAR` line to set version.
+
 ## Install kubectl
 Install kubectl from the repo and enable bash completion:
 ```console
- echo "deb [signed-by=/etc/apt/keyrings/kubernetes.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
- curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes.gpg
+ export KUBEVERSION="1.30"
+ echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v$KUBEVERSION/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+ sudo chmod 644 /etc/apt/sources.list.d/kubernetes.list
+ curl -fsSL "https://pkgs.k8s.io/core:/stable:/v$KUBEVERSION/deb/Release.key" | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+ sudo chmod 644 /etc/apt/keyrings/kubernetes-apt-keyring.gpg
  sudo DEBIAN_FRONTEND=noninteractive apt-get update
  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y kubectl
  echo "source <(kubectl completion bash)" >> ~/.bashrc
 ```
-
 
 ## Install VSCode
 Download VSCode from the apt repo and install relevant packages:

@@ -1,0 +1,46 @@
+name: grades
+input:
+  - percents:
+      - 80
+      - 60
+      - 40
+      - 20
+    grades:
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+  - percents:
+      - 80
+      - 60
+      - 40
+      - 20
+    grades:
+      - 5
+      - 4
+      - 3
+      - 2
+      - 0
+  - percents:
+      - 90
+      - 75
+      - 50
+      - 30
+    grades:
+      - 5
+      - 4
+      - 3
+      - 2
+      - 1
+  - percents:
+      - 90
+      - 75
+      - 50
+      - 30
+    grades:
+      - 5
+      - 4
+      - 3
+      - 2
+      - 0

@@ -1,0 +1,10 @@
+name: pointernew
+input:
+  - type: int
+    value: 42
+  - type: float
+    value: 12.5
+  - type: bool
+    value: false
+  - type: string
+    value: "test"

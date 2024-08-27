@@ -7,6 +7,7 @@ EXERCISE_DIRS=\
 	06-switch \
 	07-loops \
 	08-arrays \
+	12-funcs \
 	15-pointers \
 	19-structs \
 	22-goroutines \

@@ -1,0 +1,4 @@
+name: structembedding
+input:
+- field: email
+- field: address

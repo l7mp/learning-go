@@ -2,8 +2,10 @@ name: pointernew
 input:
   - type: int
     value: 42
-  - type: float
+  - type: float32
     value: 12.5
+  - type: float64
+    value: 45.072
   - type: bool
     value: false
   - type: string

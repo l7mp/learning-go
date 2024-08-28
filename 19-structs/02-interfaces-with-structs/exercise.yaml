@@ -1,0 +1,38 @@
+name: structsinterfaces
+input:
+  - interface:
+      name: Shape
+      func1:
+        name: Area
+        retval: float64
+        desc: calculates the shape's area
+      func2:
+        name: Perimeter
+        retval: float64
+        desc: calculates the shape's perimeter
+    struct1:
+      name: Circle
+      new: "Radius float64"
+      params: "Radius: 5.0"
+    struct2:
+      name: Rectangle
+      new: "Width,Height float64"
+      params: "Width: 5.0, Height: 2.0"
+  - interface:
+      name: Printable
+      func1:
+        name: Info
+        retval: string
+        desc: provides all available textual information (i.e., members except the page number) comma-separated
+      func2:
+        name: PageNum
+        retval: int
+        desc: shows number of pages
+    struct1:
+      name: Book
+      new: Author,Title string, Pages int
+      params: "\"Matthew A. Titmus\", \"Cloud Native Go\", 433"
+    struct2:
+      name: Magazine
+      new: Title,Issue string, Pages int
+      params: "\"Communications of the ACM\", \"Volume 67, Issue 9\", 92"

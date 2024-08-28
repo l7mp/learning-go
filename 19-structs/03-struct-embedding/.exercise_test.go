@@ -11,12 +11,7 @@ func TestParseBook(t *testing.T) {
 		"title": "The Go Programming Language",
 		"author": {
 			"name": "Alan A. A. Donovan",
-{{if eq (index . "field") "email"}}
-			"email": "alan@example.com"
-{{end}}
-{{if eq (index . "field") "address"}}
-                        "address": "103 W Vandalia St, Edwardsville, Indiana, USA"
-{{end}}
+                        {{if eq (index . "field") "email"}}"email": "alan@example.com"{{end}}{{if eq (index . "field") "address"}}"address": "103 W Vandalia St, Edwardsville, Indiana, USA"{{end}}
 		},
 		"pages": 380,
 		"ISBN": "978-0134190440"
@@ -26,12 +21,7 @@ func TestParseBook(t *testing.T) {
 		Title: "The Go Programming Language",
 		Author: Author{
 			Name:  "Alan A. A. Donovan",
-{{if eq (index . "field") "email"}}
-			Email: "alan@example.com",
-{{end}}
-{{if eq (index . "field") "address"}}
-			Address: "103 W Vandalia St, Edwardsville, Indiana, USA",
-{{end}}
+                        {{if eq (index . "field") "email"}}Email: "alan@example.com"{{end}}{{if eq (index . "field") "address"}}Address: "103 W Vandalia St, Edwardsville, Indiana, USA"{{end}},
 		},
 		Pages: 380,
 		ISBN:  "978-0134190440",
@@ -58,31 +48,21 @@ func TestParseBookInvalidInput(t *testing.T) {
 
 func TestParseArticle(t *testing.T) {
 	jsonData := []byte(`
-{
-  "title": "Smashing The Kernel Stack For Fun And Profit",
-  "author": {
-    "name": "Sinan Eren",
-{{if eq (index . "field") "email"}}
-    "email": "noir@olympos.org"
-{{end}}
-{{if eq (index . "field") "address"}}
-    "address": "12031 N Tatum Blvd, Phoenix, Arkansas, USA"
-{{end}}
-  },
-  "journal": "Phrack Magazine"
-  "year": 2002,
-}`)
+        {
+        	"title": "Smashing The Kernel Stack For Fun And Profit",
+        	"author": {
+        		"name": "Sinan Eren",
+        		{{if eq (index . "field") "email"}}"email": "noir@olympos.org"{{end}}{{if eq (index . "field") "address"}}"address": "12031 N Tatum Blvd, Phoenix, Arkansas, USA"{{end}}
+        	},
+        	"journal": "Phrack Magazine",
+        	"year": 2002
+        }`)
 
 	expected := Article{
 		Title: "Smashing The Kernel Stack For Fun And Profit",
 		Author: Author{
 			Name:  "Sinan Eren",
-{{if eq (index . "field") "email"}}
-			Email: "noir@olympos.org",
-{{end}}
-{{if eq (index . "field") "address"}}
-			Address: "12031 N Tatum Blvd, Phoenix, Arkansas, USA",
-{{end}}
+			{{if eq (index . "field") "email"}}Email: "noir@olympos.org"{{end}}{{if eq (index . "field") "address"}}Address: "12031 N Tatum Blvd, Phoenix, Arkansas, USA"{{end}},
 		},
 		Journal: "Phrack Magazine",
 		Year:  2002,

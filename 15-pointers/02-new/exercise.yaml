@@ -7,4 +7,4 @@ input:
   - type: bool
     value: false
   - type: string
-    value: "test"
+    value: "\"test\""

@@ -13,11 +13,11 @@ input:
     struct1:
       name: Circle
       new: "Radius float64"
-      params: "Radius: 5.0"
+      params: "5.0"
     struct2:
       name: Rectangle
       new: "Width,Height float64"
-      params: "Width: 5.0, Height: 2.0"
+      params: "5.0,2.0"
   - interface:
       name: Printable
       func1:

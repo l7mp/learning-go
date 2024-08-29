@@ -1,0 +1,27 @@
+name: pipeline
+input:
+  - type: multiplier
+    desc: multiplies digits by
+    val: 2
+    input: "{1, 2, 3, 4, 5, 6, 7, 8}"
+    output: "{2, 4, 6, 8, 10, 12, 14, 16}"
+  - type: multiplier
+    desc: multiples digits by
+    val: 5
+    input: "{1, 2, 3, 4, 5, 6, 7, 8}"
+    output: "{5, 10, 15, 20, 25, 30, 35, 40}"
+  - type: adder
+    desc: increments digits by
+    val: 1
+    input: "{1, 2, 3, 4, 5, 6, 7, 8}"
+    output: "{2, 3, 4, 5, 6, 7, 8, 9}"
+  - type: adder
+    desc: increments digits by
+    val: 2
+    input: "{1, 2, 3, 4, 5, 6, 7, 8}"
+    output: "{3, 4, 5, 6, 7, 8, 9, 10}"
+  - type: adder
+    desc: increments digits by
+    val: 3
+    input: "{1, 2, 3, 4, 5, 6, 7, 8}"
+    output: "{4, 5, 6, 7, 8, 9, 10, 11}"

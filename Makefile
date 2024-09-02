@@ -10,7 +10,9 @@ EXERCISE_DIRS=\
 	12-funcs \
 	15-pointers \
 	19-structs \
-	22-goroutines \
+	20-goroutines \
+	21-channels \
+	22-context \
 	23-misc
 
 # LAB subdirs

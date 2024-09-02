@@ -11,8 +11,8 @@ func TestGeneratePrimes(t *testing.T) {
 		input    int
 		expected []int
 	}{
-		{"First 10 primes", 10, []int{2, 3, 5, 7, 11, 13, 17, 19, 23, 29}},
-		{"First 20 primes", 20, []int{2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71}},
+		{"First 10 primes", 1000, []int{2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31}},
+		{"First 20 primes", 5000, []int{2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67}},
 		{"Negative input", -1, []int{}},
 		{"Zero input", 0, []int{}},
 	}

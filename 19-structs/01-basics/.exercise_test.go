@@ -52,7 +52,7 @@ func TestById(t *testing.T) {
 	assert.Equal(t, "{{index . "by_id" "result" "genre"}}", g.genre, "game genre")
 
 	g, err = queryById(newGameList(), 11)
-	assert.EqualError(t, err, "No such game", "error")
+	assert.EqualError(t, err, "no such game", "error")
 }
 
 func TestNameByPrice(t *testing.T) {

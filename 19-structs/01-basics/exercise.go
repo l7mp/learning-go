@@ -25,7 +25,7 @@ func newGameList() []game {
 	// INSERT YOUR CODE HERE
 }
 
-// queryById returns the game in the specified store with the given id or returns a "No such game" error.
+// queryById returns the game in the specified store with the given id or returns a "no such game" error.
 func queryById(games []game, id int) (game, error) {
 	// INSERT YOUR CODE HERE
 }

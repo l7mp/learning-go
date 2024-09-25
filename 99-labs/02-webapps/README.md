@@ -9,7 +9,7 @@ During this lab, we will build a simple web app in Go and learn how to deploy it
 
 ## A basic web service
 
-One of the greatest strengths of Go lies in the its suitability for developing web applications. It offers a HTTP server as part of the standard library, guarantees great performance, and it is easy to deploy as a container into Kubernetes. This exercise will walk you through building a basic "hello-world" web application with Go.
+One of the greatest strengths of Go lies in the its suitability for developing web applications. It offers a HTTP server as part of the standard library, it guarantees great performance, and the compiled binary is easy to deploy as a container into Kubernetes. This exercise will walk you through building a basic "hello-world" web application with Go.
 
 ### Initialize a Go module
 
@@ -112,7 +112,7 @@ A Kubernetes *cluster* consists of a set of worker machines (*nodes*) that run c
 
 ![Kubernetes architecture, https://commons.wikimedia.org/wiki/File:Kubernetes.png.](fig/kubernetes_arch.png)
 
-The most important component of the control plane is the `kube-apiserver` that exposes the Kubernetes API acting as a frontend for the Kubernetes control plane. The cluster state is maintained in `etcd`, a consistent and highly-available key value store. The `kube-scheduler` watches for newly created pods with no assigned node and selects a node for them to run on, the *kube-controller-manager* implements the common Kubernetes control loops, and `kube-dns` implements a cluster-wide DNS service which allows access to ephemeral pod and service IP addresses using short DNS domain names (see later).
+The most important component of the control plane is the `kube-apiserver` that exposes the Kubernetes API acting as a frontend for the Kubernetes control plane. The cluster state is maintained in `etcd`, a consistent and highly-available key value store. The `kube-scheduler` watches for newly created pods with no assigned node and selects a node for them to run on, the `kube-controller-manager` implements the common Kubernetes control loops, and `kube-dns` implements a cluster-wide DNS service which allows access to ephemeral pod and service IP addresses using short DNS domain names (see later).
 
 Each node runs a `kubelet` daemon, which manages the containers/pods running on the node, `kube-proxy`, an implementation of the Kubernetes Service concept (see later), and a *container runtime* that is the software that is responsible for running the containers themselves.
 
@@ -138,7 +138,7 @@ If you haven't done that yet, create a new Minikube cluster using the below:
 minikube start --memory=4096m --cpus=2 --driver=podman --container-runtime=cri-o
 ```
 
-If you have already created the cluster then `minikube status` will report whether it is running. If not, simply use `minikube start` to start it fro where you left last time you issued `minikube stop`.
+If you have already created the cluster then `minikube status` will report whether it is running. If not, simply use `minikube start` to start it from where you left last time you issued `minikube stop`.
 
 <!-- This will download all required artifacts and create a new Minikube cluster using 4GB memory and max 2 CPU cores locally. The cluster will use the `podman` driver and the `cri-o` container runtime.  -->
 
@@ -182,7 +182,7 @@ Some useful `kubectl` commands:
 - `kubectl delete <resource> <name>`: delete the resource called `<name>` of type `<resource>`;
 - `kubectl describe <resource> <name>`: obtain a longer description of the `<resource>` called `<name>`;
 - `kubectl explain <resource>`: get a human-readable description of a Kubernetes resource;
-- `kubectl edit <resource> <name>`: online edit the YAML configuration of the `<resource>` called `<name>` (use `EDITOR=nano kubectl edit...` if you hate vi, which is usually the default editor in bash);
+- `kubectl edit <resource> <name>`: online edit the YAML configuration of the `<resource>` called `<name>` (use `EDITOR=nano kubectl edit...` if you hate `vi`, which is usually the default editor in bash);
 - `kubectl create deployment <name> --image=<image-name>`: create a Deployment called `<name>` using the image `<image-name>`;
 - `kubectl scale deployment <name> --replicas=<count>`: scale the deployment called `<name>` to `<count>` pods;
 - `kubectl expose <name> --port=<port>`: make the Deployment called `<name>` available on port `<port>`;
@@ -193,7 +193,7 @@ Some useful `kubectl` commands:
 - `kubectl cp`: copy files to/from pods;
 - `kubectl port-forward service <name> <localport:remoteport>`: listen on local port `<localport>` and forward to `<remoteport>` on (one of) the service pods running in Kubernetes.
 
-The Kubernetes API is [enormous](https://kubernetes.io/docs/reference/kubernetes-api/) and `kubectl` exposes only a tiny, but useful fraction of the available functionality. 
+The Kubernetes API is [enormously big](https://kubernetes.io/docs/reference/kubernetes-api/) and `kubectl` exposes only a tiny, but useful fraction of the available functionality. 
 
 There are two ways to interact with Kubernetes via `kubectl`. The `kubectl create/delete/expose` and similar commands are *imperative*: for instance creating a new Kubernetes resource via `kubectl create` requires you to know whether the resource is already running, because re-creating an existing resource is an error. Instead, most professional cluster admins use the [*declarative*](https://www.theserverside.com/blog/Coffee-Talk-Java-News-Stories-and-Opinions/Imperative-vs-declarative-Kubernetes-commands-Whats-the-difference) style, by specifying the entire desired state of a resource in a YAML file and then using `kubectly apply -f <file>` to load it. This style is idempotent (you will hear about idempotence a lot later): re-applying the same configuration will leave everything intact. Kubernetes is clever enough to know if you change something and update *only* the changed resource (this is called *reconciliation*).
 
@@ -226,7 +226,7 @@ FROM scratch
 # Copy the binary from the build container.
 COPY --from=build /helloworld .
 
-# Tell Docker to execute this command on a `docker run`.
+# Execute this command when the container is run.
 CMD ["/helloworld"]
 ```
 
@@ -234,7 +234,7 @@ CMD ["/helloworld"]
 > Make sure you understand what is going on here: later you will be requested to write your own Dockerfiles (see [here](https://docs.docker.com/engine/reference/builder) for more details).
 
 The standard way to build container images is via the following steps (do not issue these command just yet, most probably they won't work anyway):
-- build the image: `podman image build -t helloworld -f deploy/Dockerfile .`;
+- build the image: `podman image build -t localhost/helloworld -f deploy/Dockerfile .`;
 - list local container images: `podman image ls`;
 - login to the default container image repository: `podman login`;
 - upload the `<image>` at `<version>` to the default container repository: `podman push <image>:<version>`.
@@ -252,7 +252,7 @@ The following rules apply:
 Issue the below to build the container image of the hello-world web app locally inside the Minikube cluster:
 
 ``` sh
-minikube image build -t helloworld -f deploy/Dockerfile .
+minikube image build -t localhost/helloworld -f deploy/Dockerfile .
 ```
 
 If all goes well, listing the container images available in Minikube should show a long list of images containing our new image with the `latest` tag automatically appended:
@@ -357,7 +357,7 @@ helloworld-67f7d78ccd-lvbl6   1/1     Running   0          2m51s
 > [!NOTE]   
 > The `kubectl get deployment helloworld` would return the status of the Deployment, not the pods that belong to it. In order to query the pods, we have to use `kubectl get pods` and identify the pods we are interested in by filtering on the label `app:helloworld` automatically applied by `kubectl create deployment` to all the pods running in the Deployment.
 
-Observe how the name of the pods is now a semi-random hash appended to `helloworld`; this reinforces that pods in a Deployment are ephemeral and disposable. To demonstrate this, kill one of the pods and then `kubectl get` the pod list again:
+Observe how the name of the pods now contains a semi-random hash appended to `helloworld`; this reinforces that pods in a Deployment are ephemeral and disposable. To demonstrate this, kill one of the pods and then `kubectl get` the pod list again:
 
 ``` sh
 kubectl delete pod helloworld-67f7d78ccd-9tjw6
@@ -386,7 +386,7 @@ helloworld-67f7d78ccd-lvbl6   1/1     Running   0          12m     10.244.0.61  
 helloworld-67f7d78ccd-ph5jf   1/1     Running   0          3s      10.244.0.64   minikube
 ```
 
-Since pods are now ephemeral, it becomes fairly difficult to refer to any of them via the semi-random name or send them requests. Observe in the above that the pods of the Deployment run on seemingly random private IPs assigned automatically by Kubernetes from the CIDR range `10.244.0.0/24`. If we delete a pod, it will restart with a different IP:
+Since pods are now ephemeral, it becomes fairly difficult to refer to any of them or send them requests. Observe in the above that the pods of the Deployment run on seemingly random private IPs assigned automatically by Kubernetes from the CIDR range `10.244.0.0/24`. If we delete a pod, it will restart with a different IP:
 
 ``` sh
 kubectl delete pod helloworld-67f7d78ccd-ph5jf

@@ -462,7 +462,7 @@ Once the local tests run, we can actually deploy the application to Kubernetes. 
    ```shell
    cd 99-labs/code/kvstore
    go mod vendor
-   minikube image build -t kvstore -f deploy/Dockerfile .
+   minikube image build -t localhost/kvstore -f deploy/Dockerfile .
    ```
 
 3. Deploy the key-value store to Kubernetes using the pre-packaged manifest `deploy/kubernetes-statefulset.yaml`. This will run `kvstore` in a StatefulSet with one replica and expose it on a Service *internally* (external access to the key-value store would be a security hole) at the DNS name `kvstore.default`.
@@ -479,7 +479,7 @@ Once the local tests run, we can actually deploy the application to Kubernetes. 
    ```shell
    cd 99-labs/code/splitdim
    go mod vendor
-   minikube image build -t splitdim -f deploy/Dockerfile .
+   minikube image build -t localhost/splitdim -f deploy/Dockerfile .
    ```
 
 5. Copy the Kubernetes manifests we created during the previous lab (this is supposed to be called `deploy/kubernetes-local-db.yaml`) into a new file, say, `deploy/kubernetes-kvstore.yaml`, and modify it to make sure `splitdim` starts with the key-value store backend. This is achieved by passing in two environment variables to the Go program: `KVSTORE_MODE=kvstore` makes sure we select the key-value store backend and `KVSTORE_ADDR="kvstore.default:8081"` will contain the address of the key-value store. The only modification is, correspondingly, in the pod template of the `splitdim` Deployment:

@@ -6,7 +6,7 @@ input:
   sol0: 50
   sol1: 4
   sol2: 24
-  funcstring: "func percentageString(x,y string) (int, error)"
+  funcString: "func percentageString(x,y string) (int, error)"
 - descr: "arithmetic mean of `x` and `y` rounded to the nearest integer (so the result for `x=1.2` and `y=2.4` would be 2)"
   funcName: "amean"
   func: "func amean(x,y float64) int"

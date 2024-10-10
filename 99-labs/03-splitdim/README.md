@@ -281,10 +281,10 @@ The next step is to define our internal `DataLayer`: the internal representation
 1. Implement the placeholders for the 4 interface methods.
 
    ``` go
-   func (db *localDB) Transfer(t api.Transfer) error { return nil }
-   func (db *localDB) AccountList() ([]api.Account, error) { return []api.Account{}, nil }
-   func (db *localDB) Clear() ([]api.Transfer, error) { nil }
-   func (db *localDB) Reset() error { nil }
+   func (db *localDB) Transfer(api.Transfer) error { return nil }
+   func (db *localDB) AccountList() ([]api.Account, error) { return nil, nil }
+   func (db *localDB) Clear() ([]api.Transfer, error) { return nil, nil }
+   func (db *localDB) Reset() error { return nil }
    ```
 
 1. Initialize the in-memory database in `main.go`. Declare the global variable `db` that will hold the database (it is global so that the HTTP handlers can access it):

@@ -276,9 +276,7 @@ The next step is to define our internal `DataLayer`: the internal representation
    }
    ```
 
-   > [!WARNING]
-   > 
-   > It is idiomatic Go to make data structure definitions private and let  constructors return an *interface* as a pointer to the struct instead of the actual struct itself (observe that the above returns `api.DataLayer`, not `localDB`). Since `localDB` is private, the caller would not be able to do much with it anyway.
+   Recall, it is idiomatic Go to make data structure definitions private and let  constructors return an *interface* as a pointer to the struct instead of the actual struct itself (observe that the above returns `api.DataLayer`, not `localDB`). Since `localDB` is private, the caller would not be able to do much with it anyway.
 
 1. Implement the placeholders for the 4 interface methods.
 
@@ -538,7 +536,7 @@ The last step is to package up everything into a Docker container, deploy into K
 1. Create a Kubernetes manifest called `deploy/kubernetes-local-db.yaml` that contains 
    - a Deployment called `splitdim` to run one replica of the `splitdim` container image and
    - a Service called `splitdim` of type `LoadBalancer` that exposes the `splitdim` Deployment externally on port 80,
-   - observe that the external port 80 is different from the port used internally, the so called `targetPort`, which is now 8080, so make sure to use `port:8080` in the Service and add `targetPort:8080` as well to indicate that the pods are in fact listening on port 8080, and not on 80.
+   - observe that the external port 80 is different from the port used internally, the so called `targetPort`, which is now 8080, so make sure to use `port:80` in the Service and add `targetPort:8080` as well to indicate that the pods are in fact listening on port 8080, and not on 80.
 1. Test with `curl` or your favorite browser.
 
 > ✅ **Check**

@@ -112,7 +112,7 @@ Make sure to familiarize yourself with the workings of `kvstore`:
 
 # A key-value store client
 
-Currently, querying the key-value store from a Go program is somewhat cumbersome: we have to marshal Go types to JSON before making each call, then make the actual HTTP call to the key-value store server, remembering that `get` is implemented as a HTTP POST request whole `list` and `reset` use HTTP GET, and then again unmarshaling the result into an appropriate Go struct, check errors, etc. This gets boring (and error-prone) very soon.
+Currently, querying the key-value store from a Go program is somewhat cumbersome: we have to marshal Go types to JSON before making each call, then make the actual HTTP call to the key-value store server, remembering that `get` is implemented as a HTTP POST request while `list` and `reset` use HTTP GET, and then unmarshaling the result into an appropriate Go struct, checking errors, etc. This gets boring (and error-prone) very soon.
 
 Wouldn't it be nice to just call the key-value store through a client library that would expose the entire key-value store API as simple-to-use Go functions, and then do the heavy lifting in the background? Wouldn't it be even nicer, if the `kvstore` package would provide that client library?
 
@@ -380,7 +380,7 @@ So let us write a key-value store datalayer for our SplitDim web app. Recall, th
 
 > [!WARNING]
 > 
-> Don't do the above in real-life: if the first `setBalance` call succeeds but the second fails for some reason, then we get a halfway applied transaction: we have already removed the amount from the balance of the sender but failed to add it to the balance of the reviewer. This will then make it impossible to clear the debts and leaves the database in an inconsistent state. 
+> Don't do the above in real-life: if the first `setBalance` call succeeds but the second fails for some reason then we get a halfway applied transaction: we have already removed the amount from the balance of the sender but failed to add it to the balance of the receiver. This will then make it impossible to clear the debts and leaves the database in an inconsistent state. 
 >
 > In a real-life application these two steps should be performed as a single *transaction*; since our key-value store does not implement transactions we spare this step for now (but see the next lab). 
 

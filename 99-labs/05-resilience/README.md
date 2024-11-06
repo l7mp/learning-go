@@ -321,7 +321,7 @@ Rebuild the container image, redeploy the `splitdim` Deployment, and rerun some 
 
 ## Health checks
 
-The last thing we will do is to add health checking to the `splitdim` app. This makes sure Kubernetes has a way to test whether our application is up and running. For simplicity we will use the same HTTP server for serving both the main SplitDim API and health check requests: this is a common practice that simplifies configuration a lot, but may create false negatives under heavy load (i.e., when there are lots of client requests the app may start to drop health check probes). For brevity, we won't implement deep health checks and won't test downstream availability: deep health checks are mostly made irrelevant by Kubernetes selectively health-checking all downstream dependencies by itself anyway.
+The last thing we will do is to add health checking to the `splitdim` app. This makes sure Kubernetes has a way to test whether our application is up and running. For simplicity we will use the same HTTP server for serving both the main SplitDim API and health check requests: this is a common practice that simplifies configuration a lot, but may create false negatives under heavy load (i.e., when there are lots of client requests the app may start to drop health check probes). For brevity, we won't implement deep health checks and won't test downstream availability: deep health checks are mostly made irrelevant by Kubernetes selectively health-checking all downstream dependencies all by itself anyway.
 
 Adding health-checking to a Go web service is extremely simple: (1) just add a new HTTP handler that serves GET requests on the the `/healthz` path and returns status 200 (`http.StatusOK`) and, optionally, writes `"OK"` into the response body, and then tell Kubernetes that it can use the pod's main HTTP server port (currently TCP 8080) to probe its health:
 ```yaml
@@ -372,7 +372,7 @@ If any of the `put` operations in the `opList` fails then the whole transaction 
 > [!TIP]
 > 
 > Feel free to experiment with the transactional API. Here are some ideas on possible improvements:
-> - Rewrite the key-value store data layer of `splitdim` to make use of the new API. Put your transactional data-layr implementation into a new package, say, `pkg/db/transactionalkvstore`.
+> - Rewrite the key-value store data layer of `splitdim` to make use of the new API. Put your transactional data-layer implementation into a new package, say, `pkg/db/transactionalkvstore`.
 > - Implement transactions in the kvstore client (`kvstore/pkg/client`) to simplify the calling of the new transactional API. Let the signature added to the client interface be the following:
 >   ```go
 >	Transaction([]api.VersionedKeyValue) error

@@ -1,0 +1,50 @@
+name: functional
+input:
+  - name: fmap
+    text: |
+      The fmap function receives as arguments a slice of type E and a function of type E -> R,
+      and returns a slice of type R, where E and R could be any type.
+    example: |
+      Fmap is a function that receives an operation and a list and returns a new list whose elements are the elements of the original list after the operation was performed.
+      For example:
+      ```python
+          mapper := a -> 2 * a
+          values := {1,2,3,4,5,6}
+          mapped := map(values,mapper) // produces {2,4,6,8,10,12}
+      ```
+  - name: reduce
+    text: |
+      The reduce function receives as arguments a slice of type E, a variable of type E and a function of type (R, E) -> R,
+      and returns a single value of type R,where E and R could be any type.
+    example: |
+      Reduce is a function that receives an operation and a list and returns a value which is the accumulation of the operation performed on each list element.
+      For example:
+      ```python
+          multiply := accumulator, b -> accumulator * b
+          values := {1,2,3,4}
+          reduced := reduce(values,1,multiply) // produces 24
+          // 1 is the initial value of the accumulator
+      ```
+  - name: flatten
+    text: |
+      The flatten function receives as arguments a slice of type E and returns a slice of type R,
+      where E is of type []T and T is of type []R and R could be any type.
+    example: |
+      Flatten is a function that receives a list of lists and returns a list of one dimension.
+      For example:
+      ```python
+          values := {{1,2,3},{4,5,6}}
+          flattened := flatten(values) // produces {1,2,3,4,5,6}
+      ```
+  - name: filter
+    text: |
+      The filter function receives as arguments a slice of type E and a function of type E -> bool,
+      and returns a slice of type E.
+    example: |
+      Filter is a function that recieves a list and a predicate function and returns  a list containing the elements from the input list where the predicate returns true.
+      For example:
+      ```python
+          is_even := a -> a % 2 is 0
+          values := {1,2,3,4,5}
+          filtered := filter(values, is_even) // produces {2,4}
+      ```

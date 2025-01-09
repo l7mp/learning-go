@@ -1,0 +1,52 @@
+name: sorting-data
+input:
+  - name: string-float64
+    type-one: string
+    type-two: float64
+    example: |
+      ```python
+        strings := {"alma","5","banan"}
+        floats := {3.14, -1.2,2.781}
+        sortSlice(strings) // returns {"5","alma","banan"}
+        sortSlice(floats) // returns {-1.2, 2.781, 3.14}
+      ```
+  - name: int64-float64
+    type-one: int64
+    type-two: float64
+    example: |
+      ```python
+      ints := {12, -3, 41, 27}
+      floats := {3.14, -1.2,2.781}
+      sortSlice(ints) // returns {-3, 12, 27, 41}
+      sortSlice(floats) // returns {-1.2, 2.781, 3.14}
+      ```
+  - name: uint8-int32
+    type-one: uint8
+    type-two: float64
+    example: |
+      ```python
+      uints := {8, 128,2}
+      ints := {12, -3, 41, 27}
+      sortSlice(uints) // returns {2, 8, 128}
+      sortSlice(ints) // returns {-3, 12, 27, 41}
+      ```
+  - name: string-uint8
+    type-one: string
+    type-two: uint8
+    example: |
+      ```python
+      strings := {"alma","5","banan"}
+      uints := {8, 128,2}
+      sortSlice(strings) // returns {"5","alma","banan"}
+      sortSlice(uints) // returns {2, 8, 128}
+      ```
+  - name: int32-uint64
+    type-one: int32
+    type-two: uint64
+    example: |
+      ```python
+      ints := {12, -3, 41, 27}
+      uints := {84, 1286,22,93}
+      sortSlice(ints) // returns {-3, 12, 27, 41}
+      sortSlice(uints) // returns {22, 84, 93, 1286}
+      ```

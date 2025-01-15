@@ -22,7 +22,7 @@ input:
       ```
   - name: uint8-int32
     type-one: uint8
-    type-two: float64
+    type-two: int32
     example: |
       ```python
       uints := {8, 128,2}

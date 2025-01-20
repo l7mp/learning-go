@@ -1,0 +1,57 @@
+name: closures
+input:
+  - name: auth
+    text: |
+      - it should receive two strings (username,password) and a function that has no parameters and returns a string
+      - it should return a function that receives two strings and returns a string and an error
+      - when the returned function is called, it should propagate the call to the received function and return its value and nil if the two string parameters match the initial username and password arguments, or an empty string and some error
+    example: |
+      ```python
+      helloWorld := () -> "Hello World!
+      auth := proxy("admin","admin",helloWorld)
+      auth("admin","admin") // should return ("Hello World!", nil)
+      auth("beka","xy") // should return ("", Error) 
+      ```
+  - name: limiter
+    text: |
+      - it should receive and int and a function that has no parameters and returns an int
+      - it should return a function that has no parameters and returns an int and an error
+      - if the returned function was called less times than the initial limit value it propagates the call to the received function and returns its value and nil, otherwise it should return 0 and an error
+    example: |
+      ```python
+        limited := proxy(2,() -> 2)
+        limited() // returns (2, nil)
+        limited() // returns (2, nil)
+        limited() // returns (0, Error)
+      ```
+  - name: load-balancer
+    text: |
+      - it should recieve a vararg of functions that have no parameters and return an int
+      - it should return a function that returns an int
+      - when the returned function is called, it should propagate the call to the next in line received function and return it's value
+      - the functions should be propagated sequentially and should loop back after the last function was called
+    example: |
+      ```python
+        one := () -> 1
+        two := () -> 2
+        three := () -> 3
+        loadBalanced := proxy(one,two,three)
+        loaBalanced() // should return 1
+        loadBalanced() // should return 2
+        loadBalanced() // should return 3
+        loadBalanced() // should return 1 again
+      ```
+  - name: on-off
+    text: |
+      - it should receive function that has one string parameter and returns an int
+      - it should return a function that receives a string and returns an int and an error
+      - when the returned function is called, it should propagate the call to the received function and return its value and nil if the proxy is on, else it should return 0 and an error
+      - after every call, the state (on/off) is switched, the first time it's called it should be on
+    example: |
+      ```python
+        strlen := s -> len(s)
+        decorated := proxy(strlen)
+        decorated("alma") // returns (4,nil)
+        decorated("xy") // returns (0,Error)
+        decorated("xy") // returns (2,nil)
+      ```

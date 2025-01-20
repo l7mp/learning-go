@@ -13,7 +13,8 @@ EXERCISE_DIRS=\
 	20-goroutines \
 	21-channels \
 	22-context \
-	23-misc
+	23-misc \
+	24-generics
 
 # LAB subdirs
 LAB_DIRS=\

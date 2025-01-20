@@ -217,6 +217,10 @@ So below is a sequence of steps that will make sure `Transfer` survives key-valu
 > 
 > Recall, you can always use the transaction log to restore the key-value store. This is why we made it *persistent* in the first place!
 
+> [!NOTE]
+> 
+> Calling `resilient.WithRetry` in the `Transfer` function will create a new retrier every time we call `Transfer`. This is not a problem as the retrier decorator is stateless, but the if we were to use the circuit breaker or the rate-limiter decorators then this would not work as these decorators maintain internal state which will become unavailable once we recreate them.
+
 You may want to update the existing `kvstore` datalayer (`splitdim/pkg/db/kvstore`) in the `splitdim` app or you can put the new code into a new subpackage (say, `splitdim/pkg/db/resilientkvstore`) as well; the choice is on you. In any way, use the usual two environment variables, `KVSTORE_MODE` and `KVSTORE_ADDR`, to select the key-value store datalayer implementation (say, `local`, `kvstore`, `resilientkvstore`, etc) and (optionally) specify the key-value store address on startup.
 
 To actually make use of the improved code, first try a local build with a missing key-value store backend (this will make all transfers fail) and check whether a `curl` call to `/api/transfer` will fail in a controlled way (instead of falling into an infinite retry loop). Then, test with Kubernetes:

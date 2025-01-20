@@ -1,4 +1,4 @@
-name: functional
+name: closures
 input:
   - name: auth
     text: |

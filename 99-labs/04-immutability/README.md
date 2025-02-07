@@ -465,14 +465,13 @@ Once the local tests run, we can actually deploy the application to Kubernetes. 
    minikube image build -t localhost/kvstore -f deploy/Dockerfile .
    ```
 
-3. Deploy the key-value store to Kubernetes using the pre-packaged manifest `deploy/kubernetes-statefulset.yaml`. This will run `kvstore` in a StatefulSet with one replica and expose it on a Service *internally* (external access to the key-value store would be a security hole) at the DNS name `kvstore.default`.
+3. Deploy the key-value store to Kubernetes using the pre-packaged manifest `deploy/kubernetes-statefulset.yaml` in `99-labs/code/kvstore`. This will run `kvstore` in a StatefulSet with one replica and expose it on a Service *internally* (external access to the key-value store would be a security hole) at the DNS name `kvstore.default`.
    ```shell
-   cd 99-labs/code/kvstore
    kubectl apply -f deploy/kubernetes-statefulset.yaml
    ```
 
 > [!NOTE]
-> 
+>
 > The full DNS name would be `kvstore.default.svc.cluster.local`, but usually only `kvstore` or `kvstore.default` is enough.
 
 4. Re-build the `splitdim` image; the `Dockerfile` created during the previous lab should be reusable for this:

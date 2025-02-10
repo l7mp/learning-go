@@ -223,16 +223,39 @@ kubectl cluster-info
 
 ### Test your Istio install
 
-In a terminal navigate to the Istio install directory and execute the below in a terminal to check that Istio is installed properly:
+In a terminal execute the below in a terminal to check that Istio is installed properly:
 
 ```shell
-bin/istioctl verify-install
+kubectl get all -n istio-system
 ```
 
 > ✅ **Check**
 >
-> This command should print that Istio is configured correctly. The last line of the output should be something like the following:\
-> `✔ Istio is installed and verified successfully`
+> This command should print all the Kubernetes resources in the namespace `istio-system`. Observe the `READY` column values (should `1/1` or similar) to check all resources are up and running.
+
+The output should be something like the following:
+```
+NAME                                        READY   STATUS    RESTARTS   AGE
+pod/istio-ingressgateway-7f57549c9f-q9jhq   1/1     Running   0          10m
+pod/istiod-ddcf4fdd9-kl5wq                  1/1     Running   0          15m
+
+NAME                           TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)                                      AGE
+service/istio-ingressgateway   LoadBalancer   10.99.219.24    <pending>     15021:32645/TCP,80:31546/TCP,443:32140/TCP   10m
+service/istiod                 ClusterIP      10.98.141.167   <none>        15010/TCP,15012/TCP,443/TCP,15014/TCP        15m
+
+NAME                                   READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/istio-ingressgateway   1/1     1            1           10m
+deployment.apps/istiod                 1/1     1            1           15m
+
+NAME                                              DESIRED   CURRENT   READY   AGE
+replicaset.apps/istio-ingressgateway-7f57549c9f   1         1         1       10m
+replicaset.apps/istiod-ddcf4fdd9                  1         1         1       15m
+
+NAME                                                       REFERENCE                         TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
+horizontalpodautoscaler.autoscaling/istio-ingressgateway   Deployment/istio-ingressgateway   cpu: <unknown>/80%   1         5         1          10m
+horizontalpodautoscaler.autoscaling/istiod                 Deployment/istiod                 cpu: <unknown>/80%   1         5         1          15m
+bin/istioctl verify-install
+```
 
 ## Exercises
 

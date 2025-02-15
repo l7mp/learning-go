@@ -62,7 +62,7 @@ Cloud native apps are, in contrast, stateless, storing all *resource state* in a
       Version int    `json:"version"`
   }
   ```
-- `POST /api/get, body: "key"`: get versioned value for the key given in the HTTP request body;
+- `GET /api/get?id=<id> `: get versioned value for the key given in the query parameter with the name id;
 - `POST /api/put, body: {"key":<key>, "value":<value>, "version":<version>}`: insert the key-value pair into the database (only if the current version equals the specified version);
 - `GET /api/reset`: remove all key-value pairs from the store; and
 - `GET /api/list`: list the stored versioned key-value pairs.
@@ -86,7 +86,7 @@ Make sure to familiarize yourself with the workings of `kvstore`:
   ```
 - query the currently stored value and version in the database for `key1`:
   ```shell
-  curl -X POST -H "Content-Type: application/json" --data '"key1"' http://localhost:8081/api/get
+  curl -X GET http://localhost:8081/api/get?id=key1
   {"value":"1","version":1}
   ```
 - insert the new value with the new version and then list the entire content of the database:
@@ -177,18 +177,20 @@ Your task is to implement this interface. Some help:
 4. At this point, we are ready to actually implement the `Client` interface. Let us add the implementation for the `get` method first; recall, this receives a string key as an argument and returns the corresponding key and version as an `api.VersionedValue`:
    ``` go
    // Get returns the value and version stored for the given key, or an error if something goes wrong.
-   func (c *client) Get(key string) (api.VersionedValue, error) { 
-       // this will package the requested key into the body of the HTTP request
-       body := []byte(fmt.Sprintf("\"%s\"", key))
-   
+   func (c *client) Get(key string) (api.VersionedValue, error) {
+      //this will append the query parameter formatted to the url
+      url, _ := url2.Parse(c.url + "/api/get")
+	  q := url.Query()
+	  q.Set("id", key)
+	  url.RawQuery = q.Encode()
        ...
    }
    ```
 
    The function itself will have to perform the following steps:
-   - make a HTTP POST call to the HTTP server at the URL `c.url` (`c` is the receiver of the `Get` function of our implementation type `client`) at the API endpoint `/api/get`:
+   - make a HTTP GET call to the HTTP server at the URL `c.url` (`c` is the receiver of the `Get` function of our implementation type `client`) at the API endpoint `/api/get` using the `key` argument as the query id parameter value:
      ```go
-     r, err := http.Post(c.url+"/api/get", "application/json", bytes.NewReader(body))
+     r, err := http.Get(url.String())
      ```
    - return an empty `api.VersionedValue{}` and an error if something goes wrong,
    - check if the return status is 200 (`http.StatusOK`) and return an empty `api.VersionedValue{}` and an error if not,

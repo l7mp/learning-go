@@ -44,16 +44,17 @@ func NewServer(logFile string) (*Server, error) {
 	})
 
 	http.HandleFunc("/api/get", func(w http.ResponseWriter, r *http.Request) {
-		key := ""
-		defer r.Body.Close()
-		if err := json.NewDecoder(r.Body).Decode(&key); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+		//Enforce HTTP GET on the GET endpoint
+		if r.Method != "GET" {
+			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
 		}
-		if key == "" {
-			w.WriteHeader(http.StatusBadRequest)
+		params := r.URL.Query()
+		if !params.Has("id") {
+			http.Error(w, "No transaction id supplied as query parameter", http.StatusBadRequest)
 			return
 		}
+		key := params.Get("id")
 		log.Printf("get: key=%s\n", key)
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(s.get(key))

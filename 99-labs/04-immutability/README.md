@@ -179,10 +179,10 @@ Your task is to implement this interface. Some help:
    // Get returns the value and version stored for the given key, or an error if something goes wrong.
    func (c *client) Get(key string) (api.VersionedValue, error) {
       //this will append the query parameter formatted to the url
-      url, _ := url2.Parse(c.url + "/api/get")
-	  q := url.Query()
+      uri, _ := url.Parse(c.url + "/api/get")
+	  q := uri.Query()
 	  q.Set("id", key)
-	  url.RawQuery = q.Encode()
+	  uri.RawQuery = q.Encode()
        ...
    }
    ```
@@ -190,7 +190,7 @@ Your task is to implement this interface. Some help:
    The function itself will have to perform the following steps:
    - make a HTTP GET call to the HTTP server at the URL `c.url` (`c` is the receiver of the `Get` function of our implementation type `client`) at the API endpoint `/api/get` using the `key` argument as the query id parameter value:
      ```go
-     r, err := http.Get(url.String())
+     r, err := http.Get(uri.String())
      ```
    - return an empty `api.VersionedValue{}` and an error if something goes wrong,
    - check if the return status is 200 (`http.StatusOK`) and return an empty `api.VersionedValue{}` and an error if not,

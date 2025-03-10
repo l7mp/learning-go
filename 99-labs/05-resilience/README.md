@@ -105,7 +105,7 @@ It is easy to test this:
 - You should see `curl` hanging for a while just to timeout after a longish wait. Meanwhile the `splitdim` pod is going completely berserk, filling the log with the traces of desperately trying to reach the key-value store:
   ```shell
   kubectl logs $(kubectl get pods -l app=splitdim -o jsonpath='{.items[0].metadata.name}') -f
-  kvstore_db.go:52: transfer: could not set balance for user "a": get: HTTP error: Post "http://kvstore.default:8081/api/get": dial tcp: lookup kvstore.default on 10.96.0.10:53: no such host
+  kvstore_db.go:52: transfer: could not set balance for user "a": get: HTTP error: Get "http://kvstore.default:8081/api/get": dial tcp: lookup kvstore.default on 10.96.0.10:53: no such host
   ...
   ```
 

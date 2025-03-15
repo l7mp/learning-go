@@ -1,0 +1,36 @@
+name: Minikube cluster setup
+description: "Sets up a minikube cluster, starts the minikube tunnel and loads the necessery images"
+inputs:
+  istio:
+    description: "Flag if istio should be installed"
+    default: 'false'
+runs:
+  using: composite
+  steps:
+    - name: Start minikube
+      uses: medyagh/setup-minikube@latest
+      with:
+        driver: docker
+        container-runtime: containerd
+        wait: all
+        cache: true
+
+    - name: Start minikube tunnel
+      shell: bash
+      run: minikube tunnel &> /dev/null &
+
+    - name: Load images
+      shell: bash
+      run: |
+        for i in $(docker images --format "{{.Repository}}:{{.Tag}}" | grep ':test'); do
+          minikube image load ${i}
+        done
+    - name: Start istio service mash
+      if: inputs.istio == 'true'
+      shell: bash
+      run: |
+        curl -L https://istio.io/downloadIstio | sh -
+        cd istio*
+        kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v1.0.0" | kubectl apply -f -
+        bin/istioctl install --set profile=minimal -y
+        kubectl label namespace default istio-injection=enabled --overwrite

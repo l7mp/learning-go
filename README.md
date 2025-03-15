@@ -36,11 +36,28 @@ You can divide your code into as many files as you like but don't forget to add 
 
 ### Test
 
+#### Manual testing
 At any point in time you can test your solutions as follows.
 
 ``` console
 make test
 ```
+
+#### Automated testing remotely
+You have the option to test your homeworks using GitHub Actions.
+To do so, you just have to commit your local changes and push them to your master branch on your forked repository.
+
+```console
+git add .
+git commit -m '<your commit message>'
+git push
+```
+This will start an automatic testing pipeline that you can check in the GitHub GUI.
+
+#### Automated testing locally
+Alternatively, if you want to you can execute the testing pipeline locally using nektos/act.
+Installation and usage guide can be found here: https://github.com/nektos/act
+
 
 ### Keep track of repo updates
 

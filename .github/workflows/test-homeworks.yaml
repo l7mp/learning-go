@@ -1,0 +1,26 @@
+name: Test Homeworks
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - 99-labs
+      - env
+      - internals
+      - .gitignore
+jobs:
+  test-homeworks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: '1'
+      - name: Setup go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '^1.23.0'
+      - name: Test homeworks
+        run: |
+          export STUDENT_ID="$(grep -v -e '^$' STUDENT_ID)" # set the student_id used for test generation
+          make generate # generate the tests
+          make test

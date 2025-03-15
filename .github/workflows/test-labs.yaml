@@ -1,0 +1,78 @@
+name: Test
+on:
+  workflow_dispatch:
+    inputs:
+      kube-distro:
+        type: choice
+        description: "The type of kubernetes distribution to use, i.e minikube, kind"
+        options:
+          - minikube
+          - kind
+        default: kind
+        required: false
+
+      istio-ready:
+        type: boolean
+        description: "Set to true if istio can be tested, leave false otherwise"
+        required: false
+
+      kubernetes-tests:
+        type: string
+        description: "The name(s) of the kubernetes test(s) to be run, if you want to run multiple, provide them separated with spaces, e.g 'kvstore splitdim', if you provide 'all', it will execute all kubernetes tests"
+        default: 'all'
+        required: false
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image-root: ['helloworld','kvstore', 'splitdim']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/templates/docker
+        with:
+          path: ${{ github.workspace }}/99-labs/code/${{ matrix.image-root }}
+          filepath: ${{ github.workspace }}/99-labs/code/${{ matrix.image-root }}/deploy/Dockerfile
+          tags: ${{ matrix.image-root }}:test
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: '1'
+      - uses: actions/download-artifact@v4
+        with:
+          path: images
+          merge-multiple: 'true'
+      - name: Load all docker images
+        uses: ./.github/templates/load-images
+
+      - name: Setup go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '^1.23.0'
+
+      - name: Start kind cluster
+        if: github.event.inputs.kube-distro == 'kind'
+        uses: ./.github/templates/kind-cluster-setup
+        with:
+          istio: 'true'
+
+      - name: Start minikube cluster
+        if: github.event.inputs.kube-distro == 'minikube'
+        uses: ./.github/templates/minikube-cluster-setup
+        with:
+          istio: 'true'
+
+
+      - name: Test istio
+        if: github.event.inputs.istio-ready == true
+        uses: ./.github/templates/test-istio
+
+      - name: Test go project
+        uses: ./.github/templates/go
+        with:
+          tests: ${{ github.event.inputs.kubernetes-tests }}

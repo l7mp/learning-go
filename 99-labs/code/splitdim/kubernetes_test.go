@@ -4,7 +4,6 @@ package main
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	"io"
 	"net"
@@ -17,18 +16,11 @@ import (
 )
 
 func TestSplitDimKubernetes(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
 	// clean up cluster
 	execCmd(t, "kubectl", "delete", "-f", "deploy/kubernetes-local-db.yaml")
 
-	// build the container image
-	_, _, err := execCmd(t, "minikube", "image", "build", "-t", "splitdim", "-f", "deploy/Dockerfile", ".")
-	assert.NoError(t, err, "kubectl delete")
-
 	// redeploy
-	_, _, err = execCmd(t, "kubectl", "apply", "-f", "deploy/kubernetes-local-db.yaml")
+	_, _, err := execCmd(t, "kubectl", "apply", "-f", "deploy/kubernetes-local-db.yaml")
 	assert.NoError(t, err, "kubectl apply")
 
 	// may take a while
@@ -40,8 +32,6 @@ func TestSplitDimKubernetes(t *testing.T) {
 
 	ip, _, err := execCmd(t, "kubectl", "get", "service", "splitdim", "-o", `jsonpath="{.status.loadBalancer.ingress[0].ip}"`)
 	if ip == "" {
-		// make sure minikube tunnel is running if no public IP exists
-		execCmdContext(ctx, t, "minikube", "tunnel")
 		// may take a while
 		time.Sleep(10 * time.Second)
 		ip, _, err = execCmd(t, "kubectl", "get", "service", "splitdim", "-o", `jsonpath="{.status.loadBalancer.ingress[0].ip}"`)

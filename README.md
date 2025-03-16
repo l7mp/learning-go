@@ -54,6 +54,8 @@ git push
 ```
 This will start an automatic testing pipeline that you can check in the GitHub GUI.
 
+You can also check your labs exercies, to do so, navigate to the GitHub repository (your repo), click `Actions`, click `Run workflow`, pass in the parameters and click `Run workflow`.
+
 #### Automated testing locally
 Alternatively, if you want to you can execute the testing pipeline locally using nektos/act.
 Installation and usage guide can be found here: https://github.com/nektos/act

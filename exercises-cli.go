@@ -12,7 +12,7 @@ import (
 )
 
 func Usage() {
-	fmt.Fprintf(os.Stderr, "exercises-cli <generate|check>\n")
+	fmt.Fprintf(os.Stderr, "exercises-cli <generate|check|report|html>\n")
 	fmt.Fprintf(os.Stderr, "Flags:\n")
 	flag.PrintDefaults()
 }
@@ -20,6 +20,7 @@ func Usage() {
 var (
 	studentId = flag.String("student-id", "", "student id; optional, default is to read from file STUDENT_ID")
 	verbose   = flag.Bool("verbose", false, "verbose mode; default is off")
+	reportDir = flag.String("report-dir", "", "path to directory where the report files are stored")
 )
 
 func main() {
@@ -29,10 +30,10 @@ func main() {
 	flag.Usage = Usage
 	flag.Parse()
 
-	if len(flag.Args()) != 1 {
-		flag.Usage()
-		os.Exit(1)
-	}
+	//if len(flag.Args()) != 1 {
+	//	flag.Usage()
+	//	os.Exit(1)
+	//}
 
 	id, err := lib.GetStudentId(studentId)
 	if err != nil {
@@ -50,6 +51,15 @@ func main() {
 		}
 	case "check":
 		fmt.Println("Would check stuff")
+	case "report":
+		if err := lib.CreateStudentReport(id, *verbose); err != nil {
+			log.Fatalf("Cannot create report for student id %q: %s", id, err)
+		}
+	case "html":
+		fmt.Println(reportDir)
+		if err := lib.CreateTeacherReport(*reportDir, *verbose); err != nil {
+			log.Fatalf("Cannot create teacher report %s", err)
+		}
 	default:
 		flag.Usage()
 		os.Exit(1)

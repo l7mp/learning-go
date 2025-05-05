@@ -122,16 +122,27 @@
     </div>
 
     <div class="navigation">
-        <button onclick="showSection(-1)">Previous</button>
-        <button onclick="showSection(1)">Next</button>
+        <button id="prev" onclick="showSection(-1)">Previous</button>
+        <button id="next" onclick="showSection(1)">Next</button>
     </div>
 </div>
 
 <script>
     let currentIndex = 0;
     const sections = document.querySelectorAll('.table-view');
+    const [next,prev] = [document.getElementById("next"), document.getElementById("prev")]
 
     function showSection(direction) {
+        if (currentIndex  === sections.length - 1){
+            next.disabled = true
+            prev.disabled = false
+        } else if(currentIndex === 0){
+            next.disabled = false
+            prev.disabled = true
+        }else{
+            next.disabled = false
+            prev.disabled = false
+        }
         sections[currentIndex].style.display = 'none';
         currentIndex = (currentIndex + direction + sections.length) % sections.length;
         sections[currentIndex].style.display = 'block';

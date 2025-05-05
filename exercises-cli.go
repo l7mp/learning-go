@@ -30,10 +30,10 @@ func main() {
 	flag.Usage = Usage
 	flag.Parse()
 
-	//if len(flag.Args()) != 1 {
-	//	flag.Usage()
-	//	os.Exit(1)
-	//}
+	if len(flag.Args()) != 1 {
+		flag.Usage()
+		os.Exit(1)
+	}
 
 	id, err := lib.GetStudentId(studentId)
 	if err != nil {
@@ -56,7 +56,7 @@ func main() {
 			log.Fatalf("Cannot create report for student id %q: %s", id, err)
 		}
 	case "html":
-		fmt.Println(reportDir)
+		log.Println(*reportDir)
 		if err := lib.CreateTeacherReport(*reportDir, *verbose); err != nil {
 			log.Fatalf("Cannot create teacher report %s", err)
 		}

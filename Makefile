@@ -55,12 +55,12 @@ report:
 	if  [ ! -f report_tmp ]; then \
 		go test ./... -v -count 1 -parallel 1 > report_tmp; \
   	fi
-	go run exercises-cli.go -v report
+	go run exercises-cli.go -verbose report
 
 # generate the hmtl report
 report-html:
 	export STUDENT_ID=$(STUDENT_ID)
-	go run exercises-cli.go --report-dir $(REPORT_DIR) html > report.html
+	go run exercises-cli.go -report-dir=$(REPORT_DIR) -verbose html > report.html
 
 # clean up generated files
 clean:

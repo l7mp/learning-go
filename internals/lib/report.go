@@ -18,6 +18,7 @@ type reportCard struct {
 	Summary        string                   `json:"report"`
 }
 type exerciseStats struct {
+	_owner          string
 	Score           float64         `json:"score"`
 	TestCaseSuccess map[string]bool `json:"testCaseSuccess"`
 }
@@ -33,14 +34,22 @@ func getTestCaseName(line string) string {
 	return ""
 }
 
+// extractExerciseName takes a string and returns the exercise name and the concrete exercise name (e.g 01-getting-started/01-hello-world)
+func extractExerciseName(line string) (string, bool) {
+	re := regexp.MustCompile(`github\.com(?:/[^/\s]+)*/([^/\s]+)/([^/\s]+)`)
+	match := re.FindStringSubmatch(line)
+	if match == nil {
+		return "", false
+	}
+	return fmt.Sprintf("%s/%s", match[1], match[2]), true
+}
+
 // newPrefilledReport takes a slice of string and returns a reportCard that has keys matching the names of the tested exercises (e.g 01-hello-world)
 func newPrefilledReport(id string, lines []string) reportCard {
 	ret := reportCard{StudentID: id, ExerciseScores: make(map[string]exerciseStats)}
-	re := regexp.MustCompile(`^ok\s+\S+/([^/\s]+)/([^/\s]+)\s+\d+\.\d+s`)
 	for _, line := range lines {
-		if match := re.FindStringSubmatch(line); match != nil {
-			matchString := match[1] + "/" + match[2]
-			ret.ExerciseScores[matchString] = exerciseStats{}
+		if match, ok := extractExerciseName(line); ok {
+			ret.ExerciseScores[match] = exerciseStats{}
 		}
 	}
 	return ret
@@ -77,9 +86,11 @@ func extractExerciseScores(lines []string, verbose bool) (exStats []exerciseStat
 			fail += 1.0
 			exStat.TestCaseSuccess[testCaseName] = false
 		} else if strings.Contains(line, "github.com/") {
+			owner, _ := extractExerciseName(line)
 			exStat.Score = succ / (fail + succ) * 100
+			exStat._owner = owner
 			exStats = append(exStats, exStat)
-			exStat = exerciseStats{Score: 0, TestCaseSuccess: make(map[string]bool)}
+			exStat = exerciseStats{_owner: "", Score: 0, TestCaseSuccess: make(map[string]bool)}
 			fail, succ = 0.0, 0.0
 		}
 	}
@@ -117,14 +128,19 @@ func CreateStudentReport(id string, verbose bool) error {
 	}
 	report := newPrefilledReport(id, lines)
 	exStats, failTotal, succTotal := extractExerciseScores(lines, verbose)
-	index := 0
-	for k, _ := range report.ExerciseScores {
-		if math.IsNaN(exStats[index].Score) {
-			delete(report.ExerciseScores, k)
-			continue
+
+	for k := range report.ExerciseScores {
+	Inner:
+		for i, exStat := range exStats {
+			if exStat._owner == k {
+				if math.IsNaN(exStats[i].Score) {
+					delete(report.ExerciseScores, k)
+					break Inner
+				}
+				report.ExerciseScores[k] = exStat
+				break Inner
+			}
 		}
-		report.ExerciseScores[k] = exStats[index]
-		index++
 	}
 	report.Summary = generateReportSummary(id, failTotal, succTotal)
 	outName := fmt.Sprintf("/%s-report.json", report.StudentID)

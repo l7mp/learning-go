@@ -1,5 +1,5 @@
 name: "Kind setup"
-description: "Installs and sets up a running kind cluster, including the cloud-provider-kind and istio for service mash"
+description: "Installs and sets up a running kind cluster, including the cloud-provider-kind and istio for service mesh"
 inputs:
   istio:
     description: "A flag weather to start the istio service mash"

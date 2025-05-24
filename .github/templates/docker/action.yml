@@ -20,7 +20,6 @@ runs:
         CONTEXT_PATH: ${{ inputs.path }}
         FILE_PATH: ${{ inputs.filepath }}
         TAGS: ${{ inputs.tags }}
-        ACTION_PATH: ${{ github.action_path }}
       run: | 
         bash $GITHUB_ACTION_PATH/build.sh
         IMAGE_NAME=$(echo "${TAGS}" | cut -d : -f1)

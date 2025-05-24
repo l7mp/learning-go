@@ -2,7 +2,7 @@ name: "Kind setup"
 description: "Installs and sets up a running kind cluster, including the cloud-provider-kind and istio for service mesh"
 inputs:
   istio:
-    description: "A flag weather to start the istio service mash"
+    description: "A flag weather to start the istio service mesh"
     default: 'false'
     required: false
 runs:
@@ -12,7 +12,7 @@ runs:
       uses: helm/kind-action@v1
       with:
         cluster_name: test
-        kubectl_version: 'v1.29.3'
+        kubectl_version: 'v1.30.4'
 
     - name: Load images to node(s)
       shell: bash
@@ -21,29 +21,18 @@ runs:
           kind load docker-image -n test ${i}
         done
 
-    - name: Check if cloud provider is cached
-      id: cpvd
-      uses: actions/cache@v4
-      with:
-        path: ~/go/bin/cloud-provider-kind
-        key: cpvd-cache
-
-    - name: Install cloud-provider-kind
-      if: steps.cpvd.outputs.cache-hit != 'true'
+    - name: Install cloud-provider-kind and start in background
       shell: bash
-      run: go install sigs.k8s.io/cloud-provider-kind@latest
+      env:
+        VERSION: 0.6.0
+      run: |
+        curl -L https://github.com/kubernetes-sigs/cloud-provider-kind/releases/download/v${VERSION}/cloud-provider-kind_${VERSION}_linux_amd64.tar.gz \
+        | tar -xz
+        sudo mv cloud-provider-kind /usr/local/bin/
+        sudo chmod +x /usr/local/bin/cloud-provider-kind
+        cloud-provider-kind &
 
-    - name: Save cloud-provider-cache
-      uses: actions/cache/save@v4
-      with:
-        path: ~/go/bin/cloud-provider-kind
-        key: cpvd-cache
-
-    - name: Start cloud-provider-kind in background
-      shell: bash
-      run: cloud-provider-kind &
-
-    - name: Start istio service mash
+    - name: Start istio service mesh
       if: inputs.istio == 'true'
       shell: bash
       run: |

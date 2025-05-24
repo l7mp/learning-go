@@ -18,7 +18,7 @@ on:
 
       kubernetes-tests:
         type: string
-        description: "The name(s) of the kubernetes test(s) to be run, if you want to run multiple, provide them separated with spaces, e.g 'kvstore splitdim', if you provide 'all', it will execute all kubernetes tests"
+        description: "Kubernetes tests to be run. Options: 'helloworld' 'splitdim', 'kvstore', 'all'.  if you want to run multiple, provide them separated with spaces (e.g., 'kvstore splitdim'); 'all' means execute all tests"
         default: 'all'
         required: false
 

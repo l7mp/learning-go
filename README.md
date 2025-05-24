@@ -44,7 +44,7 @@ make test
 ```
 
 #### Automated testing remotely
-You have the option to test your homeworks using GitHub Actions.
+You have the option to test your **homeworks** using GitHub Actions.
 To do so, you just have to commit your local changes and push them to your master branch on your forked repository.
 
 ```console
@@ -54,10 +54,10 @@ git push
 ```
 This will start an automatic testing pipeline that you can check in the GitHub GUI.
 
-You can also check your labs exercies, to do so, navigate to the GitHub repository (your repo), click `Actions`, click `Run workflow`, pass in the parameters and click `Run workflow`.
+You can also check your **labs**, to do so, navigate to your GitHub repository, click `Actions`, click `Run workflow`, set parameters and click `Run workflow`.
 
 #### Automated testing locally
-Alternatively, if you want to you can execute the testing pipeline locally using nektos/act.
+Alternatively, if you want to you can execute both of the testing pipelines locally using nektos/act.
 Installation and usage guide can be found here: https://github.com/nektos/act
 
 

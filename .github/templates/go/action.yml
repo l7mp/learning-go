@@ -1,0 +1,16 @@
+name: Test go
+description: "Tests the go files with the given arguments"
+inputs:
+  tests:
+    description: "The project(s) that should be tested (kubernetes tests only), if you want to run multiple, provide their name separated with spaces"
+    required: true
+    default: 'all'
+runs:
+  using: composite
+  steps:
+    - name: Test go program
+      shell: bash
+      env:
+        PROJECT_PATH: ${{ github.workspace }}
+        TESTS: ${{ inputs.tests }}
+      run: bash ${{ github.action_path }}/main.sh

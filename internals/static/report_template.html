@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Exercise Statistics</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: #f0f0f0;
+        }
+
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+
+        .failure {
+            color: red;
+            font-weight: bold;
+        }
+
+        .summary {
+            margin: 1em 0;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        .navigation {
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+
+        .navigation button {
+            padding: 0.5rem 1rem;
+            margin: 0 0.5rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        .navigation button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Student Exercise Statistics</h2>
+
+    <div id="student-sections">
+        {{ range . }}
+        <div class="table-view" style="display: none;">
+            <p><strong>Student ID:</strong> {{ .StudentID }}</p>
+
+            <table>
+                <thead>
+                <tr>
+                    <th>Exercise</th>
+                    <th>Score</th>
+                    <th>Test Cases</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{ range $exercise, $details := .ExerciseScores }}
+                <tr>
+                    <td>{{ $exercise }}</td>
+                    <td>{{ $details.Score }}%</td>
+                    <td>
+                        {{ range $testName, $passed := $details.TestCaseSuccess }}
+                        <div>{{ $testName }}:
+                            {{ if $passed }}
+                            <span class="success">Passed</span>
+                            {{ else }}
+                            <span class="failure">Failed</span>
+                            {{ end }}
+                        </div>
+                        {{ end }}
+                    </td>
+                </tr>
+                {{ end }}
+                </tbody>
+            </table>
+
+            <hr>
+            <p class="summary"><strong>Summary:</strong> {{ .Summary }}</p>
+            <hr>
+        </div>
+        {{ end }}
+    </div>
+
+    <div class="navigation">
+        <button id="prev" onclick="showSection(-1)">Previous</button>
+        <button id="next" onclick="showSection(1)">Next</button>
+    </div>
+</div>
+
+<script>
+    let currentIndex = 0;
+    const sections = document.querySelectorAll('.table-view');
+    const [next,prev] = [document.getElementById("next"), document.getElementById("prev")]
+
+    function showSection(direction) {
+        if (currentIndex  === sections.length - 1){
+            next.disabled = true
+            prev.disabled = false
+        } else if(currentIndex === 0){
+            next.disabled = false
+            prev.disabled = true
+        }else{
+            next.disabled = false
+            prev.disabled = false
+        }
+        sections[currentIndex].style.display = 'none';
+        currentIndex = (currentIndex + direction + sections.length) % sections.length;
+        sections[currentIndex].style.display = 'block';
+    }
+
+    // Initialize by showing the first student
+    if (sections.length > 0) {
+        sections[0].style.display = 'block';
+    }
+</script>
+</body>
+</html>

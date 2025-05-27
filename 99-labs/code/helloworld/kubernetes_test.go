@@ -3,7 +3,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"net"
@@ -17,16 +16,9 @@ import (
 )
 
 func TestHelloWorldKubernetes(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
 	// clean up cluster
 	execCmd(t, "kubectl", "delete", "-f", "deploy/kubernetes-deployment.yaml")
 	execCmd(t, "kubectl", "delete", "-f", "deploy/kubernetes-service.yaml")
-
-	// build the container image
-	execCmd(t, "minikube", "image", "build", "-t", "helloworld", "-f", "deploy/Dockerfile", ".")
-	go execCmd(t, "minikube", "tunnel")
 
 	// redeploy
 	execCmd(t, "kubectl", "apply", "-f", "deploy/kubernetes-deployment.yaml")
@@ -37,8 +29,6 @@ func TestHelloWorldKubernetes(t *testing.T) {
 
 	ip, _ := execCmd(t, "kubectl", "get", "service", "helloworld", "-o", `jsonpath="{.status.loadBalancer.ingress[0].ip}"`)
 	if ip == "" {
-		// make sure minikube tunnel is running if no public IP exists
-		execCmdContext(ctx, t, "minikube", "tunnel")
 		// may take a while
 		time.Sleep(10 * time.Second)
 		ip, _ = execCmd(t, "kubectl", "get", "service", "helloworld", "-o", `jsonpath="{.status.loadBalancer.ingress[0].ip}"`)

@@ -1,0 +1,44 @@
+name: "Kind setup"
+description: "Installs and sets up a running kind cluster, including the cloud-provider-kind and istio for service mesh"
+inputs:
+  istio:
+    description: "A flag weather to start the istio service mesh"
+    default: 'false'
+    required: false
+runs:
+  using: composite
+  steps:
+    - name: Install kind and start cluster
+      uses: helm/kind-action@v1
+      with:
+        cluster_name: test
+        kubectl_version: 'v1.30.4'
+
+    - name: Load images to node(s)
+      shell: bash
+      run: |
+        for i in $(docker images --format "{{.Repository}}:{{.Tag}}" | grep ':test'); do
+          kind load docker-image -n test ${i}
+        done
+
+    - name: Install cloud-provider-kind and start in background
+      shell: bash
+      env:
+        VERSION: 0.6.0
+      run: |
+        curl -L https://github.com/kubernetes-sigs/cloud-provider-kind/releases/download/v${VERSION}/cloud-provider-kind_${VERSION}_linux_amd64.tar.gz \
+        | tar -xz
+        sudo mv cloud-provider-kind /usr/local/bin/
+        sudo chmod +x /usr/local/bin/cloud-provider-kind
+        cloud-provider-kind &
+
+    - name: Start istio service mesh
+      if: inputs.istio == 'true'
+      shell: bash
+      run: |
+        curl -L https://istio.io/downloadIstio | sh -
+        cd istio*
+        kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v1.0.0" | kubectl apply -f -
+        bin/istioctl install --set profile=minimal -y
+        kubectl label namespace default istio-injection=enabled --overwrite
+

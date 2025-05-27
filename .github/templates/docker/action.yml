@@ -1,0 +1,33 @@
+name: Docker build
+description: "Build the specified docker image and publishes it for the workflow"
+inputs:
+  path:
+    description: "The path of the dockerfile to be built"
+    required: true
+  filepath:
+    description: "If the dockerfile is in a different directory then the context it needs to be specified here"
+    required: false
+  tags:
+    description: "The tag(s) for building the image"
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Build the container
+      id: img
+      shell: bash
+      env:
+        CONTEXT_PATH: ${{ inputs.path }}
+        FILE_PATH: ${{ inputs.filepath }}
+        TAGS: ${{ inputs.tags }}
+      run: | 
+        bash $GITHUB_ACTION_PATH/build.sh
+        IMAGE_NAME=$(echo "${TAGS}" | cut -d : -f1)
+        echo ${IMAGE_NAME}
+        echo  "name=${IMAGE_NAME}" >> $GITHUB_ENV
+
+    - name: Publish image
+      uses:  actions/upload-artifact@v4
+      with:
+        name: ${{ env.name }}
+        path: ${{ inputs.path }}/images

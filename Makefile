@@ -49,6 +49,19 @@ test:
 	export STUDENT_ID=$(STUDENT_ID)
 	go test ./... -v -count 1
 
+# generate reports
+report:
+	export STUDENT_ID=$(STUDENT_ID)
+	if  [ ! -f report_tmp ]; then \
+		go test ./... -v -count 1 -parallel 1 > report_tmp; \
+  	fi
+	go run exercises-cli.go -verbose report
+
+# generate the hmtl report
+report-html:
+	export STUDENT_ID=$(STUDENT_ID)
+	go run exercises-cli.go -report-dir=$(REPORT_DIR) -verbose html > report.html
+
 # clean up generated files
 clean:
 	for dir in $(EXERCISE_DIRS); do \
@@ -59,3 +72,4 @@ clean:
 # also wipe student id
 realclean: clean
 	echo "PLEASE SET STUDENT ID" > $(STUDENT_ID_FILE)
+

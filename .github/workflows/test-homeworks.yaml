@@ -1,0 +1,46 @@
+name: Test Homeworks
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - 99-labs
+      - env
+      - internals
+      - .gitignore
+  workflow_dispatch:
+    inputs:
+      report:
+        type: boolean
+        description: If true then the pipeline creates a report json used for final evaluation and doesn't execute regular tests
+        default: false
+jobs:
+  test-homeworks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: '1'
+      - name: Setup go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '^1.24.0'
+      - name: Test homeworks
+        if: ! inputs.report || github.event_name == 'push'
+        run: |
+          export STUDENT_ID="$(grep -v -e '^$' STUDENT_ID)" # set the student_id used for test generation
+          make generate # generate the tests
+          make test
+      - name: Generate report
+        if: inputs.report
+        run: |
+          export STUDENT_ID="$(grep -v -e '^$' STUDENT_ID)" # set the student_id used for test generation
+          make generate
+          make report
+      - name: Artifact report
+        if: inputs.report
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'report'
+          path: '*-report.json'
+

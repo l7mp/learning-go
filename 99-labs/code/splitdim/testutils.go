@@ -63,6 +63,7 @@ func execCmdContext(ctx context.Context, t *testing.T, cmd string, args ...strin
 	var outb, errb bytes.Buffer
 	e.Stdout = &outb
 	e.Stderr = &errb
+	assert.NoError(t, e.Run(), fmt.Sprintf("run command %q", cmd))
 	log.Print("StdOut:\t", outb.String())
 	log.Print("StdErr:\t ", errb.String())
 

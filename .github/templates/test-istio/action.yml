@@ -1,0 +1,11 @@
+name: Test istio
+description: "Tests the istio service mesh"
+runs:
+  using: composite
+  steps:
+    - name: Test istio service mesh program
+      shell: bash
+      run: bash ${{ github.action_path }}/main.sh
+      env:
+        PROJECT_PATH: ${{ github.workspace }}
+        ACTION_PATH: ${{ github.action_path }}

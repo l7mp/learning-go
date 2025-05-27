@@ -1,0 +1,18 @@
+name: Load built images
+description: "Loads the previously built images and deletes the artifacts after"
+runs:
+  using: composite
+  steps:
+    - name: Load images
+      shell: bash
+      run: |
+        for i in $(ls images); do
+        docker image load < "images/$i"
+        done
+    - name: Delete artifacts
+      uses: geekyeggo/delete-artifact@v5
+      with:
+        useGlob: 'true'
+        name: '*'
+        failOnError: false
+

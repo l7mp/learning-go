@@ -25,7 +25,7 @@ runs:
         for i in $(docker images --format "{{.Repository}}:{{.Tag}}" | grep ':test'); do
           minikube image load ${i}
         done
-    - name: Start istio service mash
+    - name: Start istio service mesh
       if: inputs.istio == 'true'
       shell: bash
       run: |

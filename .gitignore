@@ -14,3 +14,4 @@
 *.out
 
 .vscode/*
+env/.vagrant/*

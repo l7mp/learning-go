@@ -47,7 +47,7 @@ The following command removes most of the extra packages.
 	wireshark-gtk \
 	fonts-noto-color-emoji
 
- export CNI_PLUGIN_DEB="containernetworking-plugins_1.1.1+ds1-3ubuntu0.24.04.1_amd64.deb"
+ export CNI_PLUGIN_DEB="containernetworking-plugins_1.1.1+ds1-3ubuntu0.24.04.3_amd64.deb"
  wget http://hu.archive.ubuntu.com/ubuntu/pool/universe/g/golang-github-containernetworking-plugins/$CNI_PLUGIN_DEB
  sudo dpkg -i $CNI_PLUGIN_DEB
  rm $CNI_PLUGIN_DEB
@@ -64,8 +64,8 @@ The following command removes most of the extra packages.
 ## Install Go
 This snippet installs the latest stable Go version:
 ```console
- export GO_TAR="$(curl -s https://go.dev/VERSION?m=text | head -n 1).linux-amd64.tar.gz"
- # export GO_TAR="go1.22.6.linux-amd64.tar.gz"
+ # export GO_TAR="$(curl -s https://go.dev/VERSION?m=text | head -n 1).linux-amd64.tar.gz"
+ export GO_TAR="go1.24.6.linux-amd64.tar.gz"
  wget "https://go.dev/dl/$GO_TAR"
  sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf $GO_TAR
  echo "export PATH=$PATH:/usr/local/go/bin" | sudo tee /etc/profile
@@ -108,7 +108,8 @@ Download VSCode from the apt repo and install relevant packages:
 ## Install Minikube
 Download, install and configure latest minikube:
 ```console
- curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+ # curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+ curl -LO https://github.com/kubernetes/minikube/releases/download/v1.33.1/minikube-linux-amd64
  sudo install minikube-linux-amd64 /usr/local/bin/minikube
  rm minikube-linux-amd64
  echo "source <(minikube completion bash)" >> ~/.bashrc

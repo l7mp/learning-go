@@ -28,5 +28,3 @@ jobs:
 
       - name: Run linters
         uses: golangci/golangci-lint-action@v8
-        with:
-          args: --issues-exit-code 0 --exclude-files '.*_test.go'

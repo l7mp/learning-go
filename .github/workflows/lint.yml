@@ -17,6 +17,7 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    if: github.repository == 'l7mp/learning-go'
     steps:
       - name: Install Go
         uses: actions/setup-go@v5

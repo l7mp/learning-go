@@ -175,7 +175,7 @@ func WithRetry(f Closure, wait Backoff) Closure
 
 > [!TIP]
 > 
-> You can browse the full documentation of the `resilient` package by starting a local godoc server in the root directory of the `resililient` package with `godoc -http=:6060` and then opening [`http://localhost:6060/pkg/resilient`](http://localhost:6060/pkg/resilient) in your browser.
+> You can browse the full documentation of the `resilient` package by starting a local godoc server in the root directory of the `resilient` package with `godoc -http=:6060` and then opening [`http://localhost:6060/pkg/resilient`](http://localhost:6060/pkg/resilient) in your browser.
 
 First, as usual, we have to make the `resilient` package available in `splitdim` (don't forget to "replace" the package search path with the local version):
 ```shell

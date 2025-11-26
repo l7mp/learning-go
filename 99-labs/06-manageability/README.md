@@ -141,7 +141,7 @@ Your job is now to add the necessary settings to the `splitdim` container templa
 >   ```
 > - wait a bit until the pod restarts and run the tests:
 >   ```shell
->   cd 99-labs/code
+>   cd 99-labs/code/splitdim
 >   export EXTERNAL_IP=$(kubectl get service splitdim -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 >   export EXTERNAL_PORT=80
 >   go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1

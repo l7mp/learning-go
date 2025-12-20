@@ -1,0 +1,5 @@
+name: testimony
+input:
+- name: strstr
+- name: strncat
+- name: strncpy

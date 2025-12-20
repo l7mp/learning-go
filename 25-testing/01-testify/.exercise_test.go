@@ -61,20 +61,55 @@ func TestNoTrivialAssertions(t *testing.T) {
 	}
 }
 
+{{- if eq (index . "name") "strstr"}}
+
+func strstr(str string, substr string) int {
+	if substr == "" {
+		return 0
+	}
+
+	for i := 0; i <= len(str)-len(substr); i++ {
+		if str[i:i+len(substr)] == substr {
+			return i
+		}
+	}
+
+	return -1
+}
+{{- end}}
+{{- if eq (index . "name") "strncat"}}
+
+func strncat(dest *string, src string, n int) {
+	if n > len(src) {
+		n = len(src)
+	}
+	*dest += src[:n]
+}
+{{- end}}
+{{- if eq (index . "name") "strncpy"}}
+
+func strncpy(dest *string, src string, n int) {
+	if n > len(src) {
+		n = len(src)
+	}
+	*dest = src[:n]
+}
+{{- end}}
+
 func TestRunStudentTests(t *testing.T) {
-{{if eq (index . "name") "strstr"}}
+{{- if eq (index . "name") "strstr"}}
 	t.Run("StrStrMatch", StrStrMatch)
 	t.Run("StrStrNoMatch", StrStrNoMatch)
 	t.Run("StrStrEmptySubString", StrStrEmptySubString)
-{{end}}
-{{if eq (index . "name") "strncat"}}
+{{- end}}
+{{- if eq (index . "name") "strncat"}}
 	t.Run("StrNCatInbounds", StrNCatInbounds)
 	t.Run("StrNCatOutOfBounds", StrNCatOutOfBounds)
 	t.Run("StrNCatEmptySource", StrNCatEmptySource)
-{{end}}
-{{if eq (index . "name") "strncpy"}}
+{{- end}}
+{{- if eq (index . "name") "strncpy"}}
 	t.Run("StrNCpyINbounds", StrNCpyINbounds)
 	t.Run("StrNCpyEmptyDestination", StrNCpyEmptyDestination)
 	t.Run("StrNCpyEmptySource", StrNCpyEmptySource)
-{{end}}
+{{- end}}
 }

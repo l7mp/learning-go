@@ -8,7 +8,8 @@ import (
 
 // DO NOT REMOVE THIS COMMENT
 //go:generate go run ../../exercises-cli.go -student-id=$STUDENT_ID generate
-{{if eq (index . "name") "strstr"}}
+{{- if eq (index . "name") "strstr"}}
+
 func strstr(str string, substr string) int {
 	if substr == "" {
 		return 0
@@ -22,26 +23,29 @@ func strstr(str string, substr string) int {
 
 	return -1
 }
-{{end}}
-{{if eq (index . "name") "strncat"}}
+{{- end}}
+{{- if eq (index . "name") "strncat"}}
+
 func strncat(dest *string, src string, n int) {
 	if n > len(src) {
 		n = len(src)
 	}
 	*dest += src[:n]
 }
-{{end}}
-{{if eq (index . "name") "strncpy"}}
+{{- end}}
+{{- if eq (index . "name") "strncpy"}}
+
 func strncpy(dest *string, src string, n int) {
 	if n > len(src) {
 		n = len(src)
 	}
 	*dest = src[:n]
 }
-{{end}}
+{{- end}}
+
 
 // INSERT YOUR CODE HERE
-{{if eq (index . "name") "strstr"}}
+{{- if eq (index . "name") "strstr"}}
 func StrStrMatch(t *testing.T) {
 
 }
@@ -54,7 +58,7 @@ func StrStrEmptySubString(t *testing.T) {
 
 }
 {{end}}
-{{if eq (index . "name") "strncat"}}
+{{- if eq (index . "name") "strncat"}}
 func StrNCatInbounds(t *testing.T) {
 
 }
@@ -67,7 +71,7 @@ func StrNCatEmptySource(t *testing.T) {
 
 }
 {{end}}
-{{if eq (index . "name") "strncpy"}}
+{{- if eq (index . "name") "strncpy"}}
 func StrNCpyINbounds(t *testing.T) {
 
 }

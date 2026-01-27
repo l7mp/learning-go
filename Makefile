@@ -14,7 +14,8 @@ EXERCISE_DIRS=\
 	21-channels \
 	22-context \
 	23-misc \
-	24-generics
+	24-generics \
+	25-testing
 
 # LAB subdirs
 LAB_DIRS=\

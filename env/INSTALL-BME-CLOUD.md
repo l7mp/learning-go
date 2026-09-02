@@ -65,7 +65,7 @@ The following command removes most of the extra packages.
 This snippet installs the latest stable Go version:
 ```console
  # export GO_TAR="$(curl -s https://go.dev/VERSION?m=text | head -n 1).linux-amd64.tar.gz"
- export GO_TAR="go1.24.6.linux-amd64.tar.gz"
+ export GO_TAR="go1.27.1.linux-amd64.tar.gz"
  wget "https://go.dev/dl/$GO_TAR"
  sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf $GO_TAR
  echo "export PATH=$PATH:/usr/local/go/bin" | sudo tee /etc/profile

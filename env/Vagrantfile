@@ -116,6 +116,8 @@ Vagrant.configure("2") do |config|
     gsettings set org.gnome.desktop.screensaver idle-activation-enabled false
     gsettings set org.gnome.desktop.screensaver lock-enabled false
     gsettings set org.gnome.desktop.lockdown disable-lock-screen 'true'
+
+    sudo sed -ri 's/^Prompt=.*/Prompt=never/' /etc/update-manager/release-upgrades
   SHELL
 
   config.vm.provision "reboot", type: "shell" do |shell|

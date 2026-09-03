@@ -118,6 +118,9 @@ Vagrant.configure("2") do |config|
     gsettings set org.gnome.desktop.lockdown disable-lock-screen 'true'
 
     sudo sed -ri 's/^Prompt=.*/Prompt=never/' /etc/update-manager/release-upgrades
+
+    sudo sed -i 's/^#\\?WaylandEnable=.*/WaylandEnable=false/' /etc/gdm3/custom.conf
+    grep -q '^WaylandEnable=false' /etc/gdm3/custom.conf || echo 'WaylandEnable=false' | sudo tee -a /etc/gdm3/custom.conf
   SHELL
 
   config.vm.provision "reboot", type: "shell" do |shell|

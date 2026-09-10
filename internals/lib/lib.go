@@ -12,12 +12,6 @@ import (
 const (
 	// StudentIdFile is the name of the file that holds the student id
 	StudentIdFile = "STUDENT_ID"
-	// OverrideStudentIdFile holds a student id that takes precedence over StudentIdFile.
-	// It exists for repositories that are not a student's own, like the solutions
-	// repository: every repository tracks StudentIdFile, so writing an id into it there
-	// would conflict on every merge from upstream. This file is carried only by the
-	// repository that needs it.
-	OverrideStudentIdFile = "__STUDENT_ID"
 	// StudentEnvVar is the name of the environment variable that holds the student id
 	StudentEnvVar = "STUDENT_ID"
 	// DefaultStudentId is what we store in the student id file by default

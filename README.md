@@ -19,11 +19,6 @@ Your student id should always be available in the file named `STUDENT_ID` in the
 STUDENT_ID=<MY-STUDENT-ID> make generate
 ```
 
-A file named `__STUDENT_ID`, if present, is consulted before `STUDENT_ID`. You will not
-need it: it is for repositories that are not a student's own, such as the solutions
-repository, which can carry an id there without touching `STUDENT_ID`, a file every
-repository tracks and which would otherwise conflict on every merge from upstream.
-
 ## Solve the exercises
 
 ### Write code

@@ -102,19 +102,17 @@ Then run `make clean`, this will add the placeholders for the exercise (these wi
 
 Labs tasks are located in the [99-labs](99-labs/) folder. The labs give you hands-on development and deployment experience. You will learn how to build and containerize Go programs as well as how to run them in Kubernetes. Each lab contains a README that gives you context and specifies the lab exercises. The labs depend on each other, so it is recommended to complete them one after the other.
 
-Each lab README walks you through the checks by hand, with `kubectl` and Minikube, which is how you are meant to work through them. Once you are done, `make lab-test` answers the other question: it builds your container images, brings up a throwaway Kubernetes cluster, deploys your own manifests into it and runs every lab check against them, so you get a single pass or fail for labs 02 to 06. It needs a container engine, and takes a few minutes; `make ci-test` runs the Go exercises first and then the labs.
+Each lab README walks you through the checks by hand, with `kubectl` and Minikube, which is how you are meant to work through them. Once you are done, `make lab-test` builds your container images, brings up a throwaway Kubernetes cluster, deploys your own manifests into it and runs every lab check against them, so you get a single pass or fail. It needs a container engine, and takes a few minutes to run.
 
 ``` console
-make ci-test           # exercises, then every lab
-make lab-test          # every lab
-LAB=05 make lab-test   # only lab 05
+make ci-test           # test exercises, then every lab
+make lab-test          # test all the labs
+LAB=05 make lab-test   # test only lab 05
 ```
 
-`LAB` is worth knowing about while you are working through the course. Only the
-applications you have already started are built, so you can check the lab you are on before
-the later ones exist.
+> [!NOTE] The CI tests are experimental: they pass in our tests, may not pass in yours. If the CI tests fail, that may not necessarily mean there a problem with your code. If you suspect the tests are wrong, please file an GitHub issue and copy-paste the tests logs, we will try to investigate.
 
-You can also run the checks against a cluster you already have, Minikube included. Build the images the manifests refer to (`localhost/helloworld`, `localhost/splitdim`, `localhost/kvstore`) into that cluster, then point the tests at it with your usual `KUBECONFIG`:
+You can also run the checks against a cluster you already have, Minikube included. Build the images into that cluster, then point the tests at it with your usual `KUBECONFIG`:
 
 ``` console
 cd 99-labs/ci
@@ -122,6 +120,8 @@ LABS_EXTERNAL_CLUSTER=1 LABS_SOURCE=$(git rev-parse --show-toplevel) go test ./ 
 ```
 
 See [99-labs/ci/README.md](99-labs/ci/README.md) for the details.
+
+> [!NOTE] This repo is set up to automatically run the test suite at GitHub and report the result in a small status check: a green check mark if all tests (homework+labs) pass, a little red cross if not. This requires your student if in `STUDENT_ID`: make sure to commit and push it. Don't forget to commit all your lab solutions and manifests as well!
 
 ## Clean up
 

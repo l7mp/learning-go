@@ -277,7 +277,7 @@ You should always add and commit your solutions to this repo (see below) to avoi
 
 ### Generate the exercises
 
-Change to the root of the git repo and make sure to read the instructions in the `README.md` file. The below summarizes the main steps.
+Change to the root of the git repo and make sure to read the instructions in the main `README.md` file. The below summarizes the main steps. Then make sure to store your student id in the file named `STUDENT_ID` and issue `make generate` to generate the tests:
 
 ``` shell
 echo <MY-STUDENT-ID> > STUDENT_ID
@@ -310,7 +310,7 @@ FAIL
 Consult the `README.md` file for how to solve the exercise and place your solution into the file `exercise.go` at the placeholder.
 
 > [!NOTE]
-> It is usually not worth copying someone else's solution: most probably your exercises will be quite different for theirs (that is what `make generate` is for).
+> It is usually not worth copying someone else's solution: most probably your exercises will be quite different from theirs (that is what `make generate` is for).
 
 For instance, you may be asked to write a `helloWorld` function in Go that will return the string `Hello world!` (your exercise may differ, so make sure you read the README carefully!). In this case, insert the below code into `exercise.go`:
 
@@ -344,6 +344,22 @@ git commit -m 'first exercise solved'
 > ```
 
 You can test *all* your solutions from the main directory by issuing `make test`. Currently only the first test will succeed: at the end of the course you should have *all the tests* pass.
+
+## Labs
+
+Later we will go through all the labs in `99-labs/` and solve each task. We provide an experimental continuous integration test suite that can be used to test your lab solutions. The CI tests will deploy the lab applications into a real Kubernetes cluster and check that your code behaves the expected way. 
+
+To run the CI tests locally, first make sure to store student ID in `STUDENT_ID` and then issue:
+
+> ``` shell
+> make ci-test
+> ```
+
+This will run the homework tests and the lab tests. If all goes well, you should see all tests to pass.
+
+> [!NOTE] The CI tests are experimental: they pass in our tests, may not pass in yours. If the CI tests fail, that may not necessarily mean there a problem with your code. If you suspect the tests are wrong, please file an GitHub issue and copy-paste the tests logs, we will try to investigate.
+
+This repo is set up to automatically run the test suite at GitHub and report the result in a small status check: a green check mark if all tests (homework+labs) pass, a little red cross if not. This requires your student if in `STUDENT_ID`: make sure to commit and push it.
 
 <!-- Local Variables: -->
 <!-- mode: markdown; coding: utf-8 -->

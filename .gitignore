@@ -15,3 +15,7 @@
 
 .vscode/*
 env/.vagrant/*
+
+# The lab Dockerfiles build from a vendor directory, so working through the labs leaves one
+# behind in every lab module. It is derived from go.mod and go.sum and never belongs in git.
+99-labs/code/*/vendor/

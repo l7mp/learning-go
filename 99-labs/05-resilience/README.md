@@ -105,7 +105,7 @@ It is easy to test this:
 - You should see `curl` hanging for a while just to timeout after a longish wait. Meanwhile the `splitdim` pod is going completely berserk, filling the log with the traces of desperately trying to reach the key-value store:
   ```shell
   kubectl logs $(kubectl get pods -l app=splitdim -o jsonpath='{.items[0].metadata.name}') -f
-  kvstore_db.go:52: transfer: could not set balance for user "a": get: HTTP error: Get "http://kvstore.default:8081/api/get": dial tcp: lookup kvstore.default on 10.96.0.10:53: no such host
+  kvstore_db.go:52: transfer: could not set balance for user "a": get: HTTP error: Get "http://kvstore.default:8081/api/get?id=a": dial tcp: lookup kvstore.default on 10.96.0.10:53: no such host
   ...
   ```
 
@@ -205,7 +205,7 @@ Observe that the function returned from `setBalanceForUser` now conforms to the 
 
 So below is a sequence of steps that will make sure `Transfer` survives key-value store failures:
 
-1. Create a `defaultBackoff` retry policy that will allow at most 6 retries, using the base time of 150 ms and 2 sec timeout.
+1. Create a `defaultBackoff` retry policy that will allow at most 4 attempts, using a base time of 50 ms and a 500 ms cap. Keep the delays short: the whole point is to give a flaky downstream a few chances without making the caller wait, and a transfer that cannot succeed should report the failure in about a second rather than after half a minute.
 2. Call `db.setBalanceForUser(t.Sender, t.Amount)` to create a `Closure` that will increase the balance of the sender by the requested amount that can now be passed to `resilient.WithRetry`.
 3. Use `resilient.WithRetry` on the closure obtained in the previous step using the default backoff policy to decorate it with a retry policy.
 4. Call the decorated closure returned from `resilient.WithRetry` to actually set the balance: if this fails that means that all retries have failed so we can safely return an error.
@@ -223,53 +223,64 @@ So below is a sequence of steps that will make sure `Transfer` survives key-valu
 
 You may want to update the existing `kvstore` datalayer (`splitdim/pkg/db/kvstore`) in the `splitdim` app or you can put the new code into a new subpackage (say, `splitdim/pkg/db/resilientkvstore`) as well; the choice is on you. In any way, use the usual two environment variables, `KVSTORE_MODE` and `KVSTORE_ADDR`, to select the key-value store datalayer implementation (say, `local`, `kvstore`, `resilientkvstore`, etc) and (optionally) specify the key-value store address on startup.
 
-To actually make use of the improved code, first try a local build with a missing key-value store backend (this will make all transfers fail) and check whether a `curl` call to `/api/transfer` will fail in a controlled way (instead of falling into an infinite retry loop). Then, test with Kubernetes:
+To actually make use of the improved code, first try a local build with a missing key-value store backend: every transfer should now fail in a controlled way instead of hanging forever.
 
-1. Enable the Istio service mesh in the cluster and apply the below *fault injection* policy that will fail roughly every third call to the `/api/put` API (make sure Istio is installed!):
-   ```shell
-   kubectl label namespace default istio-injection=enabled --overwrite
-   kubectl apply -f - <<EOF
-   apiVersion: networking.istio.io/v1alpha3
-   kind: VirtualService
-   metadata: { name: kvstore-500 }
-   spec:
-     hosts: [ kvstore ]
-     http:
-       # requests to the "/api/put" path will return 500 status
-       - match: [ uri: { exact: "/api/put" } ]
-         fault: { abort: { httpStatus: 500, percentage: { value: 33 } } }
-         route: [ destination: { host: kvstore } ]
-       # default route: everything that is not a "put" ("list" and "get")
-       - route: [ destination: { host: kvstore } ]
-   EOF
-   ```
-
-2. Rebuild the `splitdim` and the `kvstore` images.
-
-3. Restart the `splitdim` Deployment and the key-value store.
-   ```shell
-   kubectl rollout restart deployment splitdim
-   kubectl rollout restart statefulset kvstore
-   ```
-
-4. Wait until all pods restart and then make some simple tests with `curl` to check if everything works fine.
+The first test below checks exactly that. Stop the key-value store, start the app in key-value store mode, and post a transfer: the app has to give up and report a failure rather than retry until the end of time.
 
 > ✅ **Check**
-> 
-> Test your Kubernetes deployment. If all goes well, you should see the output `PASS`.
+>
+> Stop the key-value store, then start the app pointing at it anyway:
 > ``` sh
-> export EXTERNAL_IP=$(kubectl get service splitdim -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-> export EXTERNAL_PORT=80
-> go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1
+> cd 99-labs/code/splitdim
+> KVSTORE_MODE=kvstore KVSTORE_ADDR=localhost:8081 go run main.go &
+> go test ./... --tags=failingkvstoremode -v -count 1
 > PASS
 > ```
 
-After the test passes, you can disable Istio service mesh to save resources.
-```shell
-kubectl label namespace default istio-injection=disabled --overwrite
-kubectl rollout restart deployment splitdim
-kubectl rollout restart statefulset kvstore
+For testing the resiliency policy, the key-value store can be configured at startup time so that it will randomly drop calls. In particular, started with the environment variable `KVSTORE_FAULT_INJECTION=1` the `kvstore` serves an extra API on `/api/fault` that makes its own endpoints misbehave in a configurable way:
+
+``` shell
+KVSTORE_FAULT_INJECTION=1 go run kvstore.go &
 ```
+
+Fail the next 3 calls to `/api/put`, then behave normally again:
+```
+curl -X POST -H "Content-Type: application/json" \
+     --data '{"path":"/api/put","failNext":3}' http://localhost:8081/api/fault
+```
+
+Fail a third of the calls to `/api/put`, indefinitely:
+```
+curl -X POST -H "Content-Type: application/json" \
+     --data '{"path":"/api/put","abortPercent":33}' http://localhost:8081/api/fault
+```
+
+Take two seconds over every `/api/put`:
+```
+curl -X POST -H "Content-Type: application/json" \
+     --data '{"path":"/api/put","delay":"2s"}' http://localhost:8081/api/fault
+```
+
+To see what is configured, and how many requests each endpoint has seen, issue `curl http://localhost:8081/api/fault`.
+
+Clear all configured fault-injection:
+```
+curl -X DELETE http://localhost:8081/api/fault
+```
+
+The request counters show whether your app actually retried a failed call or gave up after the first attempt. 
+
+> ✅ **Check**
+>
+> Start the key-value store with fault injection and the app in key-value store mode:
+> ``` sh
+> cd 99-labs/code/kvstore
+> KVSTORE_FAULT_INJECTION=1 go run kvstore.go &
+> cd ../splitdim
+> KVSTORE_MODE=kvstore KVSTORE_ADDR=localhost:8081 go run main.go &
+> go test ./... --tags=kvstoremode,retry,healthz,httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1
+> PASS
+> ```
 
 > [!TIP]
 > 
@@ -314,14 +325,26 @@ Rebuild the container image, redeploy the `splitdim` Deployment, and rerun some 
 > You can check the consistency of the accounts database by calling the `/api/clear`. Recall, the first thing `Clear` does is to check whether the account balances add up to zero. A halfway applied transfer will most probably leave behind state in which this condition does not hold.
 
 > ✅ **Check**
-> 
-> Test your Kubernetes deployment. 
->   ``` sh
->   export EXTERNAL_IP=$(kubectl get service splitdim -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
->   export EXTERNAL_PORT=80
->   go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1
->   PASS
->   ```
+>
+> Start the key-value store with fault injection, tell it to take five seconds over every `put`, then send the app a transfer and a `SIGTERM` while that transfer is running.
+> ``` sh
+> cd 99-labs/code/kvstore
+> KVSTORE_FAULT_INJECTION=1 go run kvstore.go &
+> curl -X POST -H "Content-Type: application/json" \
+>      --data '{"path":"/api/put","delay":"5s"}' http://localhost:8081/api/fault
+>
+> cd ../splitdim
+> go build -o splitdim main.go
+> KVSTORE_MODE=kvstore KVSTORE_ADDR=localhost:8081 ./splitdim &
+>
+> # ask the app to stop while a transfer is still in flight
+> ( sleep 1; killall -TERM splitdim ) &
+> curl -sS -w '\nHTTP %{http_code}\n' -H "Content-Type: application/json" --request POST \
+>      --data '{"sender":"a","receiver":"b","amount":1}' \
+>      http://localhost:8080/api/transfer
+> HTTP 200
+> ```
+> Every `put` now takes two seconds, so the transfer is still being served when the signal arrives, and the app has to finish it anyway: `HTTP 200` means it did. Without `server.Shutdown` the process dies the moment it receives the signal, and `curl` reports `Empty reply from server` instead.
 
 ## Health checks
 
@@ -354,14 +377,15 @@ spec:
 And this should be it. Rebuild the `splidim` image, reapply the Kubernetes manifest. Watch for the status of the `splitdim` pods: if you see lots of restarts then you misconfigured something (look for the `RESTARTS` column in the output of `kubectl get pods`). The telltale sign of a misconfigured liveness probe is Kubernetes restarting a pod every 5-10 seconds.
 
 > ✅ **Check**
-> 
-> Test your Kubernetes deployment. 
->   ``` sh
->   export EXTERNAL_IP=$(kubectl get service splitdim -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
->   export EXTERNAL_PORT=80
->   go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1
->   PASS
->   ```
+>
+> Point the tests at your Kubernetes deployment and run the same single command as above:
+> ``` sh
+> export EXTERNAL_IP=$(kubectl get service splitdim -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+> export EXTERNAL_PORT=80
+> go test ./... --tags=kvstoremode,retry,healthz,httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1
+> PASS
+> ```
+> Then watch the pods for a minute: `kubectl get pods -l app=splitdim -w`. The `RESTARTS` column has to stay at zero. A liveness probe pointed at the wrong path or port shows up as a pod that Kubernetes restarts every few seconds.
 
 ## Transactions revisited
 

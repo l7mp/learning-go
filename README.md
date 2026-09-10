@@ -19,6 +19,11 @@ Your student id should always be available in the file named `STUDENT_ID` in the
 STUDENT_ID=<MY-STUDENT-ID> make generate
 ```
 
+A file named `__STUDENT_ID`, if present, is consulted before `STUDENT_ID`. You will not
+need it: it is for repositories that are not a student's own, such as the solutions
+repository, which can carry an id there without touching `STUDENT_ID`, a file every
+repository tracks and which would otherwise conflict on every merge from upstream.
+
 ## Solve the exercises
 
 ### Write code
@@ -92,11 +97,36 @@ Add a new subdirectory and add the following files:
 
 If you add a new top-level directory, don't forget to include it in the `EXERCISE_DIRS` in the Makefile.
 
+Each exercise directory is also listed in `EXERCISES` in the Makefile. That list is what
+`make generate` writes and what `make clean` removes, which keeps the two symmetric: a
+cleaned tree can always be regenerated. Add new exercises there too.
+
 Then run `make clean`, this will add the placeholders for the exercise (these will be overwritten by `make generate`), add all files in the exercise dir to the git repo, and git-push.
 
 ## Complete the labs
 
 Labs tasks are located in the [99-labs](99-labs/) folder. The labs give you hands-on development and deployment experience. You will learn how to build and containerize Go programs as well as how to run them in Kubernetes. Each lab contains a README that gives you context and specifies the lab exercises. The labs depend on each other, so it is recommended to complete them one after the other.
+
+Each lab README walks you through the checks by hand, with `kubectl` and Minikube, which is how you are meant to work through them. Once you are done, `make lab-test` answers the other question: it builds your container images, brings up a throwaway Kubernetes cluster, deploys your own manifests into it and runs every lab check against them, so you get a single pass or fail for labs 02 to 06. It needs a container engine, and takes a few minutes; `make ci-test` runs the Go exercises first and then the labs.
+
+``` console
+make ci-test           # exercises, then every lab
+make lab-test          # every lab
+LAB=05 make lab-test   # only lab 05
+```
+
+`LAB` is worth knowing about while you are working through the course. Only the
+applications you have already started are built, so you can check the lab you are on before
+the later ones exist.
+
+You can also run the checks against a cluster you already have, Minikube included. Build the images the manifests refer to (`localhost/helloworld`, `localhost/splitdim`, `localhost/kvstore`) into that cluster, then point the tests at it with your usual `KUBECONFIG`:
+
+``` console
+cd 99-labs/ci
+LABS_EXTERNAL_CLUSTER=1 LABS_SOURCE=$(git rev-parse --show-toplevel) go test ./ -run TestLab04 -v
+```
+
+See [99-labs/ci/README.md](99-labs/ci/README.md) for the details.
 
 ## Clean up
 

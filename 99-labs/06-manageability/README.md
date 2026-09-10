@@ -52,22 +52,30 @@ Here is a sequence of steps that you can follow to achieve that:
 Once everything is ready, you can play a bit with a local build to see if everything went fine.
 
 > ✅ **Check**
-> 
+>
 > Test your solution through the following steps:
-> - start the key-value store: `cd 99-labs/code/kvstore && go run kvstore.go`;
-> - build an executable from the `splitdim` app with `cd 99-labs/code/splitdim && go build -o splitdim main.go`;
-> - start the app with the local data layer in the background: `./splitdim -mode local&`;
-> - set the reachability info for `splitdim`: `export EXTERNAL_IP=localhost; export EXTERNAL_PORT=8080`;
-> - run the tests:
->   ```go
+>
+> - start the key-value store: `cd 99-labs/code/kvstore && go run kvstore.go&`;
+> - build the app: `cd 99-labs/code/splitdim && go build -o splitdim main.go`;
+> - point the tests at it: `export EXTERNAL_IP=localhost; export EXTERNAL_PORT=8080`;
+> - start with the local data layer and check the store stays untouched:
+>   ``` sh
+>   ./splitdim -mode local&
 >   go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1
+>   killall splitdim
 >   ```
-> - restart the app with the key-value store mode: `killall splitdim; ./splitdim -mode kvstore -addr localhost:8081&`;
-> - rerun the tests:
->   ```go
->   go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1
+> - start with the key-value store data layer and check the balances arrive there:
+>   ``` sh
+>   ./splitdim -mode kvstore -addr localhost:8081&
+>   go test ./... --tags=kvstoremode,httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1
+>   killall splitdim
 >   ```
-> - stop the app: `killall splitdim`.
+> - finally check that an explicit flag overrides the environment variable, as the lab specifies:
+>   ``` sh
+>   KVSTORE_MODE=local ./splitdim -mode kvstore -addr localhost:8081&
+>   go test ./... --tags=kvstoremode,httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1
+>   killall splitdim
+>   ```
 > If all goes well, you should see all tests to PASS.
 
 ## Configuration files
@@ -122,12 +130,20 @@ An additional `optional: true` setting makes sure that Kubernetes will not compl
 >
 > You can also [map the entire ConfigMap data as a single file](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#add-configmap-data-to-a-volume) into the filesystem of the pod and use the standard filesystem operations to read it.
 
-Your job is now to add the necessary settings to the `splitdim` container template to map the `splitdim-config` ConfigMap into the environment variables `KVSTORE_MODE` and `KVSTORE_ADDR` and redeploy the Kubernetes manifests. Make some quick tests with `curl` to see if everything is fine
+Your job is now to add the necessary settings to the `splitdim` container template to map the `splitdim-config` ConfigMap into the environment variables `KVSTORE_MODE` and `KVSTORE_ADDR` and redeploy the Kubernetes manifests. Make some quick tests with `curl` to see if everything is fine. Please use exactly the entry names shown above, `kvstoreMode` and `kvstoreAddr`, in the ConfigMap, and call the ConfigMap `splitdim-config`, the automated tests need this.
 
 > ✅ **Check**
-> 
-> Test your Kubernetes deployment through the following steps:
-> - choose the local data layer and restart the `splitdim` Deployment to actually use the new settings:
+>
+> Check is where the balances land; we want the key-value store to maintain all data.
+> - point the tests at your deployment:
+>   ```shell
+>   cd 99-labs/code/splitdim
+>   export EXTERNAL_IP=$(kubectl get service splitdim -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+>   export EXTERNAL_PORT=80
+>   export KVSTORE_URL=http://localhost:8081
+>   kubectl port-forward service/kvstore 8081:8081 &
+>   ```
+> - select the local data layer and restart the Deployment to pick the new setting up:
 >   ```shell
 >   kubectl apply -f - <<EOF
 >   apiVersion: v1
@@ -138,15 +154,10 @@ Your job is now to add the necessary settings to the `splitdim` container templa
 >     kvstoreMode: "local"
 >   EOF
 >   kubectl rollout restart deployment splitdim
->   ```
-> - wait a bit until the pod restarts and run the tests:
->   ```shell
->   cd 99-labs/code/splitdim
->   export EXTERNAL_IP=$(kubectl get service splitdim -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
->   export EXTERNAL_PORT=80
+>   kubectl rollout status deployment splitdim
 >   go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1
 >   ```
-> - restart the app with the `kvstore` data layer:
+> - then switch to the key-value store data layer:
 >   ```shell
 >   kubectl apply -f - <<EOF
 >   apiVersion: v1
@@ -158,12 +169,10 @@ Your job is now to add the necessary settings to the `splitdim` container templa
 >     kvstoreAddr: "kvstore.default:8081"
 >   EOF
 >   kubectl rollout restart deployment splitdim
+>   kubectl rollout status deployment splitdim
+>   go test ./... --tags=kvstoremode,httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1
 >   ```
-> - again, wait until `splitdim` restarts and rerun the tests:
->   ```shell
->   go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1
->   ```
-> If all goes well, you should see all tests to PASS.
+> If all goes well, you should see all tests to PASS. If `TestModeLocal` finds data in the key-value store then the ConfigMap is not reaching the app: check the `configMapKeyRef` entries in your Deployment.
 
 > [!WARNING]
 >

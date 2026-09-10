@@ -2,19 +2,17 @@ package main
 
 import (
 	"bytes"
-	"context"
-	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
-	"os/exec"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
+// testHTTP issues a request against the web service under test. The address defaults to
+// localhost:8080 and can be overridden with the EXTERNAL_IP and EXTERNAL_PORT environment
+// variables, which is how the tests are pointed at a Kubernetes LoadBalancer.
 func testHTTP(t *testing.T, api, method, body string) (*http.Response, error) {
 	addr := "localhost"
 	if os.Getenv("EXTERNAL_IP") != "" {
@@ -44,27 +42,4 @@ func testHTTP(t *testing.T, api, method, body string) (*http.Response, error) {
 	assert.NoError(t, err, "create req")
 
 	return http.DefaultClient.Do(req)
-}
-
-func execCmd(t *testing.T, cmd string, args ...string) (string, string, error) {
-	return execCmdContext(context.Background(), t, cmd, args...)
-}
-
-func execCmdContext(ctx context.Context, t *testing.T, cmd string, args ...string) (string, string, error) {
-	p, err := exec.LookPath(cmd)
-	if errors.Is(err, exec.ErrDot) {
-		err = nil
-	}
-	assert.NoError(t, err, fmt.Sprintf("find command %q in PATH", cmd))
-
-	log.Print("Executing:\t", cmd, " ", strings.Join(args, " "))
-
-	e := exec.CommandContext(ctx, p, args...)
-	var outb, errb bytes.Buffer
-	e.Stdout = &outb
-	e.Stderr = &errb
-	log.Print("StdOut:\t", outb.String())
-	log.Print("StdErr:\t ", errb.String())
-
-	return outb.String(), errb.String(), err
 }

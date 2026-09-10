@@ -1,0 +1,72 @@
+name: Tests
+
+# Runs what "make ci-test" runs: the Go exercises, then the labs in a real Kubernetes
+# cluster. In your own fork it tells you whether you are done.
+#
+# The upstream repository ships the exercises and the labs as skeletons and has no student
+# id, so these jobs fail there, quickly and by design. That failure is the expected state
+# of the template, not a broken build.
+
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '*'
+  pull_request:
+  workflow_dispatch:
+
+# Nothing here writes to the repository, and this makes that impossible rather than merely
+# true.
+permissions:
+  contents: read
+
+# A push that supersedes an in-flight run makes the older one pointless, and the lab job is
+# expensive.
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # The Go exercises, which is what "make test" runs.
+  exercises:
+    name: Go exercises
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Install Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
+
+      - name: Generate the exercises
+        run: make generate
+
+      - name: Run the exercise tests
+        run: make test
+
+  # The labs proper, which is what "make lab-test" runs: build the images from the lab
+  # Dockerfiles, start Kubernetes, deploy the manifests and test against them.
+  #
+  # The runner already has a container engine, which is all this needs: the harness builds
+  # the images through the Docker API and installs k3d itself.
+  labs:
+    name: Labs 02-06 in Kubernetes
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Install Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: 99-labs/ci/go.mod
+          cache-dependency-path: 99-labs/ci/go.sum
+
+      - name: Run the lab tests
+        run: make lab-test

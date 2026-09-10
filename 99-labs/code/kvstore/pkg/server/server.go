@@ -21,11 +21,17 @@ type Server struct {
 	store  map[string]api.VersionedValue
 	mu     sync.RWMutex
 	server *http.Server
+	mux    *http.ServeMux
+	fault  *faultInjector
 	logger translog.TransactionLogger
 }
 
 func NewServer(logFile string) (*Server, error) {
-	s := Server{store: make(map[string]api.VersionedValue)}
+	s := Server{
+		store: make(map[string]api.VersionedValue),
+		mux:   http.NewServeMux(),
+		fault: newFaultInjector(),
+	}
 
 	log.Printf("Using transaction log in %q", logFile)
 	fileLogger, err := translog.NewFileTransactionLogger(logFile)
@@ -34,7 +40,14 @@ func NewServer(logFile string) (*Server, error) {
 	}
 	s.logger = fileLogger
 
-	http.HandleFunc("/api/reset", func(w http.ResponseWriter, r *http.Request) {
+	// handle registers an API handler, decorated with fault injection when that is
+	// enabled. Fault injection is inert in a normal build, see fault.go.
+	handle := func(path string, h http.HandlerFunc) {
+		s.mux.HandleFunc(path, s.fault.wrap(path, h))
+	}
+	s.fault.registerAPI(s.mux)
+
+	handle("/api/reset", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("reset")
 
 		s.reset()
@@ -43,7 +56,7 @@ func NewServer(logFile string) (*Server, error) {
 
 	})
 
-	http.HandleFunc("/api/get", func(w http.ResponseWriter, r *http.Request) {
+	handle("/api/get", func(w http.ResponseWriter, r *http.Request) {
 		//Enforce HTTP GET on the GET endpoint
 		if r.Method != "GET" {
 			w.WriteHeader(http.StatusMethodNotAllowed)
@@ -61,7 +74,7 @@ func NewServer(logFile string) (*Server, error) {
 
 	})
 
-	http.HandleFunc("/api/put", func(w http.ResponseWriter, r *http.Request) {
+	handle("/api/put", func(w http.ResponseWriter, r *http.Request) {
 		vkv := api.VersionedKeyValue{}
 		defer r.Body.Close()
 		if err := json.NewDecoder(r.Body).Decode(&vkv); err != nil {
@@ -85,13 +98,13 @@ func NewServer(logFile string) (*Server, error) {
 		w.WriteHeader(http.StatusOK)
 	})
 
-	http.HandleFunc("/api/list", func(w http.ResponseWriter, r *http.Request) {
+	handle("/api/list", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("list")
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(s.list())
 	})
 
-	http.HandleFunc("/api/transaction", func(w http.ResponseWriter, r *http.Request) {
+	handle("/api/transaction", func(w http.ResponseWriter, r *http.Request) {
 		vkvs := []api.VersionedKeyValue{}
 		defer r.Body.Close()
 		if err := json.NewDecoder(r.Body).Decode(&vkvs); err != nil {
@@ -249,7 +262,7 @@ func (s *Server) Run(ctx context.Context, addr string) error {
 	s.logger.Run(ctx)
 
 	log.Printf("Starting HTTP server at %s", addr)
-	s.server = &http.Server{Addr: addr}
+	s.server = &http.Server{Addr: addr, Handler: s.mux}
 	go func() {
 		if err := s.server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
 			log.Fatalf("HTTP server error: %v", err)

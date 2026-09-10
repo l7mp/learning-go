@@ -43,15 +43,29 @@ func findStudentId(id *string) (string, error) {
 		return "", err
 	}
 
-	if file, err := findFile(dir, StudentIdFile); err == nil {
+	// The override file wins, and a file still holding the placeholder counts as unset,
+	// so a repository that carries an override is not held back by the STUDENT_ID file
+	// that every repository tracks.
+	for _, name := range []string{OverrideStudentIdFile, StudentIdFile} {
+		file, err := findFile(dir, name)
+		if err != nil {
+			continue
+		}
+
 		dat, err := os.ReadFile(file)
 		if err != nil {
-			return "", fmt.Errorf("internal error: could not find student-id file %q returned by findFile",
-				StudentIdFile)
+			return "", fmt.Errorf("could not read student-id file %q: %w", file, err)
 		}
-		return strings.ToUpper(strings.TrimSpace(string(dat))), nil
+
+		student := strings.ToUpper(strings.TrimSpace(string(dat)))
+		if student == "" || student == DefaultStudentId {
+			continue
+		}
+
+		return student, nil
 	}
 
-	return "", fmt.Errorf("no student id file found searhing up from %q", dir)
-
+	return "", fmt.Errorf("no student id: searched for %s and %s upwards from %q, "+
+		"put your id in %s and commit it", OverrideStudentIdFile, StudentIdFile, dir,
+		StudentIdFile)
 }

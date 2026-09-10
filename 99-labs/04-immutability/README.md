@@ -6,6 +6,10 @@ In the course of this lab and the following ones we will gradually improve our r
 
 Currently the app uses a local database maintained in memory: we know that this is not safe under scaling and restarting pods. The below tasks guide you in making the web app stateless by state externalization. The tasks are followed by tests; pass each test to complete the lab.
 
+> [!NOTE]
+>
+> There is no need to build the image and deploy it by hand every time you want to check your work: `LAB=04 make lab-test` in the root of the repository runs all checks of the lab in a dedicated test harness.
+
 ## Table of Contents
 
 1. [Preliminaries](#preliminaries)
@@ -449,10 +453,11 @@ If all goes well (and all compile errors are taken care of), then we can make a 
 >
 > Run the below test in `99-labs/code/splitdim` to check whether you have successfully completed the task. If all goes well, you should see the output `PASS`.
 > ``` sh
-> go test ./... --tags=httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1
+> go test ./... --tags=kvstoremode,httphandler,api,localconstructor,reset,transfer,accounts,clear -v -count 1
 > PASS
 > ```
-> Note that the splitdim app and the key-value must both run for the tests to pass
+> Note that the splitdim app and the key-value store must both run for the tests to pass.
+
 
 ## Deploy to Kubernetes
 

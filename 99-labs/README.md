@@ -1,10 +1,9 @@
 # Labs
 
-The course consists of labs that give you hands-on experience on both
-developing and deploying cloud-native apps in Go. During the labs you
-will learn how to build, containerize, and deploy your Go programs in
-the cloud. We will mostly work with Kubernetes, while last labs focus
-on service meshes.
+The course consists of labs that give you hands-on experience on both developing and deploying
+cloud-native apps in Go. During the labs you will learn how to build, containerize, and deploy your
+Go programs in the cloud. We will mostly work with Kubernetes, while last labs focus on service
+meshes.
 
 ## Available labs
 
@@ -15,6 +14,17 @@ on service meshes.
 1. [Cloud-native patterns: Resilience](05-resilience/)
 1. [Cloud-native patterns: Manageability](06-manageability/)
 1. [Service mesh](07-service-mesh/)
+
+## Testing
+
+Each lab README walks you through the checks by hand, which is how you are meant to work through
+them. Once a lab is done, `LAB=<LAB-ID> make lab-test` from the repository root runs the automated
+tests for that lab (so `LAB=05 make lab-test` will run only the 5-th lab on resiliency): it builds
+your container images, brings up a throwaway Kubernetes cluster, deploys your manifests and runs
+every test against the cluster, giving you a single pass or fail. To check *all* labs at once, use
+`make lab-test` (again from the repository root).
+
+The test suite itself lives in [ci/](ci/); you are welcome to study them.
 
 <!-- Local Variables: -->
 <!-- mode: markdown; coding: utf-8 -->

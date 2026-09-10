@@ -351,15 +351,13 @@ Later we will go through all the labs in `99-labs/` and solve each task. We prov
 
 To run the CI tests locally, first make sure to store student ID in `STUDENT_ID` and then issue:
 
-> ``` shell
-> make ci-test
-> ```
+``` shell
+make ci-test
+```
 
 This will run the homework tests and the lab tests. If all goes well, you should see all tests to pass.
 
-> [!NOTE] The CI tests are experimental: they pass in our tests, may not pass in yours. If the CI tests fail, that may not necessarily mean there a problem with your code. If you suspect the tests are wrong, please file an GitHub issue and copy-paste the tests logs, we will try to investigate.
-
-This repo is set up to automatically run the test suite at GitHub and report the result in a small status check: a green check mark if all tests (homework+labs) pass, a little red cross if not. This requires your student if in `STUDENT_ID`: make sure to commit and push it.
+This repo is set up to automatically run the test suite at GitHub and report the result in a small status check in the header: a green check mark if all tests (homework+labs) pass, a little red cross is shown if not. This requires your student if in `STUDENT_ID`: make sure to commit and push it.
 
 <!-- Local Variables: -->
 <!-- mode: markdown; coding: utf-8 -->

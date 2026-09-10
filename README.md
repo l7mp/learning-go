@@ -110,7 +110,8 @@ make lab-test          # test all the labs
 LAB=05 make lab-test   # test only lab 05
 ```
 
-> [!NOTE] The CI tests are experimental: they pass in our tests, may not pass in yours. If the CI tests fail, that may not necessarily mean there a problem with your code. If you suspect the tests are wrong, please file an GitHub issue and copy-paste the tests logs, we will try to investigate.
+> [!NOTE]
+> The CI tests are experimental: they pass in our tests, may not pass in yours. If the CI tests fail then that may not necessarily indicate a problem with your code. If you suspect the tests are wrong, please file a GitHub issue and copy-paste the test logs, we will investigate.
 
 You can also run the checks against a cluster you already have, Minikube included. Build the images into that cluster, then point the tests at it with your usual `KUBECONFIG`:
 
@@ -121,7 +122,8 @@ LABS_EXTERNAL_CLUSTER=1 LABS_SOURCE=$(git rev-parse --show-toplevel) go test ./ 
 
 See [99-labs/ci/README.md](99-labs/ci/README.md) for the details.
 
-> [!NOTE] This repo is set up to automatically run the test suite at GitHub and report the result in a small status check: a green check mark if all tests (homework+labs) pass, a little red cross if not. This requires your student if in `STUDENT_ID`: make sure to commit and push it. Don't forget to commit all your lab solutions and manifests as well!
+> [!NOTE]
+> This repo is set up to automatically run the test suite at GitHub and report the result in a small status check: a green check mark if all tests (homework+labs) pass, a little red cross if not. This requires your student if in `STUDENT_ID`: make sure to commit and push it. Don't forget to commit all your lab solutions and manifests as well!
 
 ## Clean up
 

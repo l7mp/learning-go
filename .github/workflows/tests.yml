@@ -8,12 +8,12 @@ name: Tests
 # of the template, not a broken build.
 
 on:
-  push:
-    branches:
-      - '**'
-    tags-ignore:
-      - '*'
-  pull_request:
+  # push:
+  #   branches:
+  #     - '**'
+  #   tags-ignore:
+  #     - '*'
+  # pull_request:
   workflow_dispatch:
 
 # Nothing here writes to the repository, and this makes that impossible rather than merely

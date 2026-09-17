@@ -1,17 +1,17 @@
 name: Lint Go codes
 
 on:
-  # push:
-  #   paths:
-  #     - '**.go'
-  #     - 'go.mod'
-  #     - 'go.sum'
-  #   branches:
-  #     - '*'
-  #   tags-ignore:
-  #     - '*'
-  # pull_request:
-  #   branches: [ master ]
+  push:
+    paths:
+      - '**.go'
+      - 'go.mod'
+      - 'go.sum'
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+    branches: [ master ]
   workflow_dispatch:
 
 jobs:

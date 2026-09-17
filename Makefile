@@ -88,7 +88,7 @@ init:
 # generate the README and the test for each exercise
 generate:
 	@for dir in $(EXERCISES); do \
-		(cd $$dir && go run $(CURDIR)/exercises-cli.go generate) || exit 1; \
+		(cd $$dir && go run "$(CURDIR)/exercises-cli.go" generate) || exit 1; \
 	done
 
 # run the tests
@@ -116,7 +116,7 @@ lab-test:
 		echo "       See 99-labs/ci/README.md."; \
 		exit 1; \
 	fi
-	cd 99-labs/ci && LABS_SOURCE=$(CURDIR) go test ./ $(LAB_RUN) -v -count 1 -timeout 60m
+	cd 99-labs/ci && LABS_SOURCE="$(CURDIR)" go test ./ $(LAB_RUN) -v -count 1 -timeout 60m
 
 # clean up generated files
 clean:

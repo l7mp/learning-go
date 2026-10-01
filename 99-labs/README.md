@@ -24,7 +24,7 @@ You can use the testing harness that will execute all lab tests against your run
 instance (don't forget to run `minikube tunnel` and push your images): it will build no images and
 create no cluster, and the tests use whatever `KUBECONFIG` names.
 
-For this purpose, run `LABS_EXTERNAL_CLUSTER=1 LAB=<LAB-ID> make lab test` from the repository
+For this purpose, run `LABS_EXTERNAL_CLUSTER=1 LAB=<LAB-ID> make lab-test` from the repository
 root. For example, `LAB=05` means the 5th lab on resiliency; if you do not set `LAB`, it will test
 *all* labs at once.
 

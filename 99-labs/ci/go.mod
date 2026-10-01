@@ -1,6 +1,6 @@
 module labci
 
-go 1.25.7
+go 1.27
 
 require (
 	github.com/moby/moby/client v0.6.0

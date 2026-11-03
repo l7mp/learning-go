@@ -52,7 +52,6 @@ spec:
   - name: http-kvstore
     port: 8081
     protocol: TCP
-    name: kvstore
 
 ---
 apiVersion: v1

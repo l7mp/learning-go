@@ -39,8 +39,10 @@ You can divide your code into as many files as you like but don't forget to add 
 At any point in time you can test your solutions as follows.
 
 ``` console
-make test
+make exercise-test
 ```
+
+This runs the exercise tests only. `make test` runs the exercise tests and then the lab tests (see below), and `make lab-test` runs only the lab tests.
 
 ### Keep track of repo updates
 
@@ -105,7 +107,7 @@ Labs tasks are located in the [99-labs](99-labs/) folder. The labs give you hand
 Each lab README walks you through the checks by hand, with `kubectl` and Minikube, which is how you are meant to work through them. Once you are done, `make lab-test` builds your container images, brings up a throwaway Kubernetes cluster, deploys your own manifests into it and runs every lab check against them, so you get a single pass or fail. It needs a container engine, and takes a few minutes to run.
 
 ``` console
-make ci-test           # test exercises, then every lab
+make test              # test exercises, then every lab
 make lab-test          # test all the labs
 LAB=05 make lab-test   # test only lab 05
 ```

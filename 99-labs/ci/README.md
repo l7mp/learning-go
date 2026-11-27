@@ -9,7 +9,8 @@ that the result behaves the expected way.
 From the repository root, with a container engine available:
 
 ``` shell
-make ci-test          # test the Go exercises, then the labs
+make test             # test the Go exercises, then the labs
+make exercise-test    # test only the Go exercises
 make lab-test         # test only the labs
 LAB=05 make lab-test  # test only lab 05, while you are working through it
 ```

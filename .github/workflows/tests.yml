@@ -1,6 +1,6 @@
 name: Tests
 
-# Runs what "make ci-test" runs: the Go exercises, then the labs in a real Kubernetes
+# Runs what "make test" runs: the Go exercises, then the labs in a real Kubernetes
 # cluster. In your own fork it tells you whether you are done.
 #
 # The upstream repository ships the exercises and the labs as skeletons and has no student
@@ -28,7 +28,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # The Go exercises, which is what "make test" runs.
+  # The Go exercises, which is what "make exercise-test" runs.
   exercises:
     name: Go exercises
     runs-on: ubuntu-latest
@@ -47,7 +47,7 @@ jobs:
         run: make generate
 
       - name: Run the exercise tests
-        run: make test
+        run: make exercise-test
 
   # The labs proper, which is what "make lab-test" runs: build the images from the lab
   # Dockerfiles, start Kubernetes, deploy the manifests and test against them.

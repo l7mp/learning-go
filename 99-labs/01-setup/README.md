@@ -259,7 +259,7 @@ bin/istioctl verify-install
 
 ## Exercises
 
-The course comes with a set of exercises to practice the basics of Go programming (syntax, type system, concurrency primitives, etc.). The exercises are customized per each student; this is to increase the effort required to copy your solutions from elsewhere. Each exercise is randomly generated from a template using your student id as the random seed, which is supposed to be your student id. Once the exercises are generated, you can start to add your solutions and then run `make test` to check your solutions.
+The course comes with a set of exercises to practice the basics of Go programming (syntax, type system, concurrency primitives, etc.). The exercises are customized per each student; this is to increase the effort required to copy your solutions from elsewhere. Each exercise is randomly generated from a template using your student id as the random seed, which is supposed to be your student id. Once the exercises are generated, you can start to add your solutions and then run `make exercise-test` to check your solutions.
 
 ### Prerequisites
 
@@ -343,7 +343,7 @@ git commit -m 'first exercise solved'
 > git push
 > ```
 
-You can test *all* your solutions from the main directory by issuing `make test`. Currently only the first test will succeed: at the end of the course you should have *all the tests* pass.
+You can test *all* your exercise solutions from the main directory by issuing `make exercise-test`. Currently only the first test will succeed: at the end of the course you should have *all the tests* pass.
 
 ## Labs
 
@@ -352,7 +352,7 @@ Later we will go through all the labs in `99-labs/` and solve each task. We prov
 To run the CI tests locally, first make sure to store student ID in `STUDENT_ID` and then issue:
 
 ``` shell
-make ci-test
+make test
 ```
 
 This will run the homework tests and the lab tests. If all goes well, you should see all tests to pass.

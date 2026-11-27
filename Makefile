@@ -69,7 +69,7 @@ EXERCISES=\
 
 
 # files to be generated
-.PHONY: init check generate test ci-test lab-test clean realclean
+.PHONY: init check generate test exercise-test lab-test clean realclean
 
 # check if STUDENT_ID is set
 check:
@@ -91,10 +91,15 @@ generate:
 		(cd $$dir && go run "$(CURDIR)/exercises-cli.go" generate) || exit 1; \
 	done
 
-# run the tests
-test:
+# run the exercise tests plus the lab tests. The lab tests build the container images from
+# the code in 99-labs/code, bring up a Kubernetes cluster and deploy into it, so they need
+# a container engine; see 99-labs/ci/README.md.
+test: exercise-test lab-test
+
+# run only the exercise tests: every package under EXERCISE_DIRS, and nothing from 99-labs
+exercise-test:
 	export STUDENT_ID=$(STUDENT_ID)
-	go test ./... -v -count 1
+	go test $(addprefix ./,$(addsuffix /...,$(EXERCISE_DIRS))) -v -count 1
 
 # LAB narrows the lab tests to a single lab, e.g. "LAB=02 make lab-test" while you are
 # working through lab 02. Only the applications you have already started are built, so the
@@ -102,11 +107,6 @@ test:
 LAB ?=
 
 LAB_RUN=$(if $(LAB),-run TestLab$(LAB))
-
-# run the exercise tests plus the lab tests. The lab tests build the container images from
-# the code in 99-labs/code, bring up a Kubernetes cluster and deploy into it, so they need
-# a container engine; see 99-labs/ci/README.md.
-ci-test: test lab-test
 
 # run only the lab tests
 lab-test:
